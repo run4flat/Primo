@@ -54,6 +54,7 @@
 #include "Utils.h"
 #include "Printer.h"
 #include "img_conv.h"
+#include "Hummingbird.h"
 
 
 #define USE_MAGICAL_STORAGE 0
@@ -636,6 +637,9 @@ XS(Prima_init)
       register_notifications((PVMT)CWindow);
       register_notifications((PVMT)CApplication);
       register_notifications((PVMT)CPrinter);
+      /* Don't register notifications; Hummingbird is derived from Object,
+       * not Component. */
+      /* register_notifications((PVMT)CHummingbird); */
       prima_init_ok++;
    }
    
@@ -1364,6 +1368,7 @@ XS( boot_Prima)
    register_Application_Class();
    register_Timer_Class();
    register_Printer_Class();
+   register_Hummingbird_Class();
 
    ST(0) = &PL_sv_yes;
    XSRETURN(1);

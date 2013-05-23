@@ -1421,6 +1421,14 @@ sub toggle  {
 	return $i
 }
 
+# class Hummingbird
+package Prima::Hummingbird;
+@Prima::Hummingbird::ISA = qw(Prima::Object);
+
+sub foo {
+	print "Foo!\n";
+}
+
 # class AbstractMenu
 package Prima::AbstractMenu;
 use vars qw(@ISA);
