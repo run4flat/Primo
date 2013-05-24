@@ -18,7 +18,6 @@ include/img.h
 include/img_conv.h
 include/unix/guts.h
 include/unix/queue.h
-include/win32/win32guts.h
 pod/gencls.pod
 pod/Prima/internals.pod
 pod/Prima/Object.pod
@@ -61,13 +60,3 @@ utils/makedoc/Makefile
 utils/p-class.pl
 utils/podview.pl
 utils/tmlink.pl
-win32/apc.c
-win32/clip.c
-win32/cursor.c
-win32/dev.c
-win32/files.c
-win32/global.c
-win32/gp.c
-win32/misc.c
-win32/stock.c
-win32/timers.c
