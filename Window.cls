@@ -28,7 +28,6 @@
 object Prima::Window( Prima::Widget)
 {
    Handle   menu;
-   Font     menuFont;
    ColorSet menuColor;
    int      modal;
    int      modalResult;
@@ -62,9 +61,7 @@ object Prima::Window( Prima::Widget)
    method   int      execute( Handle insertBefore = nilHandle);
    method   Bool     execute_shared( Handle insertBefore = nilHandle);
    method   SV   *   get_client_handle();
-   static   Font     get_default_menu_font( char * dummy = "");
    method   Handle   get_horizon();
-   method   Font     get_menu_font();
    method   int      get_modal();
    method   Handle   get_modal_window( int modalFlag = mtExclusive, Bool next = true);
    c_only   void     handle_event ( PEvent event);
@@ -74,7 +71,6 @@ object Prima::Window( Prima::Widget)
    c_only   Bool     process_accel( int key);
    import   SV *     profile_default ();
    method   void     set( HV * profile);
-   method   void     set_menu_font( Font font);
    c_only   void     update_sys_handle( HV * profile);
    c_only   Bool     validate_owner( Handle * newOwner, HV * profile);
 # private

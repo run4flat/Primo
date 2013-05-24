@@ -63,8 +63,6 @@ Window_init( Handle self, HV * profile)
    my-> menuColorIndex( self, true, ciDisabled,      pget_i( menuDisabledBackColor));
    my-> menuColorIndex( self, true, ciLight3DColor,  pget_i( menuLight3DColor)     );
    my-> menuColorIndex( self, true, ciDark3DColor,   pget_i( menuDark3DColor)      );
-   SvHV_Font( pget_sv( menuFont), &Font_buffer, "Window::init");
-   my-> set_menu_font  ( self, Font_buffer);
    if ( SvTYPE( sv = pget_sv( menuItems)) != SVt_NULL)
       my-> set_menuItems( self, sv);
    my-> set_modalResult( self, pget_i( modalResult));
@@ -138,13 +136,6 @@ void Window_handle_event( Handle self, PEvent event)
    case cmColorChanged:
       if ( event-> gen. source == var-> menu) {
          var-> menuColor[ event-> gen. i] = apc_menu_get_color( var-> menu, event-> gen. i);
-         return;
-      }
-      break;
-   case cmFontChanged:
-      if ( event-> gen. source == var-> menu)
-      {
-         apc_menu_get_font( var-> menu, &var-> menuFont);
          return;
       }
       break;
@@ -465,12 +456,6 @@ void Window_set( Handle self, HV * profile)
    dPROFILE;
    Bool owner_icon = false;
    
-   if ( pexist( menuFont)) {
-      SvHV_Font( pget_sv( menuFont), &Font_buffer, "Window::set");
-      my-> set_menu_font( self, Font_buffer);
-      pdelete( menuFont);
-   }
-
    if ( pexist( owner)) {
       owner_icon = pexist( ownerIcon) ? pget_B( ownerIcon) : my-> get_ownerIcon( self);
       pdelete( ownerIcon);
@@ -580,7 +565,6 @@ Window_menu( Handle self, Bool set, Handle menu)
          for ( i = 0; i < ciMaxId + 1; i++)
            apc_menu_set_color( menu, menuColor[ i], i);
          memcpy( var-> menuColor, menuColor, sizeof( ColorSet));
-         apc_menu_set_font( menu, &var-> menuFont);
       }
    }
    return nilHandle;
@@ -619,27 +603,6 @@ Window_menuColorIndex( Handle self, Bool set, int index, Color color)
    var-> menuColor[ index] = color;
    if ( var-> menu) apc_menu_set_color( var-> menu, color, index);
    return clInvalid;
-}
-
-void
-Window_set_menu_font( Handle self, Font font)
-{
-   apc_font_pick( self, &font, &var-> menuFont);
-   if ( var-> menu) apc_menu_set_font( var-> menu, &var-> menuFont);
-}
-
-Font
-Window_get_menu_font( Handle self)
-{
-   return var-> menuFont;
-}
-
-Font
-Window_get_default_menu_font( char * dummy)
-{
-   Font f;
-   apc_menu_default_font( &f);
-   return f;
 }
 
 Bool

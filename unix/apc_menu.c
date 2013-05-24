@@ -275,9 +275,7 @@ update_menu_window( PMenuSysData XX, PMenuWindow w)
 #ifdef USE_XFT
    {
       PWindow owner = ( PWindow)(PComponent( w-> self)-> owner);
-      const char * encoding = ( XX-> type. popup) ? 
-         owner-> popupFont. encoding :
-         owner-> menuFont. encoding;
+      const char * encoding = owner-> popupFont. encoding;
       xft_map8 = prima_xft_map8( encoding);
    }
 #endif      
@@ -711,9 +709,7 @@ prima_handle_menu_event( XEvent *ev, XWindow win, Handle self)
 #ifdef USE_XFT
       if ( kf-> xft) {
          PWindow owner = ( PWindow)(PComponent( w-> self)-> owner);
-         char * encoding = ( XX-> type. popup) ? 
-            owner-> popupFont. encoding :
-            owner-> menuFont. encoding;
+         char * encoding = owner-> popupFont. encoding;
          draw. xft_map8 = prima_xft_map8( encoding);
          draw. xft_drawable = XftDrawCreate( DISP, win, 
             guts. visual. visual, guts. defaultColormap);
@@ -1507,7 +1503,6 @@ apc_menu_create( Handle self, Handle owner)
           nilHandle, 
           prima_map_color( PWindow(owner)-> menuColor[i], nil), 
           nil);
-   apc_menu_set_font( self, &PWindow(owner)-> menuFont);
    return true;
 }
 
@@ -1813,7 +1808,7 @@ apc_window_set_menu( Handle self, Handle menu)
          | PointerMotionMask;
       attrs. do_not_propagate_mask = attrs. event_mask;
       attrs. win_gravity = NorthWestGravity;
-      y = PWindow(self)-> menuFont. height + MENU_ITEM_GAP * 2;
+      y = MENU_ITEM_GAP * 2;
       M(m)-> w-> w = m-> handle = XCreateWindow( DISP, X_WINDOW, 
          0, 0, 1, 1, 0, CopyFromParent, 
          InputOutput, CopyFromParent, CWWinGravity| CWEventMask, &attrs);
