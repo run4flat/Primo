@@ -152,25 +152,13 @@ Window_execute( Handle self, Handle insertBefore)
 Bool
 Window_execute_shared( Handle self, Handle insertBefore)
 {
-   if ( var-> modal || var-> nextSharedModal) return false;
-   if ( insertBefore &&
-         (( insertBefore == self) ||
-         ( !kind_of( insertBefore, CWindow)) ||
-         ( PWindow( insertBefore)-> modal != mtShared) ||
-         ( CWindow( insertBefore)-> get_horizon( insertBefore) != my-> get_horizon( self))))
-             insertBefore = nilHandle;
-   return apc_window_execute_shared( self, insertBefore);
+   return false;
 }
 
 Bool
 Window_modalHorizon( Handle self, Bool set, Bool modalHorizon)
 {
-   if ( !set)
-      return is_opt( optModalHorizon);
-   if ( is_opt( optModalHorizon) == modalHorizon) return false;
-   my-> cancel_children( self);
-   opt_assign( optModalHorizon, modalHorizon);
-   return modalHorizon;
+   return false;
 }
 
 int
@@ -189,9 +177,7 @@ activate( Handle self, Bool ok)
 Bool
 Window_focused( Handle self, Bool set, Bool focused)
 {
-   if ( set)
-      activate( self, focused);
-   return inherited focused( self, set, focused);
+   return false;
 }
 
 void Window_set( Handle self, HV * profile)
@@ -201,11 +187,7 @@ void Window_set( Handle self, HV * profile)
 static Bool
 icon_notify ( Handle self, Handle child, Handle icon)
 {
-    if ( kind_of( child, CWindow) && (( PWindow) child)-> options. optOwnerIcon) {
-       (( PWindow) child)-> self-> set_icon( child, icon);
-       (( PWindow) child)-> options. optOwnerIcon = 1;
-    }
-    return false;
+   return false;
 }
 
 Handle
@@ -238,46 +220,25 @@ Window_icon( Handle self, Bool set, Handle icon)
 Bool
 Window_mainWindow( Handle self, Bool set, Bool mainWindow)
 {
-   if ( !set)
-      return is_opt( optMainWindow);
-   opt_assign( optMainWindow, mainWindow);
    return false;
 }
 
 Bool
 Window_onTop( Handle self, Bool set, Bool onTop)
 {
-   HV * profile;
-   if ( !set)
-      return apc_window_get_on_top( self);
-   profile = newHV();
-   pset_i( onTop, onTop);
-   my-> set( self, profile);
-   sv_free(( SV *) profile);
-   return true;
+   return false;
 }
 
 Bool
 Window_ownerIcon( Handle self, Bool set, Bool ownerIcon)
 {
-   if ( !set)
-      return is_opt( optOwnerIcon);
-   opt_assign( optOwnerIcon, ownerIcon);
-   if ( is_opt( optOwnerIcon) && var-> owner) {
-      Handle icon = ( var-> owner == application) ?
-         CApplication( application)-> get_icon( application) :
-         CWindow(      var-> owner)-> get_icon( var-> owner);
-      my-> set_icon( self, icon);
-      opt_set( optOwnerIcon);
-   }
    return false;
 }
 
 Bool
 Window_process_accel( Handle self, int key)
 {
-   return var-> modal ? my-> first_that_component( self, (void*)find_accel, &key)
-     : inherited process_accel( self, key);
+   return false;
 }
 
 void  Window_on_execute( Handle self) {}
@@ -357,11 +318,7 @@ Window_rect( Handle self, Bool set, Rect r)
 Bool
 Window_selected( Handle self, Bool set, Bool selected)
 {
-   if (!set)
-      return inherited get_selected( self);
-   activate( self, selected);
-   inherited selected( self, set, selected);
-   return selected;
+   return false;
 }
 
 Point
@@ -376,14 +333,7 @@ Window_size( Handle self, Bool set, Point size)
 Bool
 Window_taskListed( Handle self, Bool set, Bool taskListed)
 {
-   HV * profile;
-   if ( !set)
-      return apc_window_get_task_listed( self);
-   profile = newHV();
-   pset_i( taskListed, taskListed);
-   my-> set( self, profile);
-   sv_free(( SV *) profile);
-   return nilHandle;
+   return false;
 }
 
 
@@ -399,10 +349,7 @@ Window_text( Handle self, Bool set, SV * text)
 Bool
 Window_validate_owner( Handle self, Handle * owner, HV * profile)
 {
-   dPROFILE;
-   *owner = pget_H( owner);
-   if ( *owner != application && !kind_of( *owner, CWidget)) return false;
-   return inherited validate_owner( self, owner, profile);
+   return false;
 }
 
 int

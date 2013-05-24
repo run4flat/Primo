@@ -83,28 +83,13 @@ Application_yield( char * dummy)
 Bool
 Application_begin_paint( Handle self)
 {
-   Bool ok;
-   if ( !CDrawable-> begin_paint( self))
-      return false;
-   if ( !( ok = apc_application_begin_paint( self))) {
-      CDrawable-> end_paint( self);
-      perl_error();
-   }
-   return ok;
+   return false;
 }
 
 Bool
 Application_begin_paint_info( Handle self)
 {
-   Bool ok;
-   if ( is_opt( optInDraw))     return true;
-   if ( !CDrawable-> begin_paint_info( self))
-      return false;
-   if ( !( ok = apc_application_begin_paint_info( self))) {
-      CDrawable-> end_paint_info( self);
-      perl_error();
-   }
-   return ok;
+   return false;
 }
 
 void
@@ -125,8 +110,7 @@ Application_end_paint_info( Handle self)
 Bool
 Application_focused( Handle self, Bool set, Bool focused)
 {
-   if ( set) return false;
-   return inherited focused( self, set, focused);
+   return false;
 }
 
 void Application_bring_to_front( Handle self) {}
@@ -330,11 +314,7 @@ Application_get_hint_widget( Handle self)
 static Bool
 icon_notify ( Handle self, Handle child, Handle icon)
 {
-    if ( kind_of( child, CWindow) && (( PWidget) child)-> options. optOwnerIcon) {
-       CWindow( child)-> set_icon( child, icon);
-       PWindow( child)-> options. optOwnerIcon = 1;
-    }
-    return false;
+   return false;
 }
 
 Handle
@@ -377,9 +357,7 @@ Application_get_active_window( Handle self)
 Bool
 Application_autoClose( Handle self, Bool set, Bool autoClose)
 {
-   if ( !set)
-      return var->  autoClose;
-   return var-> autoClose = autoClose;
+   return false;
 }
 
 SV *
@@ -441,16 +419,13 @@ Application_set_font( Handle self, Font font)
 Bool
 Application_close( Handle self)
 {
-   if ( var->  stage > csNormal) return true;
-   return my-> can_close( self) ? ( apc_application_close( self), true) : false;
+   return false;
 }
 
 Bool
 Application_insertMode( Handle self, Bool set, Bool insMode)
 {
-   if ( !set)
-      return apc_sys_get_insert_mode();
-   return apc_sys_set_insert_mode( insMode);
+   return false;
 }
 
 
@@ -533,9 +508,6 @@ Application_get_hint_font( Handle self)
 Bool
 Application_showHint( Handle self, Bool set, Bool showHint)
 {
-   if ( !set)
-      return inherited showHint( self, set, showHint);
-   opt_assign( optShowHint, showHint);
    return false;
 }
 
@@ -669,9 +641,7 @@ Application_popup_modal( Handle self)
 Bool
 Application_pointerVisible( Handle self, Bool set, Bool pointerVisible)
 {
-   if ( !set)
-      return apc_pointer_get_visible( self);
-   return apc_pointer_set_visible( self, pointerVisible);
+   return false;
 }
 
 Point
@@ -691,18 +661,13 @@ Application_origin( Handle self, Bool set, Point origin)
 Bool
 Application_modalHorizon( Handle self, Bool set, Bool modalHorizon)
 {
-   return true;
+   return false;
 }
 
 Bool
 Application_wantUnicodeInput( Handle self, Bool set, Bool want_ui)
 {
-   if ( !set) return var-> wantUnicodeInput;
-#ifdef PERL_SUPPORTS_UTF8
-   if ( apc_sys_get_value( svCanUTF8_Input)) 
-      var-> wantUnicodeInput = want_ui;
-#endif
-   return 0;
+   return false;
 }
 
 
@@ -715,9 +680,9 @@ Bool   Application_tabStop( Handle self, Bool set, Bool tabStop)       { return 
 Bool   Application_selectable( Handle self, Bool set, Bool selectable) { return false; }
 Handle Application_shape( Handle self, Bool set, Handle mask)          { return nilHandle; }
 Bool   Application_syncPaint( Handle self, Bool set, Bool syncPaint)   { return false; }
-Bool   Application_visible( Handle self, Bool set, Bool visible)       { return true; }
+Bool   Application_visible( Handle self, Bool set, Bool visible)       { return false; }
 Bool   Application_buffered( Handle self, Bool set, Bool buffered)     { return false; }
-Bool   Application_enabled( Handle self, Bool set, Bool enable)        { return true;}
+Bool   Application_enabled( Handle self, Bool set, Bool enable)        { return false; }
 int    Application_growMode( Handle self, Bool set, int flags)         { return 0; }
 Bool   Application_hintVisible( Handle self, Bool set, Bool visible)   { return false; }
 Handle Application_owner( Handle self, Bool set, Handle owner)         { return nilHandle; }
@@ -726,11 +691,11 @@ Bool   Application_ownerBackColor( Handle self, Bool set, Bool ownerBackColor) {
 Bool   Application_ownerFont( Handle self, Bool set, Bool ownerFont)   { return false; }
 Bool   Application_ownerShowHint( Handle self, Bool set, Bool ownerShowHint) { return false; }
 Bool   Application_ownerPalette( Handle self, Bool set, Bool ownerPalette) { return false; }
-Bool   Application_clipOwner( Handle self, Bool set, Bool clipOwner)   { return true; }
+Bool   Application_clipOwner( Handle self, Bool set, Bool clipOwner)   { return false; }
 int    Application_tabOrder( Handle self, Bool set, int tabOrder)      { return 0; }
 SV   * Application_text    ( Handle self, Bool set, SV * text)       { return nilSV; }
 Bool   Application_transparent( Handle self, Bool set, Bool transparent) { return false; }
-Bool   Application_validate_owner( Handle self, Handle * owner, HV * profile) { *owner = nilHandle; return true; }
+Bool   Application_validate_owner( Handle self, Handle * owner, HV * profile) { return false; }
 
 #ifdef __cplusplus
 }

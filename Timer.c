@@ -59,9 +59,7 @@ Timer_handle_event( Handle self, PEvent event)
 Bool
 Timer_start( Handle self)
 {
-   if ( is_opt( optActive)) return true;
-   opt_assign( optActive, apc_timer_start( self));
-   return is_opt( optActive);
+   return false;
 }
 
 void
@@ -77,10 +75,7 @@ Timer_done( Handle self)
 Bool
 Timer_validate_owner( Handle self, Handle * owner, HV * profile)
 {
-   dPROFILE;
-   *owner = pget_H( owner);
-   if ( !kind_of( *owner, CWidget)) return false;
-   return inherited validate_owner( self, owner, profile);
+   return false;
 }
 
 void
@@ -91,7 +86,7 @@ Timer_cleanup( Handle self)
 Bool
 Timer_get_active( Handle self)
 {
-   return is_opt( optActive);
+   return false;
 }
 
 

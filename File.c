@@ -62,14 +62,7 @@ File_cleanup( Handle self)
 Bool
 File_is_active( Handle self, Bool autoDetach)
 {
-   if (!var-> file || SvTYPE( var-> file) != SVt_NULL)
-      return false;
-   if ( !IoIFP( sv_2io( var-> file))) {
-      if ( autoDetach)
-         my-> set_file( self, nilSV);
-      return false;
-   }
-   return true;
+   return false;
 }
 
 void

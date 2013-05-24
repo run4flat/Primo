@@ -79,11 +79,7 @@ Drawable_cleanup( Handle self)
 Bool
 Drawable_begin_paint( Handle self)
 {
-   if ( var-> stage > csFrozen) return false;
-   if ( is_opt( optInDrawInfo)) my-> end_paint_info( self);
-   opt_set( optInDraw);
-   var-> splinePrecision_saved = var-> splinePrecision;
-   return true;
+   return false;
 }
 
 void
@@ -94,12 +90,7 @@ Drawable_end_paint( Handle self)
 Bool
 Drawable_begin_paint_info( Handle self)
 {
-   if ( var-> stage > csFrozen) return false;
-   if ( is_opt( optInDraw))     return true;
-   if ( is_opt( optInDrawInfo)) return false;
-   opt_set( optInDrawInfo);
-   var-> splinePrecision_saved = var-> splinePrecision;
-   return true;
+   return false;
 }
 
 void
@@ -126,56 +117,7 @@ Drawable_font_match( char * dummy, Font * source, Font * dest, Bool pick)
 Bool
 Drawable_font_add( Handle self, Font * source, Font * dest)
 {
-   Bool useHeight = source-> height    != C_NUMERIC_UNDEF;
-   Bool useWidth  = source-> width     != C_NUMERIC_UNDEF;
-   Bool useSize   = source-> size      != C_NUMERIC_UNDEF;
-   Bool usePitch  = source-> pitch     != C_NUMERIC_UNDEF;
-   Bool useStyle  = source-> style     != C_NUMERIC_UNDEF;
-   Bool useDir    = source-> direction != C_NUMERIC_UNDEF;
-   Bool useName   = strcmp( source-> name, C_STRING_UNDEF) != 0;
-   Bool useEnc    = strcmp( source-> encoding, C_STRING_UNDEF) != 0;
-
-   /* assignning values */
-   if ( dest != source) {
-      if ( useHeight) dest-> height    = source-> height;
-      if ( useWidth ) dest-> width     = source-> width;
-      if ( useDir   ) dest-> direction = source-> direction;
-      if ( useStyle ) dest-> style     = source-> style;
-      if ( usePitch ) dest-> pitch     = source-> pitch;
-      if ( useSize  ) dest-> size      = source-> size;
-      if ( useName  ) strcpy( dest-> name, source-> name);
-      if ( useEnc   ) strcpy( dest-> encoding, source-> encoding);
-   }
-
-   /* nulling dependencies */
-   if ( !useHeight && useSize)
-      dest-> height = 0;
-   if ( !useWidth && ( usePitch || useHeight || useName || useSize || useDir || useStyle))
-      dest-> width = 0;
-   if ( !usePitch && ( useStyle || useName || useDir || useWidth))
-      dest-> pitch = fpDefault;
-   if ( useHeight)
-      dest-> size = 0;
-   if ( !useHeight && !useSize && ( dest-> height <= 0 || dest-> height > 16383)) 
-      useSize = 1;
-
-   /* validating entries */
-   if ( dest-> height <= 0) dest-> height = 1;
-      else if ( dest-> height > 16383 ) dest-> height = 16383;
-   if ( dest-> width  <  0) dest-> width  = 1;
-      else if ( dest-> width  > 16383 ) dest-> width  = 16383;
-   if ( dest-> size   <= 0) dest-> size   = 1;
-      else if ( dest-> size   > 16383 ) dest-> size   = 16383;
-   if ( dest-> name[0] == 0)
-      strcpy( dest-> name, "Default");
-   if ( dest-> pitch < fpDefault || dest-> pitch > fpFixed)
-      dest-> pitch = fpDefault;
-   if ( dest-> direction == C_NUMERIC_UNDEF)
-      dest-> direction = 0;
-   if ( dest-> style == C_NUMERIC_UNDEF)
-      dest-> style = 0;
-
-   return useSize && !useHeight;
+   return false;
 }
 
 
@@ -356,27 +298,13 @@ Drawable_width( Handle self, Bool set, int width)
 Bool
 Drawable_put_image_indirect( Handle self, Handle image, int x, int y, int xFrom, int yFrom, int xDestLen, int yDestLen, int xLen, int yLen, int rop)
 {
-   Bool ok;
-   if ( image == nilHandle) return false;
-   if ( xLen == xDestLen && yLen == yDestLen) 
-      ok = apc_gp_put_image( self, image, x, y, xFrom, yFrom, xLen, yLen, rop);
-   else    
-      ok = apc_gp_stretch_image( self, image, x, y, xFrom, yFrom, xDestLen, yDestLen, xLen, yLen, rop);
-   if ( !ok) perl_error();
-   return ok;
+   return false;
 }
 
 Bool
 Drawable_text_out( Handle self, SV * text, int x, int y)
 {
-   Bool ok;
-   STRLEN dlen;
-   char * c_text = SvPV( text, dlen);
-   Bool   utf8 = prima_is_utf8_sv( text);
-   if ( utf8) dlen = utf8_length(( U8*) c_text, ( U8*) c_text + dlen);
-   ok = apc_gp_text_out( self, c_text, x, y, dlen, utf8);
-   if ( !ok) perl_error();
-   return ok;
+   return false;
 }
 
 Point *
@@ -419,33 +347,25 @@ Drawable_polypoints( SV * points, char * procName, int mod, int * n_points)
 static Bool
 polypoints( Handle self, SV * points, char * procName, int mod, Bool (*procPtr)(Handle,int,Point*))
 {
-   int count;
-   Point * p;
-   Bool ret = false;
-   if (( p = Drawable_polypoints( points, procName, mod, &count))) {
-      ret = procPtr( self, count, p);
-      if ( !ret) perl_error();
-      free( p);
-   }
-   return ret;
+   return false;
 }
 
 Bool
 Drawable_polyline( Handle self, SV * points)
 {
-   return polypoints( self, points, "Drawable::polyline", 2, apc_gp_draw_poly);
+   return false;
 }
 
 Bool
 Drawable_lines( Handle self, SV * points)
 {
-   return polypoints( self, points, "Drawable::lines", 4, apc_gp_draw_poly2);
+   return false;
 }
 
 Bool
 Drawable_fillpoly( Handle self, SV * points)
 {
-   return polypoints( self, points, "Drawable::fillpoly", 2, apc_gp_fill_poly);
+   return false;
 }
 
 /*
@@ -640,68 +560,31 @@ TkMakeBezierCurve(
 static Bool
 plot_spline( Handle self, int count, Point * points, Bool fill)
 {
-   Bool ret;
-   int array_size;
-   Point static_array[STATIC_ARRAY_SIZE], *array;
-   
-   array_size = TkMakeBezierCurve( NULL, count, var-> splinePrecision, NULL);
-   if ( array_size >= STATIC_ARRAY_SIZE) {
-      if ( !( array = malloc( array_size * sizeof( Point)))) {
-         warn("Not enough memory");
-         return false;
-      }
-   } else 
-      array = static_array;
-
-   array_size = TkMakeBezierCurve((int*) points, count, var-> splinePrecision, array);
-
-   if ( fill && ( my-> fillpoly == Drawable_fillpoly)) {
-      ret = apc_gp_fill_poly( self, array_size, array);
-      if ( !ret) perl_error();
-   } else if ( !fill && ( my-> polyline == Drawable_polyline)) {
-      ret = apc_gp_draw_poly( self, array_size, array);
-      if ( !ret) perl_error();
-   } else {
-      int i;
-      AV * av = newAV();
-      SV * sv = newRV(( SV*) av);
-      for ( i = 0; i < array_size; i++) {
-         av_push( av, newSViv( array[i]. x));
-         av_push( av, newSViv( array[i]. y));
-      }
-      ret = fill ? 
-         my-> fillpoly( self, sv) :
-         my-> polyline( self, sv);
-      sv_free( sv);
-   }
-
-   if ( array != static_array) free( array);
-   
-   return ret; 
-}  
+   return false;
+}
 
 static Bool
 spline( Handle self, int count, Point * points)
 {
-   return plot_spline( self, count, points, false);
+   return false;
 }
 
 static Bool
 fill_spline( Handle self, int count, Point * points)
 {
-   return plot_spline( self, count, points, true);
+   return false;
 }
 
 Bool
 Drawable_spline( Handle self, SV * points)
 {
-   return polypoints( self, points, "Drawable::spline", 2, spline);
+   return false;
 }
 
 Bool
 Drawable_fill_spline( Handle self, SV * points)
 {
-   return polypoints( self, points, "Drawable::fill_spline", 2, fill_spline);
+   return false;
 }
 
 SV * 
@@ -856,15 +739,7 @@ query_abc_range( Handle self, TextWrapRec * t, unsigned int base)
 static Bool
 precalc_abc_buffer( PFontABC src, float * width, PFontABC dest)
 {
-   int i;
-   if ( !dest) return false;
-   for ( i = 0; i < 256; i++) {
-      width[i] = src[i]. a + src[i]. b + src[i]. c;
-      dest[i]. a = ( src[i]. a < 0) ? - src[i]. a : 0;
-      dest[i]. b = src[i]. b;
-      dest[i]. c = ( src[i]. c < 0) ? - src[i]. c : 0;
-   }
-   return true;
+   return false;
 }
 
 static Bool
@@ -872,35 +747,7 @@ add_wrapped_text( TextWrapRec * t, int start, int utfstart, int end, int utfend,
                   int tildeIndex, int * tildePos, int * tildeLPos, int * tildeLine,
                   char *** lArray, int * lSize)
 {
-   int l = end - start;
-   char *c = nil;
-   if (!( t-> options & twReturnChunks)) {
-      if ( !( c = allocs( l + 1))) return false;
-      memcpy( c, t-> text + start, l);
-      c[ l] = 0;
-   }                                               
-   if ( tildeIndex >= 0 && tildeIndex >= start && tildeIndex < end) {                                               
-      *tildeLine = t-> t_line = t-> count;
-      *tildePos = *tildeLPos = tildeIndex - start;
-      if ( tildeIndex == end - 1) {
-         t-> t_line++;
-         tildeLPos = 0;
-      }
-   }
-   if ( t-> count == *lSize) {
-      char ** n = allocn( char*, *lSize + 16);
-      if ( !n) return false;
-      memcpy( n, *lArray, sizeof( char*) * (*lSize));
-      *lSize += 16;
-      free( *lArray);
-      *lArray = n;
-   }
-   if ( t-> options & twReturnChunks) {
-      (*lArray)[ t-> count++] = INT2PTR(char*,utfstart);
-      (*lArray)[ t-> count++] = INT2PTR(char*,utfend - utfstart);
-   } else
-      (*lArray)[ t-> count++] = c;
-   return true;
+   return false;
 }
    
 char **
@@ -1248,9 +1095,7 @@ Drawable_clipRect( Handle self, Bool set, Rect clipRect)
 Bool
 Drawable_fillWinding( Handle self, Bool set, Bool fillWinding)
 {
-   if (!set) return apc_gp_get_fill_winding( self);
-   apc_gp_set_fill_winding( self, fillWinding);
-   return fillWinding;
+   return false;
 }
 
 int
@@ -1369,17 +1214,13 @@ Drawable_splinePrecision( Handle self, Bool set, int splinePrecision)
 Bool
 Drawable_textOpaque( Handle self, Bool set, Bool opaque)
 {
-   if (!set) return apc_gp_get_text_opaque( self);
-   apc_gp_set_text_opaque( self, opaque);
-   return opaque;
+   return false;
 }
 
 Bool
 Drawable_textOutBaseline( Handle self, Bool set, Bool textOutBaseline)
 {
-   if (!set) return apc_gp_get_text_out_baseline( self);
-   apc_gp_set_text_out_baseline( self, textOutBaseline);
-   return textOutBaseline;
+   return false;
 }
 
 Point

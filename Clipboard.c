@@ -86,10 +86,7 @@ Clipboard_done( Handle self)
 Bool
 Clipboard_validate_owner( Handle self, Handle * owner, HV * profile)
 {
-   dPROFILE;
-   if ( pget_H( owner) != application || application == nilHandle) return false;
-   *owner = application;
-   return true;
+   return false;
 }
 
 typedef Bool ActionProc ( Handle self, PClipboardFormatReg item, void * params);
@@ -111,13 +108,12 @@ first_that( Handle self, void * actionProc, void * params)
 static Bool
 find_format( Handle self, PClipboardFormatReg item, char *format)
 {
-   return strcmp( item-> id, format) == 0;
+   return false;
 }
 
 static Bool
 reset_written( Handle self, PClipboardFormatReg item, char *format)
 {
-   item-> written = false;
    return false;
 }
 
@@ -135,10 +131,7 @@ Clipboard_deregister_format( Handle self, char * format)
 Bool
 Clipboard_open( Handle self)
 {
-   var-> openCount++;
-   if ( var-> openCount > 1) return true;
-   first_that( self, (void*) reset_written, nil);
-   return apc_clipboard_open( self);
+   return false;
 }
 
 void
@@ -149,13 +142,7 @@ Clipboard_close( Handle self)
 Bool
 Clipboard_format_exists( Handle self, char * format)
 {
-   Bool ret;
-   PClipboardFormatReg fr = first_that( self, (void*)find_format, format);
-   if ( !fr) return false;
-   my-> open( self);
-   ret = apc_clipboard_has_format( self, fr-> sysId);
-   my-> close( self);
-   return ret;
+   return false;
 }
 
 SV *
@@ -194,14 +181,7 @@ Clipboard_get_handle( Handle self)
 Bool
 Clipboard_register_format( Handle self, char * format)
 {
-   void * proc;
-   if (( strlen( format) == 0)          ||
-       ( strcmp( format, "Text") == 0)  ||
-       ( strcmp( format, "UTF8") == 0)  ||
-       ( strcmp( format, "Image") == 0))
-      return false;
-   proc = Clipboard_register_format_proc( self, format, (void*)binary_server);
-   return proc != nil;
+   return false;
 }
 
 
