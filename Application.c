@@ -482,35 +482,6 @@ Application_get_scroll_rate( Handle self)
 
 static void hshow( Handle self)
 {
-   PWidget_vmt hintUnder = CWidget( var->  hintUnder);
-   SV * text = hintUnder-> get_hint( var->  hintUnder);
-   Point size  = hintUnder-> get_size( var->  hintUnder);
-   Point s = my-> get_size( self);
-   Point fin = {0,0};
-   Point pos = fin;
-   Point mouse = my-> get_pointerPos( self);
-   Point hintSize;
-   PWidget_vmt hintWidget = CWidget( var->  hintWidget);
-
-   apc_widget_map_points( var-> hintUnder, true, 1, &pos);
-
-   hintWidget-> set_text( var->  hintWidget, text);
-   sv_free( text);
-   hintSize = hintWidget-> get_size( var->  hintWidget);
-
-   fin. x = mouse. x - 16;
-   fin. y = pos. y - hintSize. y - 1;
-   if ( fin. y > mouse. y - hintSize. y - 32) fin. y = mouse. y - hintSize. y - 32;
-
-   if ( fin. x + hintSize. x >= s. x) fin. x = pos. x - hintSize. x;
-   if ( fin. x < 0) fin. x = 0;
-   if ( fin. y + hintSize. y >= s. y) fin. y = pos. y - hintSize. y;
-   if ( fin. y < 0) fin. y = pos. y + size. y + 1;
-   if ( fin. y < 0) fin. y = 0;
-
-   hintWidget-> set_origin( var->  hintWidget, fin);
-   hintWidget-> show( var->  hintWidget);
-   hintWidget-> bring_to_front( var->  hintWidget);
 }
 
 void

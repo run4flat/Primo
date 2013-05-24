@@ -140,33 +140,6 @@ File_remove_notification( Handle self, UV id)
 static void
 File_reset_notifications( Handle self)
 {
-   int i, mask = var-> eventMask2;
-   PList  list;
-   void * ret[ 3];
-   int    cmd[ 3] = { feRead, feWrite, feException};
-
-   if ( var-> eventIDs == nil) {
-      var-> eventMask = var-> eventMask2 & var-> userMask;
-      return;
-   }
-
-   ret[0] = hash_fetch( var-> eventIDs, "Read",      4);
-   ret[1] = hash_fetch( var-> eventIDs, "Write",     5);
-   ret[2] = hash_fetch( var-> eventIDs, "Exception", 9);
-
-   for ( i = 0; i < 3; i++) {
-      if ( ret[i] == nil) continue;
-      list = var-> events + PTR2IV( ret[i]) - 1;
-      if ( list-> count > 0) mask |= cmd[ i];
-   }
-
-   mask &= var-> userMask;
-
-   if ( var-> eventMask != mask) {
-      var-> eventMask = mask;
-      if ( var-> file)
-	 apc_file_change_mask( self);
-   }
 }
 
 #ifdef __cplusplus

@@ -110,10 +110,6 @@ Object_create( char *className, HV * profile)
 static void
 protect_chain( Handle self, int direction)
 {
-   while ( self) {
-      var-> destroyRefCount += direction;
-      self = var-> owner;
-   }
 }
 
 void

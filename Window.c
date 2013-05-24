@@ -184,13 +184,6 @@ Window_modalResult ( Handle self, Bool set, int modalResult)
 static void
 activate( Handle self, Bool ok)
 {
-   if ( var-> stage == csNormal) {
-      if ( ok)
-         apc_window_activate( self);
-      else
-         if ( apc_window_is_active( self))
-            apc_window_activate( nilHandle);
-   }
 }
 
 Bool

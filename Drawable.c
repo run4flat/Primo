@@ -64,18 +64,6 @@ Drawable_init( Handle self, HV * profile)
 static void
 clear_font_abc_caches( Handle self)
 {
-   PList u;
-   if (( u = var-> font_abc_unicode)) {
-      int i;
-      for ( i = 0; i < u-> count; i += 2) 
-         free(( void*) u-> items[ i + 1]);
-      plist_destroy( u);
-      var-> font_abc_unicode = nil;
-   } 
-   if ( var-> font_abc_ascii) {
-      free( var-> font_abc_ascii);
-      var-> font_abc_ascii = nil;
-   }
 }
 
 void
@@ -490,19 +478,6 @@ TkBezierScreenPoints(
 					 * generate.  */
     register Point *xPointPtr)		/* Where to put new points. */
 {
-    int i;
-    double u, u2, u3, t, t2, t3;
-
-    for (i = 1; i <= numSteps; i++, xPointPtr++) {
-	t = ((double) i)/((double) numSteps);
-	t2 = t*t;
-	t3 = t2*t;
-	u = 1.0 - t;
-	u2 = u*u;
-	u3 = u2*u;
-	xPointPtr-> x =	control[0]*u3 + 3.0 * (control[2]*t*u2 + control[4]*t2*u) + control[6]*t3;
-	xPointPtr-> y =	control[1]*u3 + 3.0 * (control[3]*t*u2 + control[5]*t2*u) + control[7]*t3;
-    }
 }
 
 /*

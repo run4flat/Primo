@@ -343,16 +343,6 @@ Widget_next( Handle self)
 static void 
 fill_tab_candidates( PList list, Handle level)
 {
-   int i;
-   PList w = &(PWidget( level)-> widgets);
-   for ( i = 0; i < w-> count; i++) {
-      Handle x = w-> items[i];
-      if ( CWidget( x)-> get_visible( x) && CWidget( x)-> get_enabled( x)) {
-         if ( CWidget( x)-> get_selectable( x) && CWidget( x)-> get_tabStop( x))
-            list_add( list, x);
-         fill_tab_candidates( list, x);
-      }
-   }   
 }
 
 Handle 

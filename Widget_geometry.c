@@ -79,21 +79,6 @@ pack Handle fields:
 static void
 geometry_reset( Handle self, int geometry)
 {
-   if ( !self) return;
-
-   if ( 
-         (var-> geometry == gtGrowMode) &&
-         (var-> growMode & gmCenter) &&
-         ( geometry == gtGrowMode || geometry < 0)
-      ) {
-      my-> set_centered( self, var-> growMode & gmXCenter, var-> growMode & gmYCenter);
-   }
-
-   if ( geometry == gtPack || geometry < 0)
-       Widget_pack_slaves( self);
-   
-   if ( geometry == gtPlace || geometry < 0)
-       Widget_place_slaves( self);
 }
 
 int
@@ -184,8 +169,6 @@ Widget_packPropagate( Handle self, Bool set, Bool propagate)
 void
 Widget_reset_children_geometry( Handle self)
 {
-   Widget_pack_slaves( self);
-   Widget_place_slaves( self);
 }
 
 /* checks if Handle in is allowed to be a master for self -
@@ -504,199 +487,6 @@ YExpansion(slavePtr, cavityHeight)
 void
 Widget_pack_slaves( Handle self)
 {
-    PWidget masterPtr, slavePtr;
-    int cavityX, cavityY, cavityWidth, cavityHeight;
-				/* These variables keep track of the
-				 * as-yet-unallocated space remaining in
-				 * the middle of the parent window. */
-    int frameX, frameY, frameWidth, frameHeight;
-				/* These variables keep track of the frame
-				 * allocated to the current window. */
-    int x, y, width, height;	/* These variables are used to hold the
-				 * actual geometry of the current window. */
-    int maxWidth, maxHeight, tmp;
-    int borderX, borderY;
-    Point size;
-
-    if ( var-> stage > csNormal) return;
-
-    /*
-     * If the parent has no slaves anymore, then don't do anything
-     * at all:  just leave the parent's size as-is.
-     */
-
-    if (!( masterPtr = ( PWidget) var-> packSlaves)) return;
-
-    /*
-     * Pass #1: scan all the slaves to figure out the total amount
-     * of space needed.  Two separate width and height values are
-     * computed:
-     *
-     * width -		Holds the sum of the widths (plus padding) of
-     *			all the slaves seen so far that were packed LEFT
-     *			or RIGHT.
-     * height -		Holds the sum of the heights (plus padding) of
-     *			all the slaves seen so far that were packed TOP
-     *			or BOTTOM.
-     *
-     * maxWidth -	Gradually builds up the width needed by the master
-     *			to just barely satisfy all the slave's needs.  For
-     *			each slave, the code computes the width needed for
-     *			all the slaves so far and updates maxWidth if the
-     *			new value is greater.
-     * maxHeight -	Same as maxWidth, except keeps height info.
-     */
-
-    width = height = maxWidth = maxHeight = 0;
-    for (slavePtr=masterPtr; slavePtr != NULL; 
-         slavePtr = ( PWidget) slavePtr-> geomInfo. next) {
-	if ((slavePtr-> geomInfo. side == TOP) || (slavePtr-> geomInfo. side == BOTTOM)) {
-	    tmp = slave_width( slavePtr, width);
-	    if (tmp > maxWidth) maxWidth = tmp;
-	    height += slave_height(slavePtr,0);
-	} else {
-	    tmp = slave_height(slavePtr, height);
-	    if (tmp > maxHeight) maxHeight = tmp;
-	    width += slave_width(slavePtr,0);
-	}
-    }
-    if (width > maxWidth) {
-	maxWidth = width;
-    }
-    if (height > maxHeight) {
-	maxHeight = height;
-    }
-
-    /*
-     * If the total amount of space needed in the parent window has
-     * changed, and if we're propagating geometry information, then
-     * notify the next geometry manager up and requeue ourselves to
-     * start again after the parent has had a chance to
-     * resize us.
-     */
-
-    if ((((maxWidth != my-> get_geomWidth(self)))
-	    || (maxHeight != my-> get_geomHeight(self)))
-	    && is_opt( optPackPropagate)) {
-        Point p, oldsize;
-        p. x = maxWidth;
-        p. y = maxHeight;
-	oldsize = my-> get_size( self);
-        my-> set_geomSize( self, p);
-	size = my-> get_size( self);
-	/* if size didn't change, that means, that no cmSize came, and thus
-	   the actual repacking of slaves never took place */
-	if ( oldsize. x != size. x || oldsize. y != size. y)
-	    return;
-    } else {
-	size = my-> get_size( self);
-    }
-
-    /*
-     * Pass #2: scan the slaves a second time assigning
-     * new sizes.  The "cavity" variables keep track of the
-     * unclaimed space in the cavity of the window;  this
-     * shrinks inward as we allocate windows around the
-     * edges.  The "frame" variables keep track of the space
-     * allocated to the current window and its frame.  The
-     * current window is then placed somewhere inside the
-     * frame, depending on anchor.
-     */
-
-    cavityX = cavityY = x = y = 0;
-    cavityWidth = size. x;
-    cavityHeight = size. y;
-    for ( slavePtr=masterPtr; slavePtr != NULL; slavePtr = ( PWidget) slavePtr-> geomInfo. next) {
-	if ((slavePtr-> geomInfo. side == TOP) || (slavePtr-> geomInfo. side == BOTTOM)) {
-	    frameWidth = cavityWidth;
-	    frameHeight = slave_height(slavePtr,0);
-	    if (slavePtr-> geomInfo. expand)
-		frameHeight += YExpansion(slavePtr, cavityHeight);
-	    cavityHeight -= frameHeight;
-	    if (cavityHeight < 0) {
-		frameHeight += cavityHeight;
-		cavityHeight = 0;
-	    }
-	    frameX = cavityX;
-	    if (slavePtr-> geomInfo. side == BOTTOM) {
-		frameY = cavityY;
-		cavityY += frameHeight;
-	    } else {
-		frameY = cavityY + cavityHeight;
-	    }
-	} else {
-	    frameHeight = cavityHeight;
-	    frameWidth = slave_width(slavePtr,0);
-	    if (slavePtr->  geomInfo. expand)
-		frameWidth += XExpansion(slavePtr, cavityWidth);
-	    cavityWidth -= frameWidth;
-	    if (cavityWidth < 0) {
-		frameWidth += cavityWidth;
-		cavityWidth = 0;
-	    }
-	    frameY = cavityY;
-	    if (slavePtr-> geomInfo. side == LEFT) {
-		frameX = cavityX;
-		cavityX += frameWidth;
-	    } else {
-		frameX = cavityX + cavityWidth;
-	    }
-	}
-
-	/*
-	 * Now that we've got the size of the frame for the window,
-	 * compute the window's actual size and location using the
-	 * fill, padding, and frame factors.  
-	 */
-
-	borderX = slavePtr-> geomInfo. pad.x;
-	borderY = slavePtr-> geomInfo. pad.y;
-	width = slavePtr->  geomSize. x + slavePtr-> geomInfo. ipad.x;
-	if (slavePtr->  geomInfo. fillx || (width > (frameWidth - borderX))) 
-	    width = frameWidth - borderX;
-	height = slavePtr->  geomSize. y + slavePtr-> geomInfo. ipad.y;
-	if (slavePtr->  geomInfo. filly || (height > (frameHeight - borderY))) 
-	    height = frameHeight - borderY;
-	borderX /= 2;
-	borderY /= 2;
-        if ( width < slavePtr-> sizeMin.x) width = slavePtr-> sizeMin.x;
-        if ( height < slavePtr-> sizeMin.y) height = slavePtr-> sizeMin.y;
-        if ( width > slavePtr-> sizeMax.x) width = slavePtr-> sizeMax.x;
-        if ( height > slavePtr-> sizeMax.y) height = slavePtr-> sizeMax.y;
-	switch (slavePtr-> geomInfo. anchorx) {
-        case WEST:
-           x = frameX + borderX;
-           break;
-        case CENTER:
-           x = frameX + (frameWidth - width)/2;
-           break;
-        case EAST:
-           x = frameX + frameWidth - width - borderX;
-           break;
-        }
-	switch (slavePtr-> geomInfo. anchory) {
-        case SOUTH:
-           y = frameY + borderY;
-           break;
-        case CENTER:
-           y = frameY + (frameHeight - height)/2;
-           break;
-        case NORTH:
-           y = frameY + frameHeight - height - borderY;
-           break;
-        }
-
-        {
-           Rect r;
-           r. left   = x;
-           r. bottom = y;
-           r. right  = x + width;
-           r. top    = y + height;
-
-           /* printf("%s: %d %d %d %d\n", slavePtr-> name, x, r.bottom, width, r.top); */
-           slavePtr-> self-> set_rect(( Handle) slavePtr, r);
-        }
-    }
 }
 
 /* applies pack parameters and enters pack slaves chain */
@@ -704,86 +494,12 @@ Widget_pack_slaves( Handle self)
 void
 Widget_pack_enter( Handle self)
 {
-   Handle master, ptr;
-
-   /* see if leftover object references are alive */
-   if ( var-> geomInfo. order && 
-        !hash_fetch( primaObjects, &var-> geomInfo. order, sizeof(Handle))) {
-      var-> geomInfo. order = nilHandle;
-      var-> geomInfo. after = 0;
-   }
-   if ( var-> geomInfo. in) {
-      if ( hash_fetch( primaObjects, &var-> geomInfo. in, sizeof(Handle))) 
-         var-> geomInfo. in = Widget_check_in( self, var-> geomInfo. in, false);
-      else
-         var-> geomInfo. in = nilHandle;
-   }
-
-   /* store into slaves list */
-   master = (( var-> geomInfo. in) ? var-> geomInfo. in : var-> owner);
-
-   if ( PWidget( master)-> packSlaves) {
-      /* insert into list using 'order' marker */
-      ptr = PWidget( master)-> packSlaves;
-      if ( ptr != var-> geomInfo. order) {
-         Handle optr = ptr;
-         Bool inserted = false;
-         while ( ptr) {
-            if ( ptr == var-> geomInfo. order) {
-               if ( var-> geomInfo. after) {
-                  var-> geomInfo. next = PWidget( ptr)-> geomInfo. next;
-                  PWidget( ptr)-> geomInfo. next = self;
-               } else {
-                  var-> geomInfo. next = ptr;
-                  PWidget( optr)-> geomInfo. next = self;
-               }
-               inserted = true;
-               break;
-            }
-            optr = ptr;
-            ptr = PWidget( ptr)-> geomInfo. next;
-         }
-         if ( !inserted) PWidget( optr)-> geomInfo. next = self;
-      } else {
-         /* order is first in list */
-         if ( var-> geomInfo. after) {
-            var-> geomInfo. next = PWidget( ptr)-> geomInfo. next;
-            PWidget( ptr)-> geomInfo. next = self;
-         } else {
-            var-> geomInfo. next = ptr;
-            PWidget( master)-> packSlaves = self;
-         }
-      }
-   } else { /* master has no slaves, we're first */
-      PWidget( master)-> packSlaves = self;
-   }
 }
 
 /* removes widget from list of pack slaves */
 void
 Widget_pack_leave( Handle self)
 {
-   Handle ptr, master;
-
-   master = (( var-> geomInfo. in) ? var-> geomInfo. in : var-> owner);
-
-   if ( master) {
-      if (( ptr = PWidget( master)-> packSlaves) != self) {
-         if ( ptr) {
-            while ( PWidget(ptr)-> geomInfo. next) {
-               if ( PWidget(ptr)-> geomInfo. next == self) {
-                  PWidget(ptr)-> geomInfo. next = var-> geomInfo. next;
-                  break;
-               }
-               ptr = PWidget(ptr)-> geomInfo. next;
-            }
-         }
-      } else {
-         PWidget( master)-> packSlaves = var-> geomInfo. next;
-      }
-   }
-
-   var-> geomInfo. next = nilHandle;
 }
 
 SV * 
@@ -987,8 +703,8 @@ XS( Widget_get_pack_slaves_FROMPERL)
 }
 
 
-void Widget_get_pack_slaves          ( Handle self) { warn("Invalid call of Widget::get_pack_slaves"); }
-void Widget_get_pack_slaves_REDEFINED( Handle self) { warn("Invalid call of Widget::get_pack_slaves"); }
+void Widget_get_pack_slaves          ( Handle self) {}
+void Widget_get_pack_slaves_REDEFINED( Handle self) {}
 
 /* 
   PLACE   
@@ -998,174 +714,17 @@ void Widget_get_pack_slaves_REDEFINED( Handle self) { warn("Invalid call of Widg
 void
 Widget_place_enter( Handle self)
 {
-   Handle master, ptr;
-
-   /* see if leftover object references are alive */
-   if ( var-> geomInfo. in) {
-      if ( hash_fetch( primaObjects, &var-> geomInfo. in, sizeof(Handle))) 
-         var-> geomInfo. in = Widget_check_in( self, var-> geomInfo. in, false);
-      else
-         var-> geomInfo. in = nilHandle;
-   }
-
-   /* store into slaves list */
-   master = (( var-> geomInfo. in) ? var-> geomInfo. in : var-> owner);
-
-   if ( PWidget( master)-> placeSlaves) {
-      /* append to the end of list  */
-      if (( ptr = PWidget( master)-> placeSlaves)) {
-         while ( PWidget( ptr)-> geomInfo. next) 
-            ptr = PWidget( ptr)-> geomInfo. next;
-         PWidget( ptr)-> geomInfo. next = self;
-      } else {
-         /* first in list */
-         var-> geomInfo. next = ptr;
-         PWidget( master)-> placeSlaves = self;
-      }
-   } else { /* master has no slaves, we're first */
-      PWidget( master)-> placeSlaves = self;
-   }
 }
 
 /* removes widget from list of place slaves */
 void
 Widget_place_leave( Handle self)
 {
-   Handle ptr, master;
-
-   master = (( var-> geomInfo. in) ? var-> geomInfo. in : var-> owner);
-
-   if ( master) {
-      if (( ptr = PWidget( master)-> placeSlaves) != self) {
-         if ( ptr) {
-            while ( PWidget(ptr)-> geomInfo. next) {
-               if ( PWidget(ptr)-> geomInfo. next == self) {
-                  PWidget(ptr)-> geomInfo. next = var-> geomInfo. next;
-                  break;
-               }
-               ptr = PWidget(ptr)-> geomInfo. next;
-            }
-         }
-      } else {
-         PWidget( master)-> placeSlaves = var-> geomInfo. next;
-      }
-   }
-
-   var-> geomInfo. next = nilHandle;
 }
 
 void
 Widget_place_slaves( Handle self)
 {
-    PWidget slave, master;
-    int x, y, width, height, tmp;
-    int masterWidth, masterHeight;
-    double x1, y1, x2, y2;
-    Point size;
-
-
-    /*
-     * Iterate over all the slaves for the master.  Each slave's
-     * geometry can be computed independently of the other slaves.
-     */
-
-    if (!( master = ( PWidget) var-> placeSlaves)) return;
-    size = my-> get_size( self);
-    masterWidth  = size. x; 
-    masterHeight = size. y; 
-    
-    for (slave=master; slave != NULL; 
-         slave = ( PWidget) slave-> geomInfo. next) {
-       Point sz;
-       register GeomInfo* slavePtr = &slave-> geomInfo;
-       
-       sz = slave-> self-> get_size(( Handle) slave);
-        
-	/*
-	 * Step 2:  compute size of slave (outside dimensions including
-	 * border) and location of anchor point within master.
-	 */
-
-	x1 = slavePtr->x + (slavePtr->relX*masterWidth);
-	x = (int) (x1 + ((x1 > 0) ? 0.5 : -0.5));
-	y1 = slavePtr->y + (slavePtr->relY*masterHeight);
-	y = (int) (y1 + ((y1 > 0) ? 0.5 : -0.5));
-	if (slavePtr-> use_w || slavePtr-> use_rw) {
-	    width = 0;
-	    if (slavePtr-> use_w) {
-		width += slave->geomSize.x;
-	    }
-	    if (slavePtr-> use_rw) {
-		/*
-		 * The code below is a bit tricky.  In order to round
-		 * correctly when both relX and relWidth are specified,
-		 * compute the location of the right edge and round that,
-		 * then compute width.  If we compute the width and round
-		 * it, rounding errors in relX and relWidth accumulate.
-		 */
-
-		x2 = x1 + (slavePtr->relWidth*masterWidth);
-		tmp = (int) (x2 + ((x2 > 0) ? 0.5 : -0.5));
-		width += tmp - x;
-	    }
-	} else {
-	    width = sz. x;
-	}
-	if (slavePtr-> use_h || slavePtr-> use_rh) {
-	    height = 0;
-	    if (slavePtr->use_h) {
-		height += slave->geomSize. y;
-	    }
-	    if (slavePtr->use_rh) {
-		/*
-		 * See note above for rounding errors in width computation.
-		 */
-
-		y2 = y1 + (slavePtr->relHeight*masterHeight);
-		tmp = (int) (y2 + ((y2 > 0) ? 0.5 : -0.5));
-		height += tmp - y;
-	    }
-	} else {
-	    height = sz. y;
-	}
-
-	/*
-	 * Step 3: adjust the x and y positions so that the desired
-	 * anchor point on the slave appears at that position.  Also
-	 * adjust for the border mode and master's border.
-	 */
-	switch (slavePtr-> anchorx) {
-        case WEST:
-           break;
-        case CENTER:
-           x -= width/2;
-           break;
-        case EAST:
-	   x -= width;
-           break;
-        }
-	switch (slavePtr-> anchory) {
-        case NORTH:
-           y -= height;
-           break;
-        case CENTER:
-	   y -= height/2;
-           break;
-        case SOUTH:
-           break;
-        }
-
-        {
-           Rect r;
-           r. left   = x;
-           r. bottom = y;
-           r. right  = x + width;
-           r. top    = y + height;
-            
-           /* printf("%s: %d %d %d %d\n", slave-> name, x, y, width, height); */
-           slave-> self-> set_rect(( Handle) slave, r);
-        }
-    }
 }
 
 
@@ -1336,8 +895,8 @@ XS( Widget_get_place_slaves_FROMPERL)
    return;
 }
 
-void Widget_get_place_slaves          ( Handle self) { warn("Invalid call of Widget::get_place_slaves"); }
-void Widget_get_place_slaves_REDEFINED( Handle self) { warn("Invalid call of Widget::get_place_slaves"); }
+void Widget_get_place_slaves          ( Handle self) {}
+void Widget_get_place_slaves_REDEFINED( Handle self) {}
 
 /*  */
 

@@ -82,18 +82,6 @@ Image_stretch( Handle self, int width, int height)
 static void
 Image_reset_sv( Handle self, int new_type, SV * palette, Bool triplets)
 {
-   int colors;
-   RGBColor pal_buf[256], *pal_ptr;
-   if ( !palette || palette == nilSV) {
-      pal_ptr = nil;
-      colors  = 0;
-   } else if ( SvROK( palette) && ( SvTYPE( SvRV( palette)) == SVt_PVAV)) {
-      colors = apc_img_read_palette( pal_ptr = pal_buf, palette, triplets);
-   } else {
-      pal_ptr = nil;
-      colors  = SvIV( palette); 
-   }
-   my-> reset( self, new_type, pal_ptr, colors);
 }
 
 void
@@ -1097,21 +1085,6 @@ Image_remove_notification( Handle self, UV id)
 static void
 Image_reset_notifications( Handle self)
 {
-   int i;
-   PList  list;
-   void * ret[ 2];
-   int    cmd[ 2] = { IMG_EVENTS_HEADER_READY, IMG_EVENTS_DATA_READY };
-   var-> eventMask2 = var-> eventMask1;
-   if ( var-> eventIDs == nil) return;
-
-   ret[0] = hash_fetch( var-> eventIDs, "HeaderReady", 11);
-   ret[1] = hash_fetch( var-> eventIDs, "DataReady",   9);
-
-   for ( i = 0; i < 2; i++) {
-      if ( ret[i] == nil) continue;
-      list = var-> events + PTR2IV( ret[i]) - 1;
-      if ( list-> count > 0) var-> eventMask2 |= cmd[ i];
-   }
 }
 
 #ifdef __cplusplus

@@ -124,22 +124,7 @@ reset_written( Handle self, PClipboardFormatReg item, char *format)
 void *
 Clipboard_register_format_proc( Handle self, char * format, void * serverProc)
 {
-   PClipboardFormatReg list = first_that( self, (void*)find_format, format);
-   if ( list) {
-      my-> deregister_format( self, format);
-   }
-   if (!( list = allocn( ClipboardFormatReg, formatCount + 1)))
-      return nil;
-   if ( formats != nil) {
-      memcpy( list, formats, sizeof( ClipboardFormatReg) * formatCount);
-      free( formats);
-   }
-   formats = list;
-   list += formatCount++;
-   list-> id     = duplicate_string( format);
-   list-> server = ( ClipboardExchangeFunc *) serverProc;
-   list-> sysId  = ( Handle) list-> server( self, list, cefInit, nilSV);
-   return list;
+   return nil;
 }
 
 void
