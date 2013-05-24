@@ -44,7 +44,6 @@ extern "C" {
 void
 Menu_update_sys_handle( Handle self, HV * profile)
 {
-   return;
 }
 
 Bool

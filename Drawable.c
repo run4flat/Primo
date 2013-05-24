@@ -59,38 +59,6 @@ extern "C" {
 void
 Drawable_init( Handle self, HV * profile)
 {
-   dPROFILE;
-   inherited init( self, profile);
-   apc_gp_init( self);
-   var-> w = var-> h = 0;
-   my-> set_color        ( self, pget_i ( color));
-   my-> set_backColor    ( self, pget_i ( backColor));
-   my-> set_fillWinding  ( self, pget_B ( fillWinding));
-   my-> set_fillPattern  ( self, pget_sv( fillPattern));
-   my-> set_lineEnd      ( self, pget_i ( lineEnd));
-   my-> set_lineJoin     ( self, pget_i ( lineJoin));
-   my-> set_linePattern  ( self, pget_sv( linePattern));
-   my-> set_lineWidth    ( self, pget_i ( lineWidth));
-   my-> set_region       ( self, pget_H ( region));
-   my-> set_rop          ( self, pget_i ( rop));
-   my-> set_rop2         ( self, pget_i ( rop2));
-   my-> set_textOpaque   ( self, pget_B ( textOpaque));
-   my-> set_textOutBaseline( self, pget_B ( textOutBaseline));
-   my-> set_splinePrecision( self, pget_i ( splinePrecision));
-   if ( pexist( translate))
-   {
-      AV * av = ( AV *) SvRV( pget_sv( translate));
-      Point tr = {0,0};
-      SV ** holder = av_fetch( av, 0, 0);
-      if ( holder) tr.x = SvIV( *holder); else warn("RTC0059: Array panic on 'translate'");
-      holder = av_fetch( av, 1, 0);
-      if ( holder) tr.y = SvIV( *holder); else warn("RTC0059: Array panic on 'translate'");
-      my-> set_translate( self, tr);
-   }
-   SvHV_Font( pget_sv( font), &Font_buffer, "Drawable::init");
-   my-> set_font( self, Font_buffer);
-   my-> set_palette( self, pget_sv( palette));
-   CORE_INIT_TRANSIENT(Drawable);
 }
 
 static void
@@ -113,19 +81,11 @@ clear_font_abc_caches( Handle self)
 void
 Drawable_done( Handle self)
 {
-   clear_font_abc_caches( self);
-   apc_gp_done( self);
-   inherited done( self);
 }
 
 void
 Drawable_cleanup( Handle self)
 {
-   if ( is_opt( optInDrawInfo))
-      my-> end_paint_info( self);
-   if ( is_opt( optInDraw))
-      my-> end_paint( self);
-   inherited cleanup( self);
 }
 
 Bool
@@ -141,9 +101,6 @@ Drawable_begin_paint( Handle self)
 void
 Drawable_end_paint( Handle self)
 {
-   clear_font_abc_caches( self);
-   opt_clear( optInDraw);
-   var-> splinePrecision = var-> splinePrecision_saved;
 }
 
 Bool
@@ -160,41 +117,11 @@ Drawable_begin_paint_info( Handle self)
 void
 Drawable_end_paint_info( Handle self)
 {
-   clear_font_abc_caches( self);
-   opt_clear( optInDrawInfo);
-   var-> splinePrecision = var-> splinePrecision_saved;
 }
 
 void 
 Drawable_set( Handle self, HV * profile)
 {
-   dPROFILE;
-   if ( pexist( font))
-   {
-      SvHV_Font( pget_sv( font), &Font_buffer, "Drawable::set");
-      my-> set_font( self, Font_buffer);
-      pdelete( font);
-   }
-   if ( pexist( translate))
-   {
-      AV * av = ( AV *) SvRV( pget_sv( translate));
-      Point tr = {0,0};
-      SV ** holder = av_fetch( av, 0, 0);
-      if ( holder) tr.x = SvIV( *holder); else warn("RTC0059: Array panic on 'translate'");
-      holder = av_fetch( av, 1, 0);
-      if ( holder) tr.y = SvIV( *holder); else warn("RTC0059: Array panic on 'translate'");
-      my-> set_translate( self, tr);
-      pdelete( translate);
-   }
-   if ( pexist( width) && pexist( height)) {
-      Point size;
-      size. x = pget_i( width);
-      size. y = pget_i( height);
-      my-> set_size( self, size);
-      pdelete( width);
-      pdelete( height);
-   }
-   inherited set( self, profile);
 }
 
 
@@ -1537,9 +1464,6 @@ Drawable_get_font( Handle self)
 void
 Drawable_set_font( Handle self, Font font)
 {
-   clear_font_abc_caches( self);
-   apc_font_pick( self, &font, &var-> font);
-   apc_gp_set_font( self, &var-> font);
 }
 
 

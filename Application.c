@@ -48,199 +48,36 @@ static void Application_HintTimer_handle_event( Handle, PEvent);
 void
 Application_init( Handle self, HV * profile)
 {
-   dPROFILE;
-   int hintPause = pget_i( hintPause);
-   Color hintColor = pget_i( hintColor), hintBackColor = pget_i( hintBackColor);
-   SV * hintFont = pget_sv( hintFont);
-   SV * sv;
-   char * hintClass      = pget_c( hintClass);
-   if ( application != nilHandle) 
-      croak( "RTC0010: Attempt to create more than one application instance");
-
-   CDrawable-> init( self, profile);
-   list_create( &var->  widgets, 16, 16);
-   list_create( &var->  modalHorizons, 0, 8);
-   application = self;
-   if ( !apc_application_create( self))
-      croak( "RTC0011: Error creating application");
-/* Widget init */
-   SvHV_Font( pget_sv( font), &Font_buffer, "Application::init");
-   my-> set_font( self, Font_buffer);
-   SvHV_Font( pget_sv( popupFont), &Font_buffer, "Application::init");
-   my-> set_popup_font( self, Font_buffer);
-   {
-      AV * av = ( AV *) SvRV( pget_sv( designScale));
-      SV ** holder = av_fetch( av, 0, 0);
-      if ( holder)
-         var->  designScale. x = SvNV( *holder);
-      else
-         warn("RTC0012: Array panic on 'designScale'");
-      holder = av_fetch( av, 1, 0);
-      if ( holder)
-         var->  designScale. y = SvNV( *holder);
-      else
-         warn("RTC0012: Array panic on 'designScale'");
-      pdelete( designScale);
-   }
-   var->  text = duplicate_string("");
-   opt_set( optModalHorizon);
-
-   /* store extra info */
-   {
-      HV * hv = ( HV *) SvRV( var-> mate);
-      (void) hv_store( hv, "HelpClass",     9,  newSVpv( pget_c( helpClass),     0), 0);
-      (void) hv_store( hv, "HelpModule",    10, newSVpv( pget_c( helpModule),    0), 0);
-   }
-
-   {
-      HV * profile = newHV();
-      static Timer_vmt HintTimerVmt;
-
-      pset_H( owner, self);
-      pset_i( timeout, hintPause);
-      pset_c( name, "HintTimer");
-      var->  hintTimer = create_instance( "Prima::Timer");
-      protect_object( var-> hintTimer);
-      hv_clear( profile);
-      memcpy( &HintTimerVmt, CTimer, sizeof( HintTimerVmt));
-      HintTimerVmt. handle_event = Application_HintTimer_handle_event;
-      (( PTimer) var->  hintTimer)-> self = &HintTimerVmt;
-
-      pset_H( owner, self);
-      pset_i( color, hintColor);
-      pset_i( backColor, hintBackColor);
-      pset_i( visible, 0);
-      pset_i( selectable, 0);
-      pset_i( showHint, 0);
-      pset_c( name, "HintWidget");
-      pset_sv( font, hintFont);
-      var->  hintWidget = create_instance( hintClass);
-      protect_object( var->  hintWidget);
-      sv_free(( SV *) profile);
-   }
-
-   if ( SvTYPE( sv = pget_sv( accelItems)) != SVt_NULL)
-      my-> set_accelItems( self, sv);
-   if ( SvTYPE( sv = pget_sv( popupItems)) != SVt_NULL)
-      my-> set_popupItems( self, sv);
-   pdelete( accelTable);
-   pdelete( accelItems);
-   pdelete( popupItems);
-
-   my-> set( self, profile);
-   CORE_INIT_TRANSIENT(Application);
 }
 
 void
 Application_done( Handle self)
 {
-   if ( self != application) return;
-   unprotect_object( var-> hintTimer);
-   unprotect_object( var-> hintWidget);
-   list_destroy( &var->  modalHorizons);
-   list_destroy( &var->  widgets);
-   free( var-> text);
-   free( var-> hint);
-   free( var-> helpContext);
-   var-> accelTable = var-> hintWidget = var-> hintTimer = nilHandle;
-   var-> text = var->  hint = var-> helpContext = nil;
-   apc_application_destroy( self);
-   CDrawable-> done( self);
-   application = nilHandle;
 }
 
 void
 Application_cleanup( Handle self)
 {
-   int i;
-
-   for ( i = 0; i < var-> widgets. count; i++)
-      Object_destroy( var-> widgets. items[i]);
-      
-   if ( var-> icon)
-      my-> detach( self, var-> icon, true);
-   var-> icon = nilHandle;
-
-   my-> first_that_component( self, (void*)kill_all, nil);
-
-   CDrawable-> cleanup( self);
 }
 
 
 void
 Application_set( Handle self, HV * profile)
 {
-   pdelete( bottom);
-   pdelete( buffered);
-   pdelete( capture);
-   pdelete( centered);
-   pdelete( clipOwner);
-   pdelete( enabled);
-   pdelete( focused);
-   pdelete( geometry);
-   pdelete( geomHeight);
-   pdelete( geomSize);
-   pdelete( geomWidth);
-   pdelete( growMode);
-   pdelete( height);
-   pdelete( hintClass);
-   pdelete( hintVisible);
-   pdelete( left);
-   pdelete( modalHorizon);
-   pdelete( origin);
-   pdelete( owner);
-   pdelete( ownerBackColor);
-   pdelete( ownerColor);
-   pdelete( ownerFont);
-   pdelete( ownerPalette);
-   pdelete( ownerShowHint);
-   pdelete( palette);
-   pdelete( pack);
-   pdelete( place);
-   pdelete( helpClass);
-   pdelete( helpModule);
-   pdelete( rect);
-   pdelete( rigth);
-   pdelete( selectable);
-   pdelete( shape);
-   pdelete( size);
-   pdelete( syncPaint);
-   pdelete( tabOrder);
-   pdelete( tabStop);
-   pdelete( transparent);
-   pdelete( text);
-   pdelete( top);
-   pdelete( visible);
-   pdelete( width);
-   inherited set( self, profile);
 }
 
 void Application_handle_event( Handle self, PEvent event)
 {
-   switch ( event-> cmd)
-   {
-      case cmPost:
-      if ( event-> gen. H != self)
-      {
-         ((( PComponent) event-> gen. H)-> self)-> message( event-> gen. H, event);
-         event-> cmd = 0;
-         if ( var->  stage > csNormal) return;
-      }
-      break;
-   }
-   inherited handle_event ( self, event);
 }
 
 void
 Application_sync( char * dummy)
 {
-   apc_application_sync();
 }
 
 void
 Application_yield( char * dummy)
 {
-   apc_application_yield();
 }
 
 Bool
@@ -273,28 +110,16 @@ Application_begin_paint_info( Handle self)
 void
 Application_detach( Handle self, Handle objectHandle, Bool kill)
 {
-   inherited detach( self, objectHandle, kill);
-   if ( var->  autoClose &&
-        ( var->  widgets. count == 1) &&
-        kind_of( objectHandle, CWidget) &&
-        ( objectHandle != var->  hintWidget)
-       ) my-> close( self);
 }
 
 void
 Application_end_paint( Handle self)
 {
-   if ( !is_opt( optInDraw)) return;
-   apc_application_end_paint( self);
-   CDrawable-> end_paint( self);
 }
 
 void
 Application_end_paint_info( Handle self)
 {
-   if ( !is_opt( optInDrawInfo)) return;
-   apc_application_end_paint_info( self);
-   CDrawable-> end_paint_info( self);
 }
 
 Bool
@@ -610,9 +435,6 @@ Application_colorIndex( Handle self, Bool set, int index, Color color)
 void
 Application_set_font( Handle self, Font font)
 {
-   if ( !opt_InPaint) my-> first_that( self, (void*)font_notify, &font);
-   apc_font_pick( self, &font, & var-> font);
-   if ( opt_InPaint) apc_gp_set_font ( self, &var-> font);
 }
 
 
@@ -694,71 +516,11 @@ static void hshow( Handle self)
 void
 Application_HintTimer_handle_event( Handle timer, PEvent event)
 {
-   CComponent-> handle_event( timer, event);
-   if ( event-> cmd == cmTimer) {
-      Handle self = application;
-      CTimer(timer)-> stop( timer);
-      if ( var->  hintActive == 1) {
-         Event ev = {cmHint};
-         if (   !var->hintUnder
-             || apc_application_get_widget_from_point( self,
-                   my-> get_pointerPos(self)) != var->hintUnder
-             || PObject( var-> hintUnder)-> stage != csNormal)
-            return;
-         ev. gen. B = true;
-         ev. gen. H = var->  hintUnder;
-         var->  hintVisible = 1;
-         if (( PWidget( var->  hintUnder)-> stage == csNormal) &&
-             ( CWidget( var->  hintUnder)-> message( var->  hintUnder, &ev)))
-             hshow( self);
-      } else if ( var->  hintActive == -1)
-         var->  hintActive = 0;
-   }
 }
 
 void
 Application_set_hint_action( Handle self, Handle view, Bool show, Bool byMouse)
 {
-   if ( show && !is_opt( optShowHint)) return;
-   if ( show)
-   {
-      var->  hintUnder = view;
-      if ( var->  hintActive == -1)
-      {
-         Event ev = {cmHint};
-         ev. gen. B = true;
-         ev. gen. H = view;
-         ((( PTimer) var->  hintTimer)-> self)-> stop( var-> hintTimer);
-         var->  hintVisible = 1;
-         if (( PWidget( view)-> stage == csNormal) &&
-             ( CWidget( view)-> message( view, &ev)))
-             hshow( self);
-      } else {
-         if ( !byMouse && var->  hintActive == 1) return;
-         CTimer( var->  hintTimer)-> start( var-> hintTimer);
-      }
-      var->  hintActive = 1;
-   } else {
-      int oldHA = var->  hintActive;
-      int oldHV = var->  hintVisible;
-      if ( oldHA != -1)
-         ((( PTimer) var-> hintTimer)-> self)-> stop( var-> hintTimer);
-      if ( var->  hintVisible)
-      {
-         Event ev = {cmHint};
-         ev. gen. B = false;
-         ev. gen. H = view;
-         var->  hintVisible = 0;
-         if (( PWidget( view)-> stage != csNormal) ||
-              ( CWidget( view)-> message( view, &ev)))
-            CWidget( var->  hintWidget)-> hide( var->  hintWidget);
-      }
-      if ( oldHA != -1) var->  hintActive = 0;
-      if ( byMouse && oldHV) {
-         var->  hintActive = -1;
-         CTimer( var->  hintTimer)-> start( var->  hintTimer);
-      }
-   }
 }
 
 Color
@@ -788,7 +550,6 @@ Application_hintPause( Handle self, Bool set, int hintPause)
 void
 Application_set_hint_font( Handle self, Font hintFont)
 {
-   CWidget( var-> hintWidget)-> set_font( var->  hintWidget, hintFont);
 }
 
 

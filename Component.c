@@ -47,50 +47,11 @@ typedef ActionProc *PActionProc;
 void
 Component_init( Handle self, HV * profile)
 {
-   dPROFILE;
-   SV * res;
-   HV * hv;
-   HE * he;
-   inherited init( self, profile);
-   if ( !my-> validate_owner( self, &var-> owner, profile)) {
-      var-> stage = csDeadInInit;
-      croak( "Illegal 'owner' reference passed to %s::%s%s", my-> className, "init",
-	     application ? "" : ". Probably you forgot to include 'use Prima::Application' in your code. Error");
-   }
-   if ( var-> owner)
-      ((( PComponent) var-> owner)-> self)-> attach( var-> owner, self);
-   my-> set_name( self, pget_sv( name));
-   my-> set_delegations( self, pget_sv( delegations));
-   var-> evQueue = plist_create( 8, 8);
-   apc_component_create( self);
-
-   res = my-> notification_types( self);
-   hv = ( HV *) SvRV( res);
-   hv_iterinit( hv);
-   while (( he = hv_iternext( hv)) != nil) {
-      char buf[ 1024];
-      SV ** holder;
-      int len = snprintf( buf, 1023, "on%s", HeKEY( he));
-      holder = hv_fetch( profile, buf, len, 0);
-      if ( holder == nil || SvTYPE( *holder) == SVt_NULL) continue;
-      my-> add_notification( self, HeKEY( he), *holder, self, -1);
-   }
-   sv_free( res);
 }
 
 void
 Component_setup( Handle self)
 {
-   Event ev = {cmCreate};
-   ev. gen. source = self;
-   my-> message( self, &ev);
-
-   if ( var-> owner) {   
-      ev. cmd = cmChildEnter;
-      ev. gen. source = var-> owner;
-      ev. gen. H      = self;
-      CComponent( var-> owner)-> message( var-> owner, &ev);
-   }
 }
 
 static Bool bring_by_name( Handle self, PComponent item, char * name)
@@ -114,20 +75,6 @@ detach_all( Handle child, Handle self)
 void
 Component_cleanup( Handle self)
 {
-   Event ev = {cmDestroy};
-   
-   if ( var-> owner) {   
-      Event ev = {cmChildLeave};
-      ev. gen. source = var-> owner;
-      ev. gen. H      = self;
-      CComponent( var-> owner)-> message( var-> owner, &ev);
-   }
-
-   if ( var-> components != nil)
-      list_first_that( var-> components, (void*)detach_all, ( void*) self);
-
-   ev. gen. source = self;
-   my-> message( self, &ev);
 }
 
 static Bool
@@ -157,87 +104,16 @@ free_eventref( Handle self, Handle * org)
 void
 Component_done( Handle self)
 {
-   if ( var-> owner) 
-      CComponent( var-> owner)-> detach( var-> owner, self, false);
-   if ( var-> eventIDs) {
-      int i;
-      PList list = var-> events;
-      hash_destroy( var-> eventIDs, false);
-      var-> eventIDs = nil;
-      for ( i = 0; i < var-> eventIDCount; i++) {
-         int j;
-         for ( j = 0; j < list-> count; j += 2)
-            sv_free(( SV *) list-> items[ j + 1]);
-         list_destroy( list++);
-      }
-      free( var-> events);
-      var-> events = nil;
-   }
-
-
-   if ( var-> refs) {
-      Handle * pself = &self;
-      list_first_that( var-> refs, (void*)free_eventref, pself);
-      plist_destroy( var-> refs);
-      var-> refs = nil;
-   }
-
-   if ( var-> postList != nil) {
-      list_first_that( var-> postList, (void*)free_private_posts, nil);
-      list_destroy( var-> postList);
-      free( var-> postList);
-      var-> postList = nil;
-   }
-   if ( var-> evQueue != nil)
-   {
-      list_first_that( var-> evQueue, (void*)free_queue, nil);
-      list_destroy( var-> evQueue);
-      free( var-> evQueue);
-      var-> evQueue = nil;
-   }
-   if ( var-> components != nil) {
-      list_destroy( var-> components);
-      free( var-> components);
-      var-> components = nil;
-   }
-   apc_component_destroy( self);
-   free( var-> name);
-   var-> name = nil;
-   free( var-> evStack);
-   var-> evStack = nil;
-   inherited done( self);
 }
 
 void
 Component_attach( Handle self, Handle object)
 {
-   if ( var-> stage > csNormal) return;
-
-   if ( object && kind_of( object, CComponent)) {
-      if ( var-> components == nil)
-         var-> components = plist_create( 8, 8);
-      else
-         if ( list_index_of( var-> components, object) >= 0) {
-            warn( "RTC0040: Object attach failed");
-            return;
-         }
-      list_add( var-> components, object);
-      SvREFCNT_inc( SvRV(( PObject( object))-> mate));
-   } else
-       warn( "RTC0040: Object attach failed");
 }
 
 void
 Component_detach( Handle self, Handle object, Bool kill)
 {
-   if ( object && ( var-> components != nil)) {
-      int index = list_index_of( var-> components, object);
-      if ( index >= 0) {
-         list_delete_at( var-> components, index);
-         --SvREFCNT( SvRV(( PObject( object))-> mate));
-         if ( kill) Object_destroy( object);
-      }
-   }
 }
 
 SV *
@@ -274,45 +150,6 @@ Component_owner( Handle self, Bool set, Handle owner)
 void
 Component_set( Handle self, HV * profile)
 {
-   /* this can eliminate unwilling items */
-   /* from HV before indirect Object::set */
-   my-> update_sys_handle( self, profile);
-
-   if ( pexist( owner)) {
-      Handle owner, oldOwner = var-> owner;
-      if ( !my-> validate_owner( self, &owner, profile))
-         croak( "Illegal 'owner' reference passed to %s::%s", my-> className, "set");
-
-      if ( oldOwner && oldOwner != owner) {
-         Event ev;
-         ev. cmd = cmChildLeave;
-         ev. gen. source = oldOwner;
-         ev. gen. H      = self;
-         if ( oldOwner)
-            CComponent( oldOwner)-> message( oldOwner, &ev);
-      }
-
-      my-> migrate( self, owner);
-      var-> owner = owner;
-      pdelete( owner); 
-
-      if ( oldOwner != owner) {
-         Event ev;
-
-         ev. cmd = cmChildEnter;
-         ev. gen. source = owner;
-         ev. gen. H      = self;
-         if ( owner)
-            CComponent( owner)-> message( owner, &ev);
-         
-         ev. cmd = cmChangeOwner;
-         ev. gen. source = self;
-         ev. gen. H      = oldOwner;
-         my-> message( self, &ev);
-      }
-   }
-
-   inherited set ( self, profile);
 }
 
 static Bool
@@ -369,25 +206,11 @@ Component_can_event( Handle self)
 void
 Component_clear_event( Handle self)
 {
-   my-> set_eventFlag( self, 0);
 }
 
 void
 Component_push_event( Handle self)
 {
-   if ( var-> stage == csDead)
-      return;
-   if ( var-> evPtr == var-> evLimit) {
-      char * newStack = allocs( 16 + var-> evLimit);
-      if ( !newStack) croak("Not enough memory");
-      if ( var-> evStack) {
-         memcpy( newStack, var-> evStack, var-> evLimit);
-         free( var-> evStack);
-      }
-      var-> evStack = newStack;
-      var-> evLimit += 16;
-   }
-   var-> evStack[ var-> evPtr++] = 1;
 }
 
 Bool
@@ -420,7 +243,6 @@ Component_eventFlag( Handle self, Bool set, Bool eventFlag)
 void
 Component_event_error( Handle self)
 {
-   apc_beep( mbWarning);
 }
 
 SV *
@@ -440,44 +262,6 @@ oversend( PEvent event, Handle self)
 void
 Component_handle_event( Handle self, PEvent event)
 {
-   switch ( event-> cmd)
-   {
-   case cmCreate:
-      my-> notify( self, "<s", "Create");
-      if ( var-> stage == csNormal && var-> evQueue) {
-         PList q = var-> evQueue;
-         var-> evQueue = nil;
-         if ( q-> count > 0)
-            list_first_that( q, (void*)oversend, ( void*) self);
-         list_destroy( q);
-         free( q);
-      }
-      break;
-   case cmDestroy:
-      opt_set( optcmDestroy);
-      my-> notify( self, "<s", "Destroy");
-      opt_clear( optcmDestroy);
-      break;
-   case cmPost:
-      {
-         PPostMsg p = ( PPostMsg) event-> gen. p;
-         list_delete( var-> postList, ( Handle) p);
-         my-> notify( self, "<sSS", "PostMessage", p-> info1, p-> info2);
-         if ( p-> info1) sv_free( p-> info1);
-         if ( p-> info2) sv_free( p-> info2);
-         free( p);
-      }
-      break;
-   case cmChangeOwner:
-      my-> notify( self, "<sH", "ChangeOwner", event-> gen. H);
-      break;
-   case cmChildEnter:
-      my-> notify( self, "<sH", "ChildEnter", event-> gen. H);
-      break;
-   case cmChildLeave:
-      my-> notify( self, "<sH", "ChildLeave", event-> gen. H);
-      break;
-   }
 }
 
 int
@@ -515,10 +299,6 @@ Component_migrate( Handle self, Handle attachTo)
 void
 Component_recreate( Handle self)
 {
-   HV * profile = newHV();
-   pset_H( owner, var-> owner);
-   my-> update_sys_handle( self, profile);
-   sv_free(( SV *) profile);
 }
 
 Handle
@@ -550,19 +330,6 @@ Component_first_that_component( Handle self, void * actionProc, void * params)
 void
 Component_post_message( Handle self, SV * info1, SV * info2)
 {
-   PPostMsg p;
-   Event ev = { cmPost};
-   if ( var-> stage > csNormal) return;
-   if (!( p = alloc1( PostMsg))) return;
-   p-> info1  = newSVsv( info1);
-   p-> info2  = newSVsv( info2);
-   p-> h      = self;
-   if ( var-> postList == nil)
-      list_create( var-> postList = ( List*) malloc( sizeof( List)), 8, 8);
-   list_add( var-> postList, ( Handle) p);
-   ev. gen. p = p;
-   ev. gen. source = ev. gen. H = self;
-   apc_message( application, &ev, true);
 }
 
 
@@ -897,8 +664,8 @@ XS( Component_get_components_FROMPERL)
    return;
 }
 
-void Component_get_components          ( Handle self) { warn("Invalid call of Component::get_components"); }
-void Component_get_components_REDEFINED( Handle self) { warn("Invalid call of Component::get_components"); }
+void Component_get_components          ( Handle self) {}
+void Component_get_components_REDEFINED( Handle self) {}
 
 UV
 Component_add_notification( Handle self, char * name, SV * subroutine, Handle referer, int index)
@@ -968,44 +735,11 @@ Component_add_notification( Handle self, char * name, SV * subroutine, Handle re
 void
 Component_remove_notification( Handle self, UV id)
 {
-   int i = var-> eventIDCount;
-   PList  list = var-> events;
-
-   if ( list == nil) return;
-
-   while ( i--) {
-      int j;
-      for ( j = 0; j < list-> count; j += 2) {
-         if ((( UV ) list-> items[ j + 1]) != id) continue;
-         sv_free(( SV *) list-> items[ j + 1]);
-         list_delete_at( list, j + 1);
-         list_delete_at( list, j);
-         return;
-      }
-      list++;
-   }
 }
 
 void
 Component_unlink_notifier( Handle self, Handle referer)
 {
-   int i = var-> eventIDCount;
-   PList  list = var-> events;
-
-   if ( list == nil) return;
-
-   while ( i--) {
-      int j;
-   AGAIN:
-      for ( j = 0; j < list-> count; j += 2) {
-         if ((( long) list-> items[ j]) != referer) continue;
-         sv_free(( SV *) list-> items[ j + 1]);
-         list_delete_at( list, j + 1);
-         list_delete_at( list, j);
-         goto AGAIN;
-      }
-      list++;
-   }
 }
 
 XS( Component_get_notification_FROMPERL)
@@ -1056,8 +790,8 @@ XS( Component_get_notification_FROMPERL)
    }
 }
 
-void Component_get_notification          ( Handle self, char * name, int index) { warn("Invalid call of Component::get_notification"); }
-void Component_get_notification_REDEFINED( Handle self, char * name, int index) { warn("Invalid call of Component::get_notification"); }
+void Component_get_notification          ( Handle self, char * name, int index) {}
+void Component_get_notification_REDEFINED( Handle self, char * name, int index) {}
 
 XS( Component_set_notification_FROMPERL)
 {
@@ -1090,8 +824,8 @@ XS( Component_set_notification_FROMPERL)
    XSRETURN_EMPTY;
 }
 
-void Component_set_notification          ( Handle self, char * name, SV * subroutine) { warn("Invalid call of Component::set_notification"); }
-void Component_set_notification_REDEFINED( Handle self, char * name, SV * subroutine) { warn("Invalid call of Component::set_notification"); }
+void Component_set_notification          ( Handle self, char * name, SV * subroutine) {}
+void Component_set_notification_REDEFINED( Handle self, char * name, SV * subroutine) {}
 
 SV *
 Component_delegations( Handle self, Bool set, SV * delegations)

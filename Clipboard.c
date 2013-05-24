@@ -76,30 +76,11 @@ Clipboard_register_format_proc( Handle self, char * format, void * serverProc);
 void
 Clipboard_init( Handle self, HV * profile)
 {
-   inherited init( self, profile);
-   if ( !apc_clipboard_create(self))
-      croak( "RTC0022: Cannot create clipboard");
-   if (clipboards == 0) {
-      Clipboard_register_format_proc( self, "Text",  (void*)text_server);
-      Clipboard_register_format_proc( self, "Image", (void*)image_server);
-      Clipboard_register_format_proc( self, "UTF8",  (void*)utf8_server);
-      protect_formats = 1;
-   }
-   clipboards++;
-   CORE_INIT_TRANSIENT(Clipboard);
 }
 
 void
 Clipboard_done( Handle self)
 {
-   clipboards--;
-   if ( clipboards == 0) {
-      protect_formats = 0;
-      while( formatCount)
-         my-> deregister_format( self, formats-> id);
-   }
-   apc_clipboard_destroy(self);
-   inherited done( self);
 }
 
 Bool
@@ -164,29 +145,6 @@ Clipboard_register_format_proc( Handle self, char * format, void * serverProc)
 void
 Clipboard_deregister_format( Handle self, char * format)
 {
-   PClipboardFormatReg fr, list; 
-
-   if ( protect_formats && (
-       ( strlen( format) == 0)          ||
-       ( strcmp( format, "Text") == 0)  ||
-       ( strcmp( format, "UTF8") == 0)  ||
-       ( strcmp( format, "Image") == 0)))
-      return;
-
-   fr = first_that( self, (void*)find_format, format);
-   if ( fr == nil) return;
-   list = formats;
-   fr-> server( self, fr, cefDone, nilSV);
-   free( fr-> id);
-   formatCount--;
-   memmove( fr, fr + 1, sizeof( ClipboardFormatReg) * ( formatCount - ( fr - list)));
-   if ( formatCount > 0) {
-      if (( fr = allocn( ClipboardFormatReg, formatCount)))
-         memcpy( fr, list, sizeof( ClipboardFormatReg) * formatCount);
-   } else
-      fr = nil;
-   free( formats);
-   formats = fr;
 }
 
 Bool
@@ -201,42 +159,6 @@ Clipboard_open( Handle self)
 void
 Clipboard_close( Handle self)
 {
-   if ( var->  openCount > 0) {
-     PClipboardFormatReg text, utf8;
-     var-> openCount--;
-     if ( var->  openCount > 0) return;
-     text = formats + cfText;
-     utf8 = formats + cfUTF8;
-     /* automatically downgrade UTF8 to TEXT */
-     if ( utf8-> written && !text-> written) {
-	 SV *utf8_sv, *text_sv;
-	 if (( utf8_sv = utf8-> server( self, utf8, cefFetch, nilSV))) {
-	    STRLEN bytelen, charlen, bytecount;
-	    U8 * src;
-	    src = ( U8 *) SvPV( utf8_sv, bytelen);
-	    bytecount = bytelen;
-	    text_sv = newSVpvn("", 0);
-	    while ( bytecount > 0) {
-               register UV u = 
-#if PERL_PATCHLEVEL >= 16
-	       	  utf8_to_uvchr_buf( src, src + bytelen, &charlen)
-#else
-	       	  utf8_to_uvchr( src, &charlen)
-#endif
-		  ;
-	       char c = ( u < 0x7f) ? u : '?';
-	       src += charlen;
-	       bytecount -= charlen;
-	       sv_catpvn( text_sv, &c, 1);
-	       if ( charlen == 0 ) break;
-	    }
-	    text-> server( self, text, cefFetch, text_sv);
-	    sv_free( text_sv);
-	 }
-     }
-     apc_clipboard_close( self);
-   } else
-     var-> openCount = 0;
 }
 
 Bool
@@ -268,25 +190,11 @@ Clipboard_fetch( Handle self, char * format)
 void
 Clipboard_store( Handle self, char * format, SV * data)
 {
-   PClipboardFormatReg fr = first_that( self, (void*)find_format, format);
-
-   if ( !fr) return;
-   my-> open( self);
-   if ( var->  openCount == 1) {
-      first_that( self, (void*) reset_written, nil);
-      apc_clipboard_clear( self);
-   }
-   fr-> server( self, fr, cefStore, data);
-   my-> close( self);
 }
 
 void
 Clipboard_clear( Handle self)
 {
-   my-> open( self);
-   first_that( self, (void*) reset_written, nil);
-   apc_clipboard_clear( self);
-   my-> close( self);
 }
 
 SV *
@@ -377,12 +285,12 @@ XS( Clipboard_get_standard_clipboards_FROMPERL)
    PUTBACK;
 }
 
-void Clipboard_get_formats                       ( Handle self) { warn("Invalid call of Clipboard::get_formats"); }
-void Clipboard_get_formats_REDEFINED             ( Handle self) { warn("Invalid call of Clipboard::get_formats"); }
-void Clipboard_get_registered_formats            ( Handle self) { warn("Invalid call of Clipboard::get_registered_formats"); }
-void Clipboard_get_registered_formats_REDEFINED  ( Handle self) { warn("Invalid call of Clipboard::get_registered_formats"); }
-void Clipboard_get_standard_clipboards               ( Handle self) { warn("Invalid call of Clipboard::get_standard_clipboards"); }
-void Clipboard_get_standard_clipboards_REDEFINED     ( Handle self) { warn("Invalid call of Clipboard::get_standard_clipboards"); }
+void Clipboard_get_formats                       ( Handle self) {}
+void Clipboard_get_formats_REDEFINED             ( Handle self) {}
+void Clipboard_get_registered_formats            ( Handle self) {}
+void Clipboard_get_registered_formats_REDEFINED  ( Handle self) {}
+void Clipboard_get_standard_clipboards               ( Handle self) {}
+void Clipboard_get_standard_clipboards_REDEFINED     ( Handle self) {}
 
 static SV *
 text_server( Handle self, PClipboardFormatReg instance, int function, SV * data)

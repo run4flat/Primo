@@ -52,24 +52,11 @@ static void File_reset_notifications( Handle self);
 void
 File_init( Handle self, HV * profile)
 {
-   dPROFILE;
-   var-> fd = -1;
-   inherited-> init( self, profile);
-   my-> set_mask( self, pget_i( mask));
-   var-> eventMask2 =
-     ( query_method( self, "on_read",    0) ? feRead      : 0) |
-     ( query_method( self, "on_write",   0) ? feWrite     : 0) |
-     ( query_method( self, "on_exception", 0) ? feException : 0);
-   File_reset_notifications( self);
-   my-> set_file( self, pget_sv( file));
-   CORE_INIT_TRANSIENT(File);
 }
 
 void
 File_cleanup( Handle self)
 {
-   my-> set_file( self, nilSV);
-   inherited-> cleanup( self);
 }
 
 Bool
@@ -88,19 +75,6 @@ File_is_active( Handle self, Bool autoDetach)
 void
 File_handle_event( Handle self, PEvent event)
 {
-   inherited-> handle_event ( self, event);
-   if ( var-> stage > csNormal) return;
-   switch ( event-> cmd) {
-   case cmFileRead:
-      my-> notify( self, "<sS", "Read", var-> file ? var-> file : nilSV);
-      break;
-   case cmFileWrite:
-      my-> notify( self, "<sS", "Write", var-> file ? var-> file : nilSV);
-      break;
-   case cmFileException:
-      my-> notify( self, "<sS", "Exception", var-> file ? var-> file : nilSV);
-      break;
-   }
 }
 
 SV *
@@ -160,8 +134,6 @@ File_add_notification( Handle self, char * name, SV * subroutine, Handle referer
 void
 File_remove_notification( Handle self, UV id)
 {
-   inherited-> remove_notification( self, id);
-   File_reset_notifications( self);
 }
 
 

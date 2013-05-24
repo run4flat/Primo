@@ -270,13 +270,6 @@ colorFound:;
 void
 Icon_init( Handle self, HV * profile)
 {
-   dPROFILE;
-   inherited init( self, profile);
-   my-> set_maskColor( self, pget_i( maskColor));
-   my-> set_maskIndex( self, pget_i( maskIndex));
-   my-> set_autoMasking( self, pget_i( autoMasking));
-   my-> set_mask( self, pget_sv( mask));
-   CORE_INIT_TRANSIENT(Icon);
 }
 
 
@@ -338,92 +331,16 @@ Icon_maskIndex( Handle self, Bool set, int index)
 void
 Icon_update_change( Handle self)
 {
-   inherited update_change( self);
-
-   if ( var-> autoMasking == amNone) {
-      int maskLine = (( var-> w + 31) / 32) * 4;
-      int maskSize = maskLine * var-> h;
-      if ( maskLine != var-> maskLine || maskSize != var-> maskSize) {
-         free( var-> mask);
-         var-> maskLine = maskLine;
-         if (!( var-> mask = allocb( var-> maskSize = maskSize)) && maskSize > 0) {
-            my-> make_empty( self);
-            warn("Not enough memory: %d bytes", maskSize);
-         } else
-            memset( var-> mask, 0, maskSize);
-      }
-      return;
-   }   
-   
-   free( var-> mask);
-   if ( var-> data)
-   {
-      var-> maskLine = (( var-> w + 31) / 32) * 4;
-      var-> maskSize = var-> maskLine * var-> h;
-      if ( !( var-> mask = allocb( var-> maskSize)) && var-> maskSize > 0) {
-          my-> make_empty( self);
-          warn("Not enough memory: %d bytes", var-> maskSize);
-          return;
-      }
-      produce_mask( self);
-   }
-   else
-      var-> mask = nil;
 }
 
 void
 Icon_stretch( Handle self, int width, int height)
 {
-   Byte * newMask = nil;
-   int lineSize, oldW = var-> w, oldH = var-> h, am = var-> autoMasking;
-   if ( var->stage > csFrozen) return;
-   if ( width  >  65535) width  =  65535;
-   if ( height >  65535) height =  65535;
-   if ( width  < -65535) width  = -65535;
-   if ( height < -65535) height = -65535;
-   if (( width == var->w) && ( height == var->h)) return;
-   if ( width == 0 || height == 0)
-   {
-      my->create_empty( self, 0, 0, var->type);
-      return;
-   }
-   
-   lineSize = (( abs( width) + 31) / 32) * 4;
-   newMask  = allocb( lineSize * abs( height));
-   if ( newMask == nil && lineSize > 0) {
-      my-> make_empty( self);
-      croak("Icon::stretch: cannot allocate %d bytes", lineSize * abs( height));
-   }
-   var-> autoMasking = amNone;
-   if ( var-> mask) 
-      ic_stretch( imMono, var-> mask, oldW, oldH, newMask, width, height, is_opt( optHScaling), is_opt( optVScaling));
-   inherited stretch( self, width, height);
-   free( var-> mask);
-   var->mask = newMask;
-   var->maskLine = lineSize;
-   var->maskSize = lineSize * abs( height);
-   inherited stretch( self, width, height);
-   var-> autoMasking = am;
 }
 
 void
 Icon_create_empty( Handle self, int width, int height, int type)
 {
-   inherited create_empty( self, width, height, type);
-   free( var-> mask);
-   if ( var-> data)
-   {
-      var-> maskLine = (( var-> w + 31) / 32) * 4;
-      var-> maskSize = var-> maskLine * var-> h;
-      if ( !( var-> mask = allocb( var-> maskSize)) && var-> maskSize > 0) {
-         my-> make_empty( self);
-         warn("Not enough memory: %d bytes", var-> maskSize);
-         return;
-      }
-      memset( var-> mask, 0, var-> maskSize);
-   }
-   else
-      var-> mask = nil;
 }
 
 Handle
@@ -472,36 +389,6 @@ Icon_split( Handle self)
 void
 Icon_combine( Handle self, Handle xorMask, Handle andMask)
 {
-   Bool killAM = 0;
-   int am = var-> autoMasking;
-
-   
-   if ( !kind_of( xorMask, CImage) || !kind_of( andMask, CImage))
-      return;
-   my-> create_empty( self, PImage( xorMask)-> w, PImage( xorMask)-> h, PImage( xorMask)-> type);
-   if (( PImage( andMask)-> type & imBPP) != imMono) {
-      killAM = 1;
-      andMask = CImage( andMask)-> dup( andMask);
-      CImage( andMask)-> set_type( andMask, imMono);
-   }
-   if ( var-> w != PImage( andMask)-> w || var-> h != PImage( andMask)-> h) {
-      if ( !killAM) {
-         killAM = 1;
-         andMask = CImage( andMask)-> dup( andMask);
-      }
-      CImage( andMask)-> set_size( andMask, my-> get_size( self));
-   }
-
-   memcpy( var-> data, PImage( xorMask)-> data, var-> dataSize);
-   memcpy( var-> mask, PImage( andMask)-> data, var-> maskSize);
-   memcpy( var-> palette, PImage( xorMask)-> palette, 768);
-   var-> palSize = PImage( xorMask)-> palSize;
-
-   if ( killAM) Object_destroy( andMask);
-
-   var-> autoMasking = amNone;
-   my-> update_change( self);
-   var-> autoMasking = am;
 }
 
 #ifdef __cplusplus

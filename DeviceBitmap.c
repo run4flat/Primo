@@ -43,28 +43,16 @@ extern "C" {
 void
 DeviceBitmap_init( Handle self, HV * profile)
 {
-   dPROFILE;
-   inherited init( self, profile);
-   var-> w = pget_i( width);
-   var-> h = pget_i( height);
-   var-> monochrome = pget_B( monochrome);
-   if ( !apc_dbm_create( self, var-> monochrome))
-      croak("RTC0110: Cannot create device bitmap");
-   inherited begin_paint( self);
-   opt_set( optInDraw);
-   CORE_INIT_TRANSIENT(DeviceBitmap);
 }
 
 void
 DeviceBitmap_done( Handle self)
 {
-   apc_dbm_destroy( self);
-   inherited done( self);
 }
 
 Bool DeviceBitmap_begin_paint      ( Handle self) { return true;}
 Bool DeviceBitmap_begin_paint_info ( Handle self) { return true;}
-void DeviceBitmap_end_paint        ( Handle self) { return;}
+void DeviceBitmap_end_paint        ( Handle self) {}
 
 Bool
 DeviceBitmap_monochrome( Handle self, Bool set, Bool monochrome)

@@ -50,23 +50,23 @@ static int key_normalize( const char * key) { return 0; }
 
 static int is_var_id_name( char * name) { return 0; }
 
-void AbstractMenu_dispose_menu( Handle self, void * menu) { }
+void AbstractMenu_dispose_menu( Handle self, void * menu) {}
 
 /* #define log_write debug_write */
 
 void * AbstractMenu_new_menu( Handle self, SV * sv, int level) { return nil; }
 
-void AbstractMenu_init( Handle self, HV * profile) { }
+void AbstractMenu_init( Handle self, HV * profile) {}
 
-void AbstractMenu_done( Handle self) { }
+void AbstractMenu_done( Handle self) {}
 
 Bool AbstractMenu_validate_owner( Handle self, Handle * owner, HV * profile) {
    return false;
 }
 
-void AbstractMenu_cleanup( Handle self) { }
+void AbstractMenu_cleanup( Handle self) {}
 
-void AbstractMenu_set( Handle self, HV * profile) { }
+void AbstractMenu_set( Handle self, HV * profile) {}
 
 static SV * new_av(  PMenuItemReg m, int level) { return nil; }
 
@@ -106,7 +106,7 @@ AbstractMenu_get_items( Handle self, char * varName)
    return nilSV;
 }
 
-void AbstractMenu_set_items( Handle self, SV * items) { }
+void AbstractMenu_set_items( Handle self, SV * items) {}
 
 
 static PMenuItemReg
@@ -180,7 +180,6 @@ AbstractMenu_key( Handle self, Bool set, char * varName, SV * key)
 void
 AbstractMenu_set_variable( Handle self, char * varName, SV * newName)
 {
-   return;
 }
 
 Bool
