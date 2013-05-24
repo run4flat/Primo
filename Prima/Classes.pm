@@ -29,7 +29,6 @@
 #
 #  $Id$
 use Prima;
-use Prima::Const;
 
 # class Object; base class of all Prima classes
 package Prima::Object;

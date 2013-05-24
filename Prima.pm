@@ -41,7 +41,6 @@ unless ( UNIVERSAL::can('Prima', 'init')) {
 	return 0;
 }
 $::application = undef;
-require Prima::Const;
 require Prima::Classes;
 
 sub parse_argv
