@@ -51,8 +51,10 @@ void Hummingbird_init ( Handle self, HV * profile)
 
 void Hummingbird_describe ( Handle self)
 {
+   printf("**** Hummingbird base class describe begin ****\n");
    printf("I am a hummingbird, %d years old, color %d\n",
       var->age, var->color);
+   printf("**** Hummingbird base class describe done****\n");
 }
 
 void Hummingbird_done (Handle self)
