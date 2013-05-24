@@ -55,14 +55,6 @@ Window_init( Handle self, HV * profile)
    opt_assign( optOwnerIcon, pget_B( ownerIcon));
    opt_assign( optMainWindow, pget_B( mainWindow));
    my-> set_icon( self, pget_H( icon));
-   my-> menuColorIndex( self, true, ciFore,          pget_i( menuColor)            );
-   my-> menuColorIndex( self, true, ciBack,          pget_i( menuBackColor)        );
-   my-> menuColorIndex( self, true, ciHiliteText,    pget_i( menuHiliteColor)      );
-   my-> menuColorIndex( self, true, ciHilite,        pget_i( menuHiliteBackColor)  );
-   my-> menuColorIndex( self, true, ciDisabledText,  pget_i( menuDisabledColor)    );
-   my-> menuColorIndex( self, true, ciDisabled,      pget_i( menuDisabledBackColor));
-   my-> menuColorIndex( self, true, ciLight3DColor,  pget_i( menuLight3DColor)     );
-   my-> menuColorIndex( self, true, ciDark3DColor,   pget_i( menuDark3DColor)      );
    if ( SvTYPE( sv = pget_sv( menuItems)) != SVt_NULL)
       my-> set_menuItems( self, sv);
    my-> set_modalResult( self, pget_i( modalResult));
@@ -133,12 +125,6 @@ void Window_handle_event( Handle self, PEvent event)
 #define objCheck if ( var-> stage > csNormal) return
    switch (event-> cmd)
    {
-   case cmColorChanged:
-      if ( event-> gen. source == var-> menu) {
-         var-> menuColor[ event-> gen. i] = apc_menu_get_color( var-> menu, event-> gen. i);
-         return;
-      }
-      break;
    case cmExecute:
       my-> notify( self, "<s", "Execute");
       break;
@@ -557,15 +543,6 @@ Window_menu( Handle self, Bool set, Handle menu)
    else {
       apc_window_set_menu( self, menu);
       var-> menu = menu;
-      if ( menu)
-      {
-         int i;
-         ColorSet menuColor;
-         memcpy( menuColor, var-> menuColor, sizeof( ColorSet));
-         for ( i = 0; i < ciMaxId + 1; i++)
-           apc_menu_set_color( menu, menuColor[ i], i);
-         memcpy( var-> menuColor, menuColor, sizeof( ColorSet));
-      }
    }
    return nilHandle;
 }
@@ -591,18 +568,6 @@ Window_menuItems( Handle self, Bool set, SV * menuItems)
    } else
      CMenu( var-> menu)-> set_items( var-> menu, menuItems);
    return menuItems;
-}
-
-Color
-Window_menuColorIndex( Handle self, Bool set, int index, Color color)
-{
-   if (( index < 0) || ( index > ciMaxId)) return clInvalid;
-   if ( !set)
-      return  var-> menuColor[ index];
-   if ((( color & clSysFlag) != 0) && (( color & wcMask) == 0)) color |= wcMenu;
-   var-> menuColor[ index] = color;
-   if ( var-> menu) apc_menu_set_color( var-> menu, color, index);
-   return clInvalid;
 }
 
 Bool

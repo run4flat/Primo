@@ -28,7 +28,6 @@
 object Prima::Window( Prima::Widget)
 {
    Handle   menu;
-   ColorSet menuColor;
    int      modal;
    int      modalResult;
 
@@ -40,7 +39,6 @@ object Prima::Window( Prima::Widget)
    property Handle   icon;
    property Bool     mainWindow;
    property Handle   menu;
-   property Color    menuColorIndex( int index);
    property SV *     menuItems;
    property Bool     modalHorizon;
    property int      modalResult;

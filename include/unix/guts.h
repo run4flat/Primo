@@ -675,7 +675,6 @@ typedef struct _drawable_sys_data
    Point transform, gtransform, btransform;
    Point ackOrigin, ackSize, ackFrameSize;   
    int menuHeight; 
-   int menuColorImmunity;
    Point decorationSize;
    Handle owner;  /* The real one */
    XWindow real_parent; /* top levels */

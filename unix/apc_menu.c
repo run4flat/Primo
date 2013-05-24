@@ -1498,11 +1498,6 @@ apc_menu_create( Handle self, Handle owner)
    XX-> w-> self  = self; 
    XX-> w-> m     = TREE;
    XX-> w-> first = 0;
-   for ( i = 0; i <= ciMaxId; i++)
-      XX-> c[i] = prima_allocate_color( 
-          nilHandle, 
-          prima_map_color( PWindow(owner)-> menuColor[i], nil), 
-          nil);
    return true;
 }
 
@@ -1532,39 +1527,6 @@ apc_menu_get_color( Handle self, int index)
       ((((c & guts. visual. blue_mask)  >> guts. blue_shift) << 8) >> guts. blue_range) |
      (((((c & guts. visual. green_mask) >> guts. green_shift) << 8) >> guts. green_range) << 8) |
      (((((c & guts. visual. red_mask)   >> guts. red_shift)   << 8) >> guts. red_range) << 16);
-}
-
-PFont
-apc_menu_get_font( Handle self, PFont font)
-{
-   DEFMM;
-   if ( !XX-> font)
-      return apc_menu_default_font( font);
-   memcpy( font, &XX-> font-> font, sizeof( Font));
-   return font;
-}
-
-Bool
-apc_menu_set_color( Handle self, Color color, int i)
-{
-   DEFMM;
-   if ( i < 0 || i > ciMaxId) return false;
-   XX-> rgb[i] = prima_map_color( color, nil);
-   if ( !XX-> type.popup) {
-      if ( X(PWidget(self)-> owner)-> menuColorImmunity) {
-         X(PWidget(self)-> owner)-> menuColorImmunity--;
-         return true;
-      }
-      if ( X_WINDOW) {
-         prima_palette_replace( PWidget(self)-> owner, false);
-         if ( !XX-> paint_pending) {
-            XClearArea( DISP, X_WINDOW, 0, 0, XX-> w-> sz.x, XX-> w-> sz.y, true);
-            XX-> paint_pending = true;
-         }
-      }
-   } else 
-      XX-> c[i] = prima_allocate_color( nilHandle, XX-> rgb[i], nil);
-   return true;
 }
 
 /* apc_menu_set_font is in apc_font.c */
@@ -1820,17 +1782,8 @@ apc_window_set_menu( Handle self, Handle menu)
       update_menu_window(M(m), M(m)-> w);
       menu_reconfigure( menu);
       repal = true;
-      /* make it immune to necessary color change calls */
-      XX-> menuColorImmunity = ciMaxId + 1;
    }
    prima_window_reset_menu( self, y);
    if ( repal) prima_palette_replace( self, false); 
-   if ( menu) {
-      int i;
-      for ( i = 0; i <= ciMaxId; i++) {
-         M(menu)-> c[i] = prima_allocate_color( self, 
-             prima_map_color( PWindow(self)-> menuColor[i], nil), nil);
-      }
-   }
    return true;
 }

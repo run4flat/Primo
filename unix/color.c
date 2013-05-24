@@ -84,7 +84,6 @@ static Color standard_edit_colors[]        = { COLORSET_PANEL    };
 static Color standard_inputline_colors[]   = { COLORSET_PANEL    };
 static Color standard_label_colors[]       = { COLORSET_GRAY     };
 static Color standard_listbox_colors[]     = { COLORSET_PANEL    };
-static Color standard_menu_colors[]        = { COLORSET_ALT_GRAY };
 static Color standard_popup_colors[]       = { COLORSET_ALT_GRAY };
 static Color standard_radio_colors[]       = { COLORSET_GRAY     };
 static Color standard_scrollbar_colors[]   = { COLORSET_ALT_GRAY };
@@ -103,7 +102,6 @@ static Color* standard_colors[] = {
    standard_inputline_colors,
    standard_label_colors,
    standard_listbox_colors,
-   standard_menu_colors,
    standard_popup_colors,
    standard_radio_colors,
    standard_scrollbar_colors,
@@ -1126,8 +1124,6 @@ prima_palette_replace( Handle self, Bool fast)
          PWidget( self)-> palette[i].r,
          PWidget( self)-> palette[i].g,
          PWidget( self)-> palette[i].b);
-   for ( i = psz - menu; i < psz; i++) 
-      req[i] = PWindow(self)-> menuColor[ i - psz + menu]; 
    
    granted = 0;
 
@@ -1297,15 +1293,6 @@ ALLOC_STAGE:
          memcpy( r, PWidget( widgets. items[i])-> palette, 
             PWidget( widgets. items[i])-> palSize * sizeof( RGBColor));
          r += PWidget( widgets. items[i])-> palSize;
-         if ( XT_IS_WINDOW(X(widgets. items[i])) && 
-              PWindow(widgets. items[i])-> menu) {
-            int k;
-            for ( k = 0; k <= ciMaxId; k++, r++) {
-               r-> r = COLOR_R(PWindow(widgets. items[i])-> menuColor[k]);
-               r-> g = COLOR_G(PWindow(widgets. items[i])-> menuColor[k]);
-               r-> b = COLOR_B(PWindow(widgets. items[i])-> menuColor[k]);
-            }
-         }
       }
    }
    
