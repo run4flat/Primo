@@ -621,22 +621,6 @@ XS(Prima_init)
    }
 
    if ( prima_init_ok == 0) {
-      register_notifications((PVMT)CComponent);
-      register_notifications((PVMT)CFile);
-      register_notifications((PVMT)CAbstractMenu);
-      register_notifications((PVMT)CAccelTable);
-      register_notifications((PVMT)CMenu);
-      register_notifications((PVMT)CPopup);
-      register_notifications((PVMT)CClipboard);
-      register_notifications((PVMT)CTimer);
-      register_notifications((PVMT)CDrawable);
-      register_notifications((PVMT)CImage);
-      register_notifications((PVMT)CIcon);
-      register_notifications((PVMT)CDeviceBitmap);
-      register_notifications((PVMT)CWidget);
-      register_notifications((PVMT)CWindow);
-      register_notifications((PVMT)CApplication);
-      register_notifications((PVMT)CPrinter);
       /* Don't register notifications; Hummingbird is derived from Object,
        * not Component. */
       /* register_notifications((PVMT)CHummingbird); */
@@ -1345,30 +1329,12 @@ XS( boot_Prima)
    newXS( "Prima::Object::create",  create_from_Perl, "Prima::Object");
    newXS( "Prima::Object::destroy", destroy_from_Perl, "Prima::Object");
    newXS( "Prima::Object::alive", Object_alive_FROMPERL, "Prima::Object");
-   newXS( "Prima::Component::event_hook", Component_event_hook_FROMPERL, "Prima::Component");
    newXS( "Prima::message", Prima_message_FROMPERL, "Prima");
    newXS( "Prima::dl_export", Prima_dl_export, "Prima");
-   register_constants();
    register_Object_Class();
-   register_Utils_Package();
-   register_Component_Class();
-   register_File_Class();
-   register_Clipboard_Class();
-   register_DeviceBitmap_Class();
-   register_Drawable_Class();
-   register_Widget_Class();
-   register_Window_Class();
-   register_Image_Class();
-   init_image_support();
-   register_Icon_Class();
-   register_AbstractMenu_Class();
-   register_AccelTable_Class();
-   register_Menu_Class();
-   register_Popup_Class();
-   register_Application_Class();
-   register_Timer_Class();
-   register_Printer_Class();
    register_Hummingbird_Class();
+   /* Should probably keep this in for now */
+   register_constants();
 
    ST(0) = &PL_sv_yes;
    XSRETURN(1);
