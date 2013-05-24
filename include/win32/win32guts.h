@@ -246,15 +246,6 @@ typedef struct _FileData
    int          type;
 } FileData;
 
-typedef struct _PrinterData
-{
-   PRINTER_INFO_2 ppi;
-   char           defPrnBuf[ 256];
-   char          *device;
-   char          *driver;
-   char          *port;
-} PrinterData;
-
 typedef struct _PaintSaveData
 {
    Color       lbs[2];
@@ -427,7 +418,6 @@ typedef struct _DrawableData
    union {
       TimerData     timer;
       WindowData    window;
-      PrinterData   prn;
       FileData      file;
       HRGN          imgCachedRegion;      // Image specific field
    } s;

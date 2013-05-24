@@ -39,7 +39,6 @@
 #include <ctype.h>
 #include "Window.h"
 #include "Image.h"
-#include "Printer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -1218,13 +1217,6 @@ apc_fonts( Handle self, const char* facename, const char *encoding, int * retCou
    *retCount = 0;
    if ( self == nilHandle || self == application) {
       if ( !( dc = dc_alloc())) return nil;
-   }
-   else if ( kind_of( self, CPrinter)) {
-      if ( !is_opt( optInDraw) && !is_opt( optInDrawInfo)) {
-         hasdc = 1;
-         CPrinter( self)-> begin_paint_info( self);
-      }
-      dc = sys ps;
    } else
       return nil;
 
@@ -1259,8 +1251,6 @@ apc_fonts( Handle self, const char* facename, const char *encoding, int * retCou
 
    if ( self == nilHandle || self == application)
       dc_free();
-   else if ( hasdc)
-      CPrinter( self)-> end_paint_info( self);
 
    if ( f. lst. count == 0) goto Nothing;
    fmtx = ( PFont) malloc( f. lst. count * sizeof( Font));
@@ -1295,13 +1285,6 @@ apc_font_encodings( Handle self )
 
    if ( self == nilHandle || self == application) {
       if ( !( dc = dc_alloc())) return nil;
-   }
-   else if ( kind_of( self, CPrinter)) {
-      if ( !is_opt( optInDraw) && !is_opt( optInDrawInfo)) {
-         hasdc = 1;
-         CPrinter( self)-> begin_paint_info( self);
-      }
-      dc = sys ps;
    } else
       return nil;
 
@@ -1315,8 +1298,6 @@ apc_font_encodings( Handle self )
 
    if ( self == nilHandle || self == application)
       dc_free();
-   else if ( hasdc)
-      CPrinter( self)-> end_paint_info( self);
 
    return lst;
 }

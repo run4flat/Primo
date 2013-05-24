@@ -1385,8 +1385,6 @@ SvBOOL( SV *sv)
 #define CMenu(h)                        (PMenu(h)-> self)
 #define PPopup(h)                       TransmogrifyHandle(Popup,(h))
 #define CPopup(h)                       (PPopup(h)-> self)
-#define PPrinter(h)                     TransmogrifyHandle(Printer,(h))
-#define CPrinter(h)                     (PPrinter(h)-> self)
 #define PTimer(h)                       TransmogrifyHandle(Timer,(h))
 #define CTimer(h)                       (PTimer(h)-> self)
 #define PWidget(h)                      TransmogrifyHandle(Widget,(h))
@@ -1598,8 +1596,6 @@ END_TABLE(dt,UV)
 #define errInvParams             0x0003
 #define errInvWindowIcon         0x0100
 #define errInvClipboardData      0x0101
-#define errInvPrinter            0x0102
-#define errNoPrinters            0x0103
 #define errNoPrnSettableOptions  0x0103
 #define errUserCancelled         0x0104
 
@@ -3307,64 +3303,6 @@ apc_gp_set_text_opaque( Handle self, Bool opaque);
 
 extern Bool
 apc_gp_set_text_out_baseline( Handle self, Bool baseline);
-
-/* printer */
-extern Bool
-apc_prn_create( Handle self);
-
-extern Bool
-apc_prn_destroy( Handle self);
-
-extern PrinterInfo*
-apc_prn_enumerate( Handle self, int * count);
-
-extern Bool
-apc_prn_select( Handle self, const char* printer);
-
-extern ApiHandle
-apc_prn_get_handle( Handle self);
-
-extern char*
-apc_prn_get_selected( Handle self);
-
-extern Point
-apc_prn_get_size( Handle self);
-
-extern Point
-apc_prn_get_resolution( Handle self);
-
-extern char*
-apc_prn_get_default( Handle self);
-
-extern Bool
-apc_prn_setup( Handle self);
-
-extern Bool
-apc_prn_begin_doc( Handle self, const char* docName);
-
-extern Bool
-apc_prn_begin_paint_info( Handle self);
-
-extern Bool
-apc_prn_end_doc( Handle self);
-
-extern Bool
-apc_prn_end_paint_info( Handle self);
-
-extern Bool
-apc_prn_new_page( Handle self);
-
-extern Bool
-apc_prn_abort_doc( Handle self);
-
-extern Bool
-apc_prn_enum_options( Handle self, int * count, char *** options);
-
-extern Bool
-apc_prn_get_option( Handle self, char * option, char ** value);
-
-extern Bool
-apc_prn_set_option( Handle self, char * option, char * value);
 
 /* fonts */
 extern PFont

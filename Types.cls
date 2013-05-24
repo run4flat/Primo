@@ -70,9 +70,3 @@ global @NPoint {
    double x;
    double y;
 }
-
-global %PrinterInfo {
-   string name;
-   string device;
-   Bool   defaultPrinter;
-}
