@@ -42,14 +42,27 @@ extern "C" {
 
 void Hummingbird_init ( Handle self, HV * profile)
 {
+   dPROFILE;
+   inherited init( self, profile);
+   var->age = 0;
+   var->color = 0;
+   CORE_INIT_TRANSIENT(Hummingbird);
 }
 
 void Hummingbird_describe ( Handle self)
 {
+   printf("**** Hummingbird base class describe begin ****\n");
+   printf("I am a hummingbird, %d years old, color %d\n",
+      var->age, var->color);
+   printf("**** Hummingbird base class describe done****\n");
 }
 
 void Hummingbird_done (Handle self)
 {
+   printf("About to call done from hummingbird with description:\n");
+   my->describe(self);
+   inherited done(self);
+   printf("Done with that\n");
 }
 
 

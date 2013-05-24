@@ -110,11 +110,115 @@ Object_create( char *className, HV * profile)
 static void
 protect_chain( Handle self, int direction)
 {
+   while ( self) {
+      var-> destroyRefCount += direction;
+      self = var-> owner;
+   }
 }
 
 void
 Object_destroy( Handle self)
 {
+   SV *mate, *object = nil;
+   int enter_stage = var-> stage;
+
+   if ( var-> stage == csDeadInInit) {
+      /* lightweight destroy */
+      if ( is_opt( optInDestroyList)) {
+         list_delete( &postDestroys, self);
+         opt_clear( optInDestroyList);
+      }
+      if ( primaObjects)
+         hash_delete( primaObjects, &self, sizeof( self), false);
+      mate = var-> mate;
+      var-> stage = csDead;
+      var-> mate = nilSV;
+      if ( mate && object) sv_free( mate);
+      return;
+   }
+
+   if ( var-> stage > csNormal && var-> stage != csHalfDead)
+      return;
+
+   if ( var-> destroyRefCount > 0) {
+      if ( !is_opt( optInDestroyList)) {
+         opt_set( optInDestroyList);
+         list_add( &postDestroys, self);
+      }
+      return;
+   }
+
+   if ( var-> stage == csHalfDead) {
+      Handle owner;
+      if ( !var-> mate || ( var-> mate == nilSV))
+         return;
+      object = SvRV( var-> mate);
+      if ( !object)
+         return;
+      var-> stage = csFinalizing;
+      recursiveCall++;
+      protect_chain( owner = var-> owner, 1);
+      my-> done( self);
+      protect_chain( owner, -1);
+      recursiveCall--;
+      if ( is_opt( optInDestroyList)) {
+         list_delete( &postDestroys, self);
+         opt_clear( optInDestroyList);
+      }
+      if ( primaObjects)
+         hash_delete( primaObjects, &self, sizeof( self), false);
+      var-> stage = csDead;
+      return;
+   }
+   var-> stage = csDestroying;
+   mate = var-> mate;
+   if ( mate && ( mate != nilSV)) {
+      object = SvRV( mate);
+      if ( object) ++SvREFCNT( object);
+   }
+   if ( object) {
+      Handle owner;
+      var-> stage = csHalfDead;
+      recursiveCall++;
+    /*  ENTER;
+        SAVEINT recursiveCall; */
+      protect_chain( owner = var-> owner, 1);
+      if ( enter_stage > csConstructing) 
+         my-> cleanup( self);
+      else if ( enter_stage == csConstructing && var-> transient_class) 
+         ((PObject_vmt)var-> transient_class)-> cleanup( self);
+      if ( var-> stage == csHalfDead) {
+         var-> stage = csFinalizing;
+         my-> done( self);
+         if ( primaObjects)
+            hash_delete( primaObjects, &self, sizeof( self), false);
+         if ( is_opt( optInDestroyList)) {
+            list_delete( &postDestroys, self);
+            opt_clear( optInDestroyList);
+         }
+      }
+      protect_chain( owner, -1);
+    /*  LEAVE; */
+      recursiveCall--;
+   }
+   var-> stage = csDead;
+   var-> mate = nilSV;
+   if ( mate && object) sv_free( mate);
+
+   while (( recursiveCall == 0) && ( postDestroys. count > 0)) {
+      Handle last = postDestroys. items[ 0];
+      recursiveCall++;
+      Object_destroy( postDestroys. items[ 0]);
+      recursiveCall--;
+      if ( postDestroys. count == 0) break;
+      if ( postDestroys. items[ 0] != last) continue;
+      if ( postDestroys. count == 1)
+         croak("RTC0A00: Zombie detected: %p", (void*)last);
+      else {
+         list_delete_at( &postDestroys, 0);
+         list_add( &postDestroys, last);
+      }
+   }
 }
 
 XS( Object_alive_FROMPERL)
@@ -152,6 +256,9 @@ void Object_done    ( Handle self) {}
 
 void Object_init    ( Handle self, HV * profile)
 {
+   if ( var-> stage != csDeadInInit) croak( "Unexpected call of Object::init");
+   var-> stage = csConstructing;
+   CORE_INIT_TRANSIENT(Object);
 }
 
 void Object_cleanup ( Handle self) {}
