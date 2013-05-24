@@ -1343,447 +1343,52 @@ NEXT_STAGE:
    }
 }
 
-/* local menu access hacks; it's good idea to have
-   hot keys changeable through resources, but have no
-   idea ( and desire :) how to plough throgh it */
-int
-prima_handle_menu_shortcuts( Handle self, XEvent * ev, KeySym keysym)
-{
-   int ret = 0;
-   int mod = 
-      (( ev-> xkey. state & ShiftMask)	? kmShift : 0) |
-      (( ev-> xkey. state & ControlMask)? kmCtrl  : 0) |
-      (( ev-> xkey. state & Mod1Mask)	? kmAlt   : 0);
-
-   if ( mod == kmShift && keysym == XK_F9) {
-      Event e;
-      bzero( &e, sizeof(e));
-      e. cmd    = cmPopup; 
-      e. gen. B = false;
-      e. gen. P = apc_pointer_get_pos( application); 
-      e. gen. H = self;
-      apc_widget_map_points( self, false, 1, &e. gen. P);
-      CComponent( self)-> message( self, &e);
-      if ( PObject( self)-> stage == csDead) return -1;
-      ret = 1;
-   }
-
-   if ( mod == 0 && keysym == XK_F10) {
-      Handle ps = self;
-      while ( PComponent( self)-> owner) {
-         ps = self;
-         if ( XT_IS_WINDOW(X(self))) break;
-         self = PComponent( self)-> owner;
-      }
-      self = ps;
-
-      if ( XT_IS_WINDOW(X(self)) && PWindow(self)-> menu) {
-         if ( !guts. currentMenu) {
-            XEvent ev;
-            bzero( &ev, sizeof( ev));
-            ev. type = ButtonPress;
-            ev. xbutton. button = Button1; 
-            ev. xbutton. send_event = true;
-            prima_handle_menu_event( &ev, M(PWindow(self)-> menu)-> w-> w, PWindow(self)-> menu);
-         } else 
-            prima_end_menu();
-         ret = 1;
-      }
-   }
-   
-   if ( !guts. currentMenu && mod == kmAlt) {   /* handle menu bar keys */
-      KeySym keysym;
-      char str_buf[ 256];
-      Handle ps = self;
-
-      while ( PComponent( self)-> owner) {
-         ps = self;
-         if ( XT_IS_WINDOW(X(self))) break;
-         self = PComponent( self)-> owner;
-      }
-      self = ps;
-
-      if ( XT_IS_WINDOW(X(self)) && PWindow(self)-> menu && 
-            1 == XLookupString( &ev-> xkey, str_buf, 256, &keysym, nil)) {
-         int i;
-         PMenuSysData selfxx = M(PWindow(self)-> menu);
-	 char c = tolower( str_buf[0]);
-         PMenuWindow w = XX-> w;
-         PMenuItemReg m = w-> m;
-         
-         for ( i = 0; i <= w-> last; i++) {
-            if ( m-> text) {
-               int j = 0;
-               char * t = m-> text, z = 0;
-               while ( t[j]) {
-                  if ( t[j] == '~' && t[j+1]) {
-                     if ( t[j+1] == '~')
-                        j += 2;
-                     else {
-                        z = tolower(t[j+1]);
-                        break;
-                     }
-                  }
-                  j++;
-               }
-               if ( z == c) {
-                  XEvent ev;
-                  bzero( &ev, sizeof( ev));
-                  ev. type = ButtonPress;
-                  ev. xbutton. button = Button1; 
-                  ev. xbutton. send_event = true;
-                  prima_handle_menu_event( &ev, w-> w, PWindow(self)-> menu);
-                  if ( menu_enter_item( XX, w, i, 1) && w-> next)
-                     menu_select_item( XX, w, i);
-                  return 1;
-               }
-            }
-            m = m-> next;
-         }
-      }
-   }
-   return ret;
+int prima_handle_menu_shortcuts( Handle self, XEvent * ev, KeySym keysym) {
+   return 0;
 }
 
-void
-prima_end_menu(void)
-{
-   PMenuSysData XX;
-   PMenuWindow w;
-   apc_timer_stop( MENU_TIMER);
-   apc_timer_stop( MENU_UNFOCUS_TIMER);
-   guts. unfocusedMenu = nilHandle; 
-   if ( !guts. currentMenu) return;
-   XX = M(guts. currentMenu);
-   {
-      XRectangle r;
-      Region rgn;
-      r. x = 0;
-      r. y = 0;
-      r. width  = guts. displaySize. x; 
-      r. height = guts. displaySize. y; 
-      rgn = XCreateRegion();
-      XUnionRectWithRegion( &r, rgn, rgn);
-      XSetRegion( DISP, guts. menugc, rgn);
-      XDestroyRegion( rgn);
-      XSetForeground( DISP, guts. menugc, XX->c[ciBack]);
-   }
-   w = XX-> w;
-   if ( XX-> focus)
-      XSetInputFocus( DISP, XX-> focus, RevertToNone, CurrentTime);
-   menu_window_delete_downlinks( XX, XX-> w);
-   XX-> focus = nilHandle;
-   XX-> focused = nil; 
-   if ( XX-> w != &XX-> wstatic) {
-      hash_delete( guts. menu_windows, &w-> w, sizeof( w-> w), false);
-      XDestroyWindow( DISP, w-> w);
-      free_unix_items( w);
-      free( w);
-      XX-> w = nil;
-   } else {
-      XX-> w-> next = nil;
-      menu_select_item( XX, XX-> w, -100);
-   }
-   guts. currentMenu = nilHandle;
-}
+void prima_end_menu(void) {}
 
-Bool
-apc_menu_create( Handle self, Handle owner)
-{
-   DEFMM;
-   int i;
-   apc_menu_destroy( self);
-   XX-> type.menu = true;
-   XX-> w         = &XX-> wstatic;
-   XX-> w-> self  = self; 
-   XX-> w-> m     = TREE;
-   XX-> w-> first = 0;
-   return true;
-}
+Bool apc_menu_create( Handle self, Handle owner) { return false; }
 
-Bool
-apc_menu_destroy( Handle self)
-{
-   if ( guts. currentMenu == self) prima_end_menu();
-   return true;
-}
+Bool apc_menu_destroy( Handle self) { return false; }
 
-PFont
-apc_menu_default_font( PFont f)
-{
-   memcpy( f, &guts. default_menu_font, sizeof( Font));
-   return f;
-}
+PFont apc_menu_default_font( PFont f) { return f; }
 
-Color
-apc_menu_get_color( Handle self, int index)
-{
-   Color c;
-   if ( index < 0 || index > ciMaxId) return clInvalid;
-   c = M(self)-> c[index];
-   if ( guts. palSize > 0) 
-       return guts. palette[c]. composite;
-   return
-      ((((c & guts. visual. blue_mask)  >> guts. blue_shift) << 8) >> guts. blue_range) |
-     (((((c & guts. visual. green_mask) >> guts. green_shift) << 8) >> guts. green_range) << 8) |
-     (((((c & guts. visual. red_mask)   >> guts. red_shift)   << 8) >> guts. red_range) << 16);
-}
+Color apc_menu_get_color( Handle self, int index) { Color c; return c; }
 
 /* apc_menu_set_font is in apc_font.c */
 
-void
-menu_touch( Handle self, PMenuItemReg who, Bool kill)
-{
-   DEFMM;
-   PMenuWindow w, lw = nil;
+void menu_touch( Handle self, PMenuItemReg who, Bool kill) { }
 
-   if ( guts. currentMenu != self) return;
+static void  menu_reconfigure( Handle self) {}
 
-   w = XX-> w;
-   while ( w) {
-      if ( w-> m == who) {
-         if ( kill || lw == nil)
-            prima_end_menu(); 
-         else
-            menu_window_delete_downlinks( M(self), lw);
-         return;
-      }
-      lw = w;
-      w = w-> next;
-   }
-}
-
-static void 
-menu_reconfigure( Handle self)
-{
-   XEvent ev;
-   DEFMM;
-   ev. type = ConfigureNotify;
-   XX-> w-> sz. x =  ev. xconfigure. width - 1; /* force cache flush */
-   ev. xconfigure. width  = X(PComponent(self)-> owner)-> size.x;
-   ev. xconfigure. height = X(PComponent(self)-> owner)-> size.y;
-   prima_handle_menu_event( &ev, PMenu(self)-> handle, self);
-}
-
-static void
-menubar_repaint( Handle self)
-{
-   DEFMM;
-   if ( !XT_IS_POPUP(XX) && XX-> w == &XX-> wstatic && PMenu(self)-> handle) {
-      XClearArea( DISP, X_WINDOW, 0, 0, XX-> w-> sz.x, XX-> w-> sz.y, true);
-      XX-> paint_pending = true;
-   }
-}
+static void menubar_repaint( Handle self) {}
 
 Bool
 apc_menu_update( Handle self, PMenuItemReg oldBranch, PMenuItemReg newBranch)
-{
-   DEFMM;
-   if ( !XT_IS_POPUP(XX) && XX-> w-> m == oldBranch) {
-      if ( guts. currentMenu == self) prima_end_menu();
-      XX-> w-> m = newBranch;
-      if ( PMenu(self)-> handle) {
-         update_menu_window( XX, XX-> w);
-         menu_reconfigure( self);
-         XClearArea( DISP, X_WINDOW, 0, 0, XX-> w-> sz.x, XX-> w-> sz.y, true);
-         XX-> paint_pending = true;
-      }
-   }
-   menu_touch( self, oldBranch, true);
-   return true;
-}
+{ return false; }
+ 
+Bool apc_menu_item_delete( Handle self, PMenuItemReg m) { return false; }
 
-Bool
-apc_menu_item_delete( Handle self, PMenuItemReg m)
-{
-   DEFMM;
-   if ( !XT_IS_POPUP(XX) && XX-> w-> m == m) {
-      if ( guts. currentMenu == self) prima_end_menu();
-      XX-> w-> m = TREE;
-      if ( PMenu(self)-> handle) {
-         update_menu_window( XX, XX-> w);
-         menu_reconfigure( self);
-         XClearArea( DISP, X_WINDOW, 0, 0, XX-> w-> sz.x, XX-> w-> sz.y, true);
-         XX-> paint_pending = true;
-      }
-   }
-   menu_touch( self, m, true);
-   return true;
-}
+Bool apc_menu_item_set_accel( Handle self, PMenuItemReg m) { return false; }
 
-Bool
-apc_menu_item_set_accel( Handle self, PMenuItemReg m)
-{
-   menu_touch( self, m, false);
-   return true;
-}
+Bool apc_menu_item_set_check( Handle self, PMenuItemReg m) { return false; }
 
-Bool
-apc_menu_item_set_check( Handle self, PMenuItemReg m)
-{
-   menu_touch( self, m, false);
-   return true;
-}
+Bool apc_menu_item_set_enabled( Handle self, PMenuItemReg m) { return false; }
 
-Bool
-apc_menu_item_set_enabled( Handle self, PMenuItemReg m)
-{
-   menu_touch( self, m, false);
-   menubar_repaint( self);
-   return true;
-}
+Bool apc_menu_item_set_image( Handle self, PMenuItemReg m) { return false; }
 
-Bool
-apc_menu_item_set_image( Handle self, PMenuItemReg m)
-{
-   menu_touch( self, m, false);
-   menubar_repaint( self);
-   return true;
-}
+Bool apc_menu_item_set_key( Handle self, PMenuItemReg m) { return false; }
 
-Bool
-apc_menu_item_set_key( Handle self, PMenuItemReg m)
-{
-   menu_touch( self, m, false);
-   return true;
-}
+Bool apc_menu_item_set_text( Handle self, PMenuItemReg m) { return false; }
 
-Bool
-apc_menu_item_set_text( Handle self, PMenuItemReg m)
-{
-   menu_touch( self, m, false);
-   menubar_repaint( self);
-   return true;
-}
+ApiHandle apc_menu_get_handle( Handle self) { return nilHandle; }
 
-ApiHandle
-apc_menu_get_handle( Handle self)
-{
-   return nilHandle;
-}
+Bool apc_popup_create( Handle self, Handle owner) { return false; }
 
-Bool
-apc_popup_create( Handle self, Handle owner)
-{
-   DEFMM;
-   apc_menu_destroy( self);
-   XX-> type.menu = true;
-   XX-> type.popup = true;
-   return true;
-}
+PFont apc_popup_default_font( PFont f) { return nil; }
 
-PFont
-apc_popup_default_font( PFont f)
-{
-   memcpy( f, &guts. default_menu_font, sizeof( Font));
-   return f;
-}
+Bool apc_popup( Handle self, int x, int y, Rect *anchor) { return false; }
 
-Bool
-apc_popup( Handle self, int x, int y, Rect *anchor)
-{
-   DEFMM;
-   PMenuItemReg m;
-   PMenuWindow w;
-   XWindow dummy;
-   PDrawableSysData owner;
-   int dx, dy;
-
-   prima_end_menu();
-   if (!(m=TREE)) return false;
-   guts. currentMenu = self;
-   if ( !send_cmMenu( self, nil)) return false;
-   if (!(w = get_window(self,m))) return false;
-   update_menu_window(XX, w);
-   if ( anchor-> left == 0 && anchor-> right == 0 && anchor-> top == 0 && anchor-> bottom == 0) {
-      anchor-> left = anchor-> right = x;
-      anchor-> top = anchor-> bottom = y;
-   } else {
-      if ( x < anchor-> left)   anchor-> left   = x;
-      if ( x > anchor-> right)  anchor-> right  = x;
-      if ( y < anchor-> bottom) anchor-> bottom = y;
-      if ( y > anchor-> top)    anchor-> top    = y;
-   }
-   owner = X(PComponent(self)->owner);
-   y = owner-> size. y - y;
-   anchor-> bottom = owner-> size. y - anchor-> bottom;
-   anchor-> top = owner-> size. y - anchor-> top;
-   dx = dy = 0;
-   XTranslateCoordinates( DISP, owner->udrawable, guts. root, dx, dy, &dx, &dy, &dummy);
-   x += dx;
-   y += dy;
-   anchor-> left   += dx;
-   anchor-> right  += dx;
-   anchor-> top    += dy;
-   anchor-> bottom += dy;
-   if ( anchor-> bottom + w-> sz.y <= guts. displaySize.y)
-      y = anchor-> bottom;
-   else if ( w-> sz. y < anchor-> top)
-      y = anchor-> top - w-> sz. y;
-   else
-      y = 0;
-   if ( anchor-> right + w-> sz.x <= guts. displaySize.x)
-      x = anchor-> right;
-   else if ( w-> sz.x < anchor-> left)
-      x = anchor-> left - w-> sz. x;
-   else
-      x = 0;
-   w-> pos. x = x;
-   w-> pos. y = y;
-   XX-> focused = w;
-   XGetInputFocus( DISP, &XX-> focus, &dx);
-   XMoveWindow( DISP, w->w, x, y);
-   XMapRaised( DISP, w->w);
-   XSetInputFocus( DISP, w->w, RevertToNone, CurrentTime);
-   XFlush( DISP);
-   XCHECKPOINT;
-   return true;
-}
-
-Bool
-apc_window_set_menu( Handle self, Handle menu)
-{
-   DEFXX;
-   int y = XX-> menuHeight;
-   Bool repal = false;
-   
-   if ( XX-> menuHeight > 0) {
-      PMenu m = ( PMenu) PWindow( self)-> menu;
-      PMenuWindow w = M(m)-> w;
-      if ( m-> handle == guts. currentMenu) prima_end_menu();
-      hash_delete( guts. menu_windows, &w-> w, sizeof( w-> w), false);
-      XDestroyWindow( DISP, w-> w);
-      free_unix_items( w);
-      m-> handle = nilHandle;
-      M(m)-> paint_pending = false;
-      M(m)-> focused = nil;
-      y = 0;
-      repal = true;
-   }
-
-   if ( menu) {
-      PMenu m = ( PMenu) menu;
-      XSetWindowAttributes attrs;
-      attrs. event_mask =           KeyPressMask | ButtonPressMask  | ButtonReleaseMask
-         | EnterWindowMask     | LeaveWindowMask | ButtonMotionMask | ExposureMask
-         | StructureNotifyMask | FocusChangeMask | OwnerGrabButtonMask
-         | PointerMotionMask;
-      attrs. do_not_propagate_mask = attrs. event_mask;
-      attrs. win_gravity = NorthWestGravity;
-      y = MENU_ITEM_GAP * 2;
-      M(m)-> w-> w = m-> handle = XCreateWindow( DISP, X_WINDOW, 
-         0, 0, 1, 1, 0, CopyFromParent, 
-         InputOutput, CopyFromParent, CWWinGravity| CWEventMask, &attrs);
-      hash_store( guts. menu_windows, &m-> handle, sizeof( m-> handle), m);
-      XResizeWindow( DISP, m-> handle, XX-> size.x, y);
-      XMapRaised( DISP, m-> handle);
-      M(m)-> paint_pending = true;
-      M(m)-> focused = nil;
-      update_menu_window(M(m), M(m)-> w);
-      menu_reconfigure( menu);
-      repal = true;
-   }
-   prima_window_reset_menu( self, y);
-   if ( repal) prima_palette_replace( self, false); 
-   return true;
-}
+Bool apc_window_set_menu( Handle self, Handle menu) { return false; }

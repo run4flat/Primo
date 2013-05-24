@@ -27,7 +27,6 @@
 
 object Prima::Window( Prima::Widget)
 {
-   Handle   menu;
    int      modal;
    int      modalResult;
 
@@ -38,7 +37,6 @@ object Prima::Window( Prima::Widget)
    property Point    frameSize;
    property Handle   icon;
    property Bool     mainWindow;
-   property Handle   menu;
    property Bool     modalHorizon;
    property int      modalResult;
    property Bool     onTop;

@@ -28,7 +28,6 @@
 
 #include "apricot.h"
 #include "Window.h"
-#include "Menu.h"
 #include "Icon.h"
 #include "Application.h"
 #include <Window.inc>
@@ -79,8 +78,6 @@ void
 Window_cleanup( Handle self)
 {
    if ( var-> modal) my-> cancel( self);
-   my-> detach( self, var-> menu, true);
-   var-> menu = nilHandle;
    inherited cleanup( self);
 }
 
@@ -527,20 +524,6 @@ Window_mainWindow( Handle self, Bool set, Bool mainWindow)
       return is_opt( optMainWindow);
    opt_assign( optMainWindow, mainWindow);
    return false;
-}
-
-Handle
-Window_menu( Handle self, Bool set, Handle menu)
-{
-   if ( var-> stage > csFrozen) return nilHandle;
-   if ( !set)
-      return var-> menu;
-   if ( menu && !kind_of( menu, CMenu)) return nilHandle;
-   else {
-      apc_window_set_menu( self, menu);
-      var-> menu = menu;
-   }
-   return nilHandle;
 }
 
 Bool

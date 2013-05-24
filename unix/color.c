@@ -1109,8 +1109,6 @@ prima_palette_replace( Handle self, Bool fast)
    if ( !fast) prima_palette_free( self, true); /* remove old entries */
   
    psz = PDrawable( self)-> palSize + menu;
-   if ( XT_IS_WINDOW(X(self)) && PWindow(self)-> menu) 
-      psz += (menu = ciMaxId + 1);
    if ( psz == 0) {
       prima_color_sync();
       return true; 
@@ -1272,9 +1270,6 @@ ALLOC_STAGE:
    stage = j; /* immutable and locked colors */
    for ( i = 0; i < widgets. count; i++) {
       j += PWidget( widgets. items[i])-> palSize;
-      if ( XT_IS_WINDOW(X(widgets. items[i])) && 
-           PWindow(widgets. items[i])-> menu)
-         j += ciMaxId + 1;
    }
    
    Pdebug("color: BIG:%d vs %d\n", j, psz);
