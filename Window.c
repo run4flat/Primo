@@ -55,8 +55,6 @@ Window_init( Handle self, HV * profile)
    opt_assign( optOwnerIcon, pget_B( ownerIcon));
    opt_assign( optMainWindow, pget_B( mainWindow));
    my-> set_icon( self, pget_H( icon));
-   if ( SvTYPE( sv = pget_sv( menuItems)) != SVt_NULL)
-      my-> set_menuItems( self, sv);
    my-> set_modalResult( self, pget_i( modalResult));
    my-> set_modalHorizon( self, pget_B( modalHorizon));
    CORE_INIT_TRANSIENT(Window);
@@ -538,36 +536,11 @@ Window_menu( Handle self, Bool set, Handle menu)
    if ( !set)
       return var-> menu;
    if ( menu && !kind_of( menu, CMenu)) return nilHandle;
-   if ( menu && (( PMenu) menu)-> owner != self)
-      my-> set_menuItems( self, ((( PMenu) menu)-> self)-> get_items( menu, ""));
    else {
       apc_window_set_menu( self, menu);
       var-> menu = menu;
    }
    return nilHandle;
-}
-
-SV *
-Window_menuItems( Handle self, Bool set, SV * menuItems)
-{
-   dPROFILE;
-   if ( var-> stage > csFrozen) return nilSV;
-
-   if ( !set)
-      return var-> menu ? CMenu( var-> menu)-> get_items( var-> menu, "") : nilSV;
-
-   if ( var-> menu == nilHandle) {
-     if ( SvTYPE( menuItems)) {
-         HV * profile = newHV();
-         pset_sv( items, menuItems);
-         pset_H ( owner, self);
-         pset_i ( selected, false);
-         my-> set_menu( self, create_instance( "Prima::Menu"));
-         sv_free(( SV *) profile);
-      }
-   } else
-     CMenu( var-> menu)-> set_items( var-> menu, menuItems);
-   return menuItems;
 }
 
 Bool
