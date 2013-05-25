@@ -448,11 +448,7 @@ prima_utf8_to_wchar( const char * utf8, XChar2b * u16, int src_len_bytes, int ta
 XChar2b *
 prima_alloc_utf8_to_wchar( const char * utf8, int length_chars)
 {
-   XChar2b * ret;
-   if ( length_chars < 0) length_chars = prima_utf8_length( utf8) + 1;
-   if ( !( ret = malloc( length_chars * sizeof( XChar2b)))) return nil;
-   prima_utf8_to_wchar( utf8, ret, strlen(utf8), length_chars);
-   return ret;
+   XChar2b * foo; return foo;
 }
 
 void 
