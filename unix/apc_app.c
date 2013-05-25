@@ -198,28 +198,13 @@ apc_application_get_gui_info( char * description, int len)
 Handle
 apc_application_get_widget_from_point( Handle self, Point p)
 {
-   XWindow from, to, child;
-
-   from = to = guts. root;
-   p. y = DisplayHeight( DISP, SCREEN) - p. y - 1;
-   while (XTranslateCoordinates(DISP, from, to, p.x, p.y, &p.x, &p.y, &child)) {
-      if (child) {
-         from = to;
-         to = child;
-      } else {
-         Handle h;
-         if ( to == from) to = X_WINDOW;
-         h = (Handle)hash_fetch( guts.windows, (void*)&to, sizeof(to));
-         return ( h == application) ? nilHandle : h;
-      }
-   }
    return nilHandle;
 }
 
 Handle
 apc_application_get_handle( Handle self, ApiHandle apiHandle)
 {
-   return prima_xw2h(( XWindow) apiHandle);
+   return nilHandle;
 }
 
 static Bool

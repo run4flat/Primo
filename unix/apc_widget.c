@@ -54,73 +54,8 @@ apc_widget_get_parent_handle( Handle self)
 Handle
 apc_widget_get_z_order( Handle self, int zOrderId)
 {
-   DEFXX;
-   XWindow root, parent, *children;
-   unsigned int count;
-   int i, inc;
-   Handle ret = nilHandle;
-
-   if ( !( PComponent(self)-> owner))
-      return self;
-
-   switch ( zOrderId) {
-   case zoFirst:
-      i = 1;
-      inc = -1;
-      break;
-   case zoLast:
-      i  = 1;
-      inc = 1;
-      break;
-   case zoNext:
-      i = 0;
-      inc = -1;
-      break;
-   case zoPrev:
-      i = 0;
-      inc = 1;
-      break;
-   default:
-      return nilHandle;
-   }
-
-   if ( XQueryTree( DISP, X(PComponent(self)-> owner)-> client, 
-      &root, &parent, &children, &count) == 0)
-         return nilHandle;
-
-   if ( count == 0) goto EXIT;
-
-   if ( i == 0) {
-      int found = -1;
-      for ( i = 0; i < count; i++) {
-         if ( children[ i] == XX-> client) {
-            found = i;
-            break;
-         }   
-      }   
-      if ( found < 0) { /* if !clipOwner */
-         ret = self;
-         goto EXIT; 
-      }   
-      i = found + inc;
-      if ( i < 0 || i >= count) goto EXIT; /* last in line */
-   } else
-      i = ( zOrderId == zoFirst) ? count - 1 : 0;
-   
-   while ( 1) {
-      Handle who = ( Handle) hash_fetch( guts. windows, (void*)&(children[i]), sizeof(X_WINDOW));
-      if ( who) {
-         ret = who;
-         break;
-      }   
-      i += inc;
-      if ( i < 0 || i >= count) break;
-   }   
-
-EXIT:   
-   if ( children) XFree( children);
-   return ret;
-}   
+   return nilHandle;
+}
 
 void
 process_transparents( Handle self)
@@ -198,7 +133,7 @@ apc_widget_get_first_click( Handle self)
 Handle
 apc_widget_get_focused( void)
 {
-   return guts. focused;
+   return nilHandle;
 }
 
 ApiHandle

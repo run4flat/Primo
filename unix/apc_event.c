@@ -53,11 +53,7 @@ prima_xw2h( XWindow win)
     tries to map X window to Prima's native handle
  */
 {
-   Handle self;
-   self = (Handle)hash_fetch( guts.windows, (void*)&win, sizeof(win));
-   if (!self) 
-      self = (Handle)hash_fetch( guts.menu_windows, (void*)&win, sizeof(win));
-   return self;
+   return nilHandle;
 }
 
 extern Bool appDead;

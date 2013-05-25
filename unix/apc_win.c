@@ -185,9 +185,7 @@ apc_window_close( Handle self)
 Handle
 apc_window_get_active( void)
 {
-   Handle x = guts. focused;
-   while ( x && !X(x)-> type. window) x = PWidget(x)-> owner;
-   return x;
+   return nilHandle;
 }
 
 int

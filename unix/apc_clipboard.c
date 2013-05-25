@@ -244,27 +244,7 @@ expand_clipboards( Handle self, int keyLen, void * key, void * dummy)
 Handle
 apc_clipboard_register_format( Handle self, const char* format)
 {
-   int i;
-   Atom x = XInternAtom( DISP, format, false);
-   Atom *f;
-
-   for ( i = 0; i < guts. clipboard_formats_count; i++) {
-      if ( x == CF_NAME(i)) 
-         return i;
-   }
-
-   if ( !( f = realloc( guts. clipboard_formats, 
-      sizeof( Atom) * 3 * ( guts. clipboard_formats_count + 1)))) 
-      return false;
-   
-   guts. clipboard_formats = f;
-   CF_ASSIGN( guts. clipboard_formats_count, x, x, 8); 
-   guts. clipboard_formats_count++;
-
-   if ( hash_first_that( guts. clipboards, (void*)expand_clipboards, nil, nil, nil))
-      return -1;
-
-   return guts. clipboard_formats_count - 1;
+   return nilHandle;
 }
 
 Bool
