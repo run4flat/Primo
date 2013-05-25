@@ -315,52 +315,7 @@ xft_add_item( unsigned long ** list, int * count, int * size, FcChar32 chr,
 unsigned long *
 prima_xft_get_font_ranges( Handle self, int * count)
 {
-   FcChar32 ucs4, last = 0, haslast = 0;
-   FcChar32 map[FC_CHARSET_MAP_SIZE];
-   FcChar32 next;
-   FcCharSet *c = X(self)-> font-> xft-> charset;
-   int size = 16;
-   unsigned long * ret;
-
-#define ADD(ch,flag) if(!xft_add_item(&ret,count,&size,ch,flag)) return ret
-
-   *count = 0;
-   if ( !c) return false;
-   if ( !( ret = malloc( sizeof( unsigned long) * size))) return nil;
-
-   if ( FcCharSetCount(c) == 0) {
-      /* better than nothing */
-      ADD( 32, true);
-      ADD( 128, false);
-      return ret;
-   }
-
-   for (ucs4 = FcCharSetFirstPage (c, map, &next);
-        ucs4 != FC_CHARSET_DONE;
-        ucs4 = FcCharSetNextPage (c, map, &next))
-   {
-       int i, j;
-       for (i = 0; i < FC_CHARSET_MAP_SIZE; i++)
-           if (map[i]) {
-               for (j = 0; j < 32; j++)
-                   if (map[i] & (1 << j)) {
-                       FcChar32 u = ucs4 + i * 32 + j;
-                       if ( haslast) {
-                          if ( last != u - 1) {
-                             ADD( last,true);
-                             ADD( u,false);
-                          }
-                       } else {
-                          ADD( u,false);
-                          haslast = 1;
-                       }
-                       last = u;
-                   }
-           }
-   }
-   if ( haslast) ADD( last,true);
-
-   return ret;
+   unsigned long * foo; return foo;
 }
 
 PFontABC

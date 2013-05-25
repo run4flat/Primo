@@ -427,27 +427,7 @@ apc_gp_get_font_abc( Handle self, int firstChar, int lastChar, Bool unicode)
 unsigned long *
 apc_gp_get_font_ranges( Handle self, int * count)
 {
-   DEFXX;
-   unsigned long * ret = nil;
-   XFontStruct * fs;
-   /*
-   if (!XX-> font) apc_gp_set_font( self, &PDrawable( self)-> font);
-   if (!XX-> font) return nil;
-   */
-#ifdef USE_XFT
-   if ( XX-> font-> xft)
-      return prima_xft_get_font_ranges( self, count);
-#endif
-   fs = XX-> font-> fs;
-   *count = (fs-> max_byte1 - fs-> min_byte1 + 1) * 2;
-   if (( ret = malloc( sizeof( unsigned long) * ( *count)))) {
-      int i;
-      for ( i = fs-> min_byte1; i <= fs-> max_byte1; i++) {
-         ret[(i - fs-> min_byte1) * 2 + 0] = i * 256 + fs-> min_char_or_byte2;
-         ret[(i - fs-> min_byte1) * 2 + 1] = i * 256 + fs-> max_char_or_byte2;
-      }
-   }
-   return ret;
+   unsigned long * foo; return foo;
 }
 
 Bool
