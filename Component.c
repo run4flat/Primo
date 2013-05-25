@@ -276,66 +276,7 @@ void Component_get_components_REDEFINED( Handle self) {}
 UV
 Component_add_notification( Handle self, char * name, SV * subroutine, Handle referer, int index)
 {
-   UV     ret;
-   PList  list;
-   int    nameLen = strlen( name);
-   SV   * res;
-
-   res = my-> notification_types( self);
-   if ( !hv_exists(( HV *) SvRV( res), name, nameLen)) {
-       sv_free( res);
-       warn("RTC04B: No such event %s", name);
-       return 0;
-   }
-   sv_free( res);
-
-   if ( !subroutine || !SvROK( subroutine) || ( SvTYPE( SvRV( subroutine)) != SVt_PVCV)) {
-      warn("RTC04C: Not a CODE reference passed to %s to Component::add_notification", name);
-      return 0;
-   }
-
-   if ( referer == nilHandle) referer = self;
-
-   if ( var-> eventIDs == nil) {
-      var-> eventIDs = hash_create();
-      ret = 0;
-   } else
-      ret = (UV) hash_fetch( var-> eventIDs, name, nameLen);
-
-   if ( ret == 0) {
-      hash_store( var-> eventIDs, name, nameLen, INT2PTR(void*, var-> eventIDCount + 1));
-      if ( var-> events == nil)
-         var-> events = ( List*) malloc( sizeof( List));
-      else {
-         void * cf = realloc( var-> events, ( var-> eventIDCount + 1) * sizeof( List));
-         if ( cf == nil) free( var-> events);
-         var-> events = ( List*) cf;
-      }
-      if ( var-> events == nil) croak("No enough memory");
-      list = var-> events + var-> eventIDCount++;
-      list_create( list, 2, 2);
-   } else
-      list = var-> events +  PTR2UV( ret) - 1;
-
-   ret   = (UV) newSVsv( subroutine);
-   index = list_insert_at( list, referer, index);
-   list_insert_at( list, ( Handle) ret, index + 1);
-
-   if ( referer != self) {
-      if ( PComponent( referer)-> refs == nil)
-         PComponent( referer)-> refs = plist_create( 2, 2);
-      else
-         if ( list_index_of( PComponent( referer)-> refs, self) >= 0) goto NO_ADDREF;
-      list_add( PComponent( referer)-> refs, self);
-   NO_ADDREF:;
-      if ( var-> refs == nil)
-         var-> refs = plist_create( 2, 2);
-      else
-         if ( list_index_of( var-> refs, referer) >= 0) goto NO_SELFREF;
-      list_add( var-> refs, referer);
-   NO_SELFREF:;
-   }
-   return ret;
+   UV foo; return foo;
 }
 
 void

@@ -428,9 +428,7 @@ Image_put_image_indirect( Handle self, Handle image, int x, int y, int xFrom, in
 UV
 Image_add_notification( Handle self, char * name, SV * subroutine, Handle referer, int index)
 {
-   UV id = inherited add_notification( self, name, subroutine, referer, index);
-   if ( id != 0) Image_reset_notifications( self);
-   return id;
+   UV foo; return foo;
 }
 
 void

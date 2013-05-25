@@ -91,9 +91,7 @@ File_mask( Handle self, Bool set, int mask)
 UV
 File_add_notification( Handle self, char * name, SV * subroutine, Handle referer, int index)
 {
-   UV id = inherited-> add_notification( self, name, subroutine, referer, index);
-   if ( id != 0) File_reset_notifications( self);
-   return id;
+   UV foo; return foo;
 }
 
 void
