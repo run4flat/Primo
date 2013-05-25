@@ -92,7 +92,6 @@
 #include "queue.h"
 #include "Widget.h"
 #include "Image.h"
-#include "img_conv.h"
 
 #ifdef USE_MITSHM
 /* at least some versions of XShm.h do not prototype XShmGetEventBase() */
@@ -198,7 +197,7 @@ typedef struct _RotatedFont {
    int          lineSize;
    int          defaultChar1;
    int          defaultChar2;
-   Fixed        sin, cos, sin2, cos2;
+   //Fixed        sin, cos, sin2, cos2;
    struct       RotatedFont *next;
 } RotatedFont, *PRotatedFont;
 

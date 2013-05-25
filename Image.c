@@ -26,14 +26,12 @@
  * $Id$
  */
 
-#include "img.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <limits.h>
 #include <math.h>
 #include "apricot.h"
 #include "Image.h"
-#include "img_conv.h"
 #include <Image.inc>
 #include "Clipboard.h"
 

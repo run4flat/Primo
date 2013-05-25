@@ -1338,8 +1338,6 @@ push_hv push_hv_for_REDEFINED query_method sv_call_perl sv_query_method
 unprotect_object perl_error
 );
 	push @Prima_exports, grep { /^(apc|list|prima)/ } suck_symbols('include/apricot.h');
-	push @Prima_exports, suck_symbols('include/img.h');
-	push @Prima_exports, suck_symbols('include/img_conv.h');
 	my %g = map { $_ => 1 } @Prima_exports;
 	delete @g{qw(prima_utf8_to_uv prima_uv_to_utf8)};
 	@Prima_exports = sort keys %g;

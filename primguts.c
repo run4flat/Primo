@@ -52,7 +52,6 @@
 #include "Application.h"
 #include "Timer.h"
 #include "Utils.h"
-#include "img_conv.h"
 #include "Hummingbird.h"
 
 

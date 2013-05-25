@@ -28,7 +28,6 @@
 
 #include "apricot.h"
 #include "Icon.h"
-#include "img_conv.h"
 #include <Icon.inc>
 
 #ifdef __cplusplus
