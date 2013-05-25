@@ -55,18 +55,6 @@ Icon_init( Handle self, HV * profile)
 SV *
 Icon_mask( Handle self, Bool set, SV * svmask)
 {
-   STRLEN maskSize;
-   void * mask;
-   int am = var-> autoMasking;
-   if ( var-> stage > csFrozen) return nilSV;
-   if ( !set)
-      return newSVpvn(( char *) var-> mask, var-> maskSize);
-   mask = SvPV( svmask, maskSize);
-   if ( is_opt( optInDraw) || maskSize <= 0) return nilSV;
-   memcpy( var-> mask, mask, maskSize > var-> maskSize ? var-> maskSize : maskSize);
-   var-> autoMasking = amNone;
-   my-> update_change( self);
-   var-> autoMasking = am;
    return nilSV;
 }
 

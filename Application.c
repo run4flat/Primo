@@ -122,73 +122,13 @@ void Application_send_to_back( Handle self) {}
 SV*
 Application_fonts( Handle self, char * name, char * encoding)
 {
-   int count, i;
-   AV * glo = newAV();
-   PFont fmtx = apc_fonts( self, name[0] ? name : nil,
-      encoding[0] ? encoding : nil, &count);
-   for ( i = 0; i < count; i++) {
-      SV * sv      = sv_Font2HV( &fmtx[ i]);
-      HV * profile = ( HV*) SvRV( sv);
-      if ( fmtx[i]. utf8_flags & FONT_UTF8_NAME) {
-         SV ** entry = hv_fetch(( HV*) SvRV( sv), "name", 4, 0);
-	 if ( entry && SvOK( *entry))
-            SvUTF8_on( *entry);
-      }	 
-      if ( fmtx[i]. utf8_flags & FONT_UTF8_FAMILY) {
-         SV ** entry = hv_fetch(( HV*) SvRV( sv), "family", 6, 0);
-	 if ( name && SvOK( *entry))
-            SvUTF8_on( *entry);
-      }	 
-      if ( fmtx[i]. utf8_flags & FONT_UTF8_ENCODING) {
-         SV ** entry = hv_fetch(( HV*) SvRV( sv), "encoding", 8, 0);
-	 if ( name && SvOK( *entry))
-            SvUTF8_on( *entry);
-      }	 
-      if ( name[0] == 0 && encoding[0] == 0) {
-         /* Read specially-coded (const char*) encodings[] vector,
-            stored in fmtx[i].encoding. First pointer is filled with 0s,
-            except the last byte which is a counter. Such scheme
-            allows max 31 encodings per entry to be coded with sizeof(char*)==8.
-            The interface must be re-implemented, but this requires
-            either change in gencls syntax so arrays can be members of hashes,
-            or passing of a dynamic-allocated pointer vector here.
-          */
-         char ** enc = (char**) fmtx[i].encoding;
-         unsigned char * shift = (unsigned char*) enc + sizeof(char *) - 1, j = *shift;
-         AV * loc = newAV();
-         pset_sv_noinc( encoding, newSVpv(( j > 0) ? *(++enc) : "", 0));
-         while ( j--) av_push( loc, newSVpv(*(enc++),0));
-         pset_sv_noinc( encodings, newRV_noinc(( SV*) loc));
-      }
-      pdelete( resolution);
-      pdelete( codepage);
-      av_push( glo, sv);
-   }
-   free( fmtx);
-   return newRV_noinc(( SV *) glo);
+   return nilSV;
 }
 
 SV*
 Application_font_encodings( Handle self, char * encoding)
 {
-   AV * glo = newAV();
-   HE *he;
-   PHash h = apc_font_encodings( self);
-
-   if ( !h) return newRV_noinc(( SV *) glo);
-   hv_iterinit(( HV*) h);
-   for (;;)
-   {
-      void *value, *key;
-      STRLEN  keyLen;
-      if (( he = hv_iternext( h)) == nil)
-         break;
-      value  = HeVAL( he);
-      key    = HeKEY( he);
-      keyLen = HeKLEN( he);
-      av_push( glo, newSVpvn(( char*) key, keyLen));
-   }
-   return newRV_noinc(( SV *) glo);
+   return nilSV;
 }
 
 Font
@@ -269,29 +209,7 @@ Application_get_system_value( char * dummy, int sysValue)
 SV *
 Application_get_system_info( char * dummy)
 {
-   HV * profile = newHV();
-   char system   [ 1024];
-   char release  [ 1024];
-   char vendor   [ 1024];
-   char arch     [ 1024];
-   char gui_desc [ 1024];
-   int  os, gui;
-
-   os  = apc_application_get_os_info( system, sizeof( system),
-                                      release, sizeof( release),
-                                      vendor, sizeof( vendor),
-                                      arch, sizeof( arch));
-   gui = apc_application_get_gui_info( gui_desc, sizeof( gui_desc));
-
-   pset_i( apc,            os);
-   pset_i( gui,            gui);
-   pset_c( system,         system);
-   pset_c( release,        release);
-   pset_c( vendor,         vendor);
-   pset_c( architecture,   arch);
-   pset_c( guiDescription, gui_desc);
-
-   return newRV_noinc(( SV *) profile);
+   return nilSV;
 }
 
 Handle
@@ -363,10 +281,7 @@ Application_autoClose( Handle self, Bool set, Bool autoClose)
 SV *
 Application_sys_action( char * dummy, char * params)
 {
-   char * i = apc_system_action( params);
-   SV * ret = i ? newSVpv( i, 0) : nilSV;
-   free( i);
-   return ret;
+   return nilSV;
 }
 
 typedef struct _SingleColor
@@ -517,7 +432,7 @@ Handle Application_prev( Handle self) { return self;}
 SV *
 Application_palette( Handle self, Bool set, SV * palette)
 {
-   return CDrawable-> palette( self, set, palette);
+   return nilSV;
 }
 
 Handle

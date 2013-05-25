@@ -73,37 +73,13 @@ File_handle_event( Handle self, PEvent event)
 SV *
 File_file( Handle self, Bool set, SV * file)
 {
-   if ( !set)
-      return var-> file ? newSVsv( var-> file) : nilSV;
-   if ( var-> file) {
-      apc_file_detach( self);
-      sv_free( var-> file);
-   }
-   var-> file = nil;
-   var-> fd = -1;
-   if ( file && ( SvTYPE( file) != SVt_NULL)) {
-      FileStream f = IoIFP(sv_2io(file));
-      if (!f) {
-         warn("RTC0A0: Not a IO reference passed to File::set_file");
-      } else {
-         var-> file = newSVsv( file);
-         var-> fd = PerlIO_fileno( f);
-         if ( !apc_file_attach( self)) {
-            sv_free( var-> file);
-            var-> file = nil;
-            var-> fd   = -1;
-         }
-      }
-   }
    return nilSV;
 }
 
 SV *
 File_get_handle( Handle self)
 {
-   char buf[ 256];
-   snprintf( buf, 256, "0x%08x", var-> fd);
-   return newSVpv( buf, 0);
+   return nilSV;
 }
 
 int

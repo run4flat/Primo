@@ -148,15 +148,7 @@ Clipboard_format_exists( Handle self, char * format)
 SV *
 Clipboard_fetch( Handle self, char * format)
 {
-   SV * ret;
-   PClipboardFormatReg fr = first_that( self, (void*)find_format, format);
-   my-> open( self);
-   if ( !fr || !my-> format_exists( self, format))
-      ret = newSVsv( nilSV);
-   else
-      ret = fr-> server( self, fr, cefFetch, nilSV);
-   my-> close( self);
-   return ret;
+   return nilSV;
 }
 
 void
@@ -172,9 +164,7 @@ Clipboard_clear( Handle self)
 SV *
 Clipboard_get_handle( Handle self)
 {
-   char buf[ 256];
-   snprintf( buf, 256, "0x%08lx", apc_clipboard_get_handle( self));
-   return newSVpv( buf, 0);
+   return nilSV;
 }
 
 
@@ -260,114 +250,24 @@ void Clipboard_get_standard_clipboards_REDEFINED     ( Handle self) {}
 static SV *
 text_server( Handle self, PClipboardFormatReg instance, int function, SV * data)
 {
-   ClipboardDataRec c;
-
-   switch( function) {
-   case cefInit:
-      return ( SV *) cfText;
-
-   case cefFetch:
-      if ( apc_clipboard_get_data( self, cfText, &c)) {
-         data = newSVpv(( char*) c. data, c. length);
-         free( c. data);
-         return data;
-      }
-      break;
-
-   case cefStore:
-      if ( prima_is_utf8_sv( data)) {
-	 /* jump to UTF8. close() will later downgrade data to ascii, if any */
-         instance = formats + cfUTF8;
-         return instance-> server( self, instance, cefStore, data);
-      } else {
-         c. data = ( Byte*) SvPV( data, c. length);
-         instance-> written = apc_clipboard_set_data( self, cfText, &c);
-      }
-      break;
-   }
    return nilSV;
 }
 
 static SV *
 utf8_server( Handle self, PClipboardFormatReg instance, int function, SV * data)
 {
-   ClipboardDataRec c;
-
-   switch( function) {
-   case cefInit:
-      return ( SV *) cfUTF8;
-
-   case cefFetch:
-      if ( apc_clipboard_get_data( self, cfUTF8, &c)) {
-         data = newSVpv(( char*) c. data, c. length);
-         SvUTF8_on( data);
-         free( c. data);
-         return data;
-      }
-      break;
-
-   case cefStore:
-      c. data = ( Byte*) SvPV( data, c. length);
-      instance-> written = apc_clipboard_set_data( self, cfUTF8, &c);
-      break;
-   }
    return nilSV;
 }
 
 static SV *
 image_server( Handle self, PClipboardFormatReg instance, int function, SV * data)
 {
-    ClipboardDataRec c;
-    switch( function) {
-    case cefInit:
-       return ( SV *) cfBitmap;
-    case cefFetch:
-       {
-          HV * profile = newHV();
-          c. image = Object_create( "Prima::Image", profile);
-          sv_free(( SV *) profile);
-          if ( apc_clipboard_get_data( self, cfBitmap, &c)) {
-             --SvREFCNT( SvRV( PImage(c. image)-> mate));
-             return newSVsv( PImage(c. image)->  mate);
-          }
-          Object_destroy( c. image);
-       }
-       break;
-    case cefStore:
-       c. image = gimme_the_mate( data);
-
-       if ( !kind_of( c. image, CImage)) {
-          warn("RTC0023: Not an image passed to clipboard");
-          return nilSV;
-       }
-       instance-> written = apc_clipboard_set_data( self, cfBitmap, &c);
-       break;
-    }
-    return nilSV;
+   return nilSV;
 }
 
 static SV *
 binary_server( Handle self, PClipboardFormatReg instance, int function, SV * data)
 {
-   ClipboardDataRec c;
-   switch( function) {
-   case cefInit:
-      return ( SV*) apc_clipboard_register_format( self, instance-> id);
-   case cefDone:
-      apc_clipboard_deregister_format( self, instance-> sysId);
-      break;
-   case cefFetch:
-      if ( apc_clipboard_get_data( self, instance-> sysId, &c)) {
-         SV * ret = newSVpv((char*) c. data, c. length);
-         free( c. data);
-         return ret;
-      }
-      break;
-   case cefStore:
-      c. data = (Byte*) SvPV( data, c. length);
-      instance-> written = apc_clipboard_set_data( self, instance-> sysId, &c);
-      break;
-   }
    return nilSV;
 }
 

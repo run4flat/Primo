@@ -135,9 +135,7 @@ Image_size( Handle self, Bool set, Point size)
 SV *
 Image_get_handle( Handle self)
 {
-   char buf[ 256];
-   snprintf( buf, 256, "0x%08lx", apc_image_get_handle( self));
-   return newSVpv( buf, 0);
+   return nilSV;
 }
 
 Color
@@ -176,19 +174,6 @@ Image_get_nearest_color( Handle self, Color color)
 SV *
 Image_data( Handle self, Bool set, SV * svdata)
 {
-   void *data;
-   STRLEN dataSize;
-
-   if ( var->stage > csFrozen) return nilSV;
-
-   if ( !set)
-      return newSVpvn(( char *) var-> data, var-> dataSize);
-
-   data = SvPV( svdata, dataSize);
-   if ( is_opt( optInDraw) || dataSize <= 0) return nilSV;
-
-   memcpy( var->data, data, dataSize > var->dataSize ? var->dataSize : dataSize);
-   my-> update_change( self);
    return nilSV;
 }
 
@@ -553,28 +538,6 @@ Image_resample( Handle self, double srcLo, double srcHi, double dstLo, double ds
 SV *
 Image_palette( Handle self, Bool set, SV * palette)
 {
-   if ( var->stage > csFrozen) return nilSV;
-   if ( set) {
-      int ps;
-      if ( var->type & imGrayScale) return nilSV;
-      if ( !var->palette)           return nilSV;
-      ps = apc_img_read_palette( var->palette, palette, true);
-      
-      if ( ps)
-         var-> palSize = ps;
-      else
-         warn("RTC0107: Invalid array reference passed to Image::palette");
-      my-> update_change( self);
-   } else {
-      int i;
-      AV * av = newAV();
-      int colors = ( 1 << ( var->type & imBPP)) & 0x1ff;
-      Byte * pal = ( Byte*) var->palette;
-      if (( var->type & imGrayScale) && (( var->type & imBPP) > imbpp8)) colors = 256;
-      if ( var-> palSize < colors) colors = var-> palSize;
-      for ( i = 0; i < colors*3; i++) av_push( av, newSViv( pal[ i]));
-      return newRV_noinc(( SV *) av);
-   }
    return nilSV;
 }
 
@@ -600,187 +563,7 @@ Image_preserveType( Handle self, Bool set, Bool preserveType)
 SV *
 Image_pixel( Handle self, Bool set, int x, int y, SV * pixel)
 {
-#define BGRto32(pal) ((var->palette[pal].r<<16) | (var->palette[pal].g<<8) | (var->palette[pal].b))
-   if (!set) {
-      if ( opt_InPaint)
-         return inherited pixel(self,false,x,y,pixel);
-
-      if ((x>=var->w) || (x<0) || (y>=var->h) || (y<0))
-         return newSViv( clInvalid);
-
-      if ( var-> type & (imComplexNumber|imTrigComplexNumber)) {
-         AV * av = newAV(); 
-         switch ( var-> type) {
-         case imComplex:
-         case imTrigComplex: {
-            float * f = (float*)(var->data + (var->lineSize*y+x*2*sizeof(float)));
-            av_push( av, newSVnv( *(f++)));
-            av_push( av, newSVnv( *f));
-            break;
-         }
-         case imDComplex:
-         case imTrigDComplex: {
-            double * f = (double*)(var->data + (var->lineSize*y+x*2*sizeof(double)));
-            av_push( av, newSVnv( *(f++)));
-            av_push( av, newSVnv( *f));
-            break;
-         }
-         }
-         return newRV_noinc(( SV*) av);
-      } else if ( var-> type & imRealNumber) {
-         switch ( var-> type) {
-         case imFloat: 
-            return newSVnv(*(float*)(var->data + (var->lineSize*y+x*sizeof(float))));
-         case imDouble: 
-            return newSVnv(*(double*)(var->data + (var->lineSize*y+x*sizeof(double))));
-         default:
-            return nilSV;
-      }} else
-         switch (var->type & imBPP) {
-      case imbpp1:
-         {
-            Byte p=var->data[var->lineSize*y+(x>>3)];
-            p=(p >> (7-(x & 7))) & 1;
-            return newSViv(((var->type & imGrayScale) ? (p ? 255 : 0) : BGRto32(p)));
-         }
-      case imbpp4:
-         {
-            Byte p=var->data[var->lineSize*y+(x>>1)];
-            p=(x&1) ? p & 0x0f : p>>4;
-            return newSViv(((var->type & imGrayScale) ? (p*255L)/15 : BGRto32(p)));
-         }
-      case imbpp8:
-         {
-            Byte p=var->data[var->lineSize*y+x];
-            return newSViv(((var->type & imGrayScale) ? p :  BGRto32(p)));
-         }
-      case imbpp16:
-         {
-            return newSViv(*(Short*)(var->data + (var->lineSize*y+x*2)));
-         }
-      case imbpp24:
-         {
-            RGBColor p=*(PRGBColor)(var->data + (var->lineSize*y+x*3));
-            return newSViv((p.r<<16) | (p.g<<8) | p.b);
-         }
-      case imbpp32:
-         return newSViv(*(Long*)(var->data + (var->lineSize*y+x*4)));
-      default:
-         return newSViv(clInvalid);
-      }
-#undef BGRto32
-   } else {
-      Color color;
-      RGBColor rgb;
-#define LONGtoBGR(lv,clr)   ((clr).b=(lv)&0xff,(clr).g=((lv)>>8)&0xff,(clr).r=((lv)>>16)&0xff,(clr))
-      if ( is_opt( optInDraw)) 
-         return inherited pixel(self,true,x,y,pixel);
-
-      if ((x>=var->w) || (x<0) || (y>=var->h) || (y<0)) 
-         return nilSV;
-
-      if ( var-> type & (imComplexNumber|imTrigComplexNumber)) {
-         if ( !SvROK( pixel) || ( SvTYPE( SvRV( pixel)) != SVt_PVAV)) {
-            switch ( var-> type) {
-            case imComplex:
-            case imTrigComplex:
-               *(float*)(var->data+(var->lineSize*y+x*2*sizeof(float)))=SvNV(pixel);
-               break;
-            case imDComplex:
-            case imTrigDComplex:
-               *(double*)(var->data+(var->lineSize*y+x*2*sizeof(double)))=SvNV(pixel);
-               break;
-            default:
-               return nilSV;
-            }
-         } else {
-            AV * av = (AV *) SvRV( pixel);
-            SV **sv[2];
-            sv[0] = av_fetch( av, 0, 0);
-            sv[1] = av_fetch( av, 1, 0);
-            
-            switch ( var-> type) {
-            case imComplex:
-            case imTrigComplex:
-               if ( sv[0]) *(float*)(var->data+(var->lineSize*y+x*2*sizeof(float)))=SvNV(*(sv[0]));
-               if ( sv[1]) *(float*)(var->data+(var->lineSize*y+(x*2+1)*sizeof(float)))=SvNV(*(sv[1]));
-               break;
-            case imDComplex:
-            case imTrigDComplex:
-               if ( sv[0]) *(double*)(var->data+(var->lineSize*y+x*2*sizeof(double)))=SvNV(*(sv[0]));
-               if ( sv[1]) *(double*)(var->data+(var->lineSize*y+(x*2+1)*sizeof(double)))=SvNV(*(sv[1]));
-               break;
-            default:
-               return nilSV;
-            }
-         }
-      } else if ( var-> type & imRealNumber) {
-         switch ( var-> type) {
-         case imFloat:  
-            *(float*)(var->data+(var->lineSize*y+x*sizeof(float)))=SvNV(pixel);
-            break;
-         case imDouble: 
-            *(double*)(var->data+(var->lineSize*y+x*sizeof(double)))=SvNV(pixel);
-            break;
-         default:
-            return nilSV;
-         }
-         my->update_change( self);
-         return nilSV;
-      }
-      
-      color = SvIV( pixel);
-      switch (var->type & imBPP) {
-      case imbpp1  :
-         {
-            int x1=7-(x&7);
-            Byte p=(((var->type & imGrayScale) ? color/255 : cm_nearest_color(LONGtoBGR(color,rgb),var->palSize,var->palette)) & 1);
-            Byte *pd=var->data+(var->lineSize*y+(x>>3));
-            *pd&=~(1 << x1);
-            *pd|=(p << x1);
-         }
-         break;
-      case imbpp4  :
-         {
-            Byte p=((var->type & imGrayScale) ? (color*15)/255 : cm_nearest_color(LONGtoBGR(color,rgb),var->palSize,var->palette));
-            Byte *pd=var->data+(var->lineSize*y+(x>>1));
-            if (x&1) {
-               *pd&=0xf0;
-            }
-            else {
-               p<<=4;
-               *pd&=0x0f;
-            }
-            *pd|=p;
-         }
-         break;
-      case imbpp8:
-         {
-            if (var->type & imGrayScale) {
-               var->data[(var->lineSize)*y+x]=color;
-            }
-            else {
-               var->data[(var->lineSize)*y+x]=cm_nearest_color(LONGtoBGR(color,rgb),(var->palSize),(var->palette));
-            }
-         }
-         break;
-      case imbpp16 :
-         *(Short*)(var->data+(var->lineSize*y+(x<<1)))=color;
-         break;
-      case imbpp24 :
-         LONGtoBGR(color,rgb);
-         memcpy((var->data + (var->lineSize*y+x*3)),&rgb,sizeof(RGBColor));
-         break;
-      case imbpp32 :
-         *(Long*)(var->data+(var->lineSize*y+(x<<2)))=color;
-         break;
-      default:
-         return nilSV;
-      }
-      my->update_change( self);
-#undef LONGtoBGR
-      return nilSV;
-   }
+   return nilSV;
 }
 
 Handle
@@ -919,18 +702,7 @@ Image_map( Handle self, Color color)
 SV * 
 Image_codecs( SV * dummy)
 {
-   int i;
-   AV * av = newAV();
-   PList p = plist_create( 16, 16);
-   apc_img_codecs( p);  
-   for ( i = 0; i < p-> count; i++) {
-      PImgCodec c = ( PImgCodec ) p-> items[ i];
-      HV * profile = apc_img_info2hash( c);
-      pset_i( codecID, i);
-      av_push( av, newRV_noinc(( SV *) profile)); 
-   }  
-   plist_destroy( p);
-   return newRV_noinc(( SV *) av); 
+   return nilSV;
 }
 
 Bool

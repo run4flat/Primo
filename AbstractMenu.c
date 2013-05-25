@@ -68,7 +68,7 @@ void AbstractMenu_cleanup( Handle self) {}
 
 void AbstractMenu_set( Handle self, HV * profile) {}
 
-static SV * new_av(  PMenuItemReg m, int level) { return nil; }
+static SV * new_av(  PMenuItemReg m, int level) { return nilSV; }
 
 static Bool var_match( Handle self, PMenuItemReg m, void * params) {
    return false;

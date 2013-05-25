@@ -159,44 +159,7 @@ Widget_end_paint_info( Handle self)
 SV*
 Widget_fetch_resource( char *className, char *name, char *classRes, char *res, Handle owner, int resType)
 {
-   char *str = nil;
-   Color clr;
-   void *parm;
-   Font font;
-   SV * ret;
-
-   switch ( resType) {
-   case frColor:
-      parm = &clr; break;
-   case frFont:
-      parm = &font;
-      bzero( &font, sizeof( font));
-      break;
-   default:
-      parm = &str;
-      resType = frString;
-   }
-
-   if ( !apc_fetch_resource(
-      prima_normalize_resource_string( className, true),
-      prima_normalize_resource_string( name, false),
-      prima_normalize_resource_string( classRes, true),
-      prima_normalize_resource_string( res, false),
-      owner, resType, parm))
-      return nilSV;
-
-   switch ( resType) {
-   case frColor:
-      ret = newSViv( clr);
-      break;
-   case frFont:
-      ret = sv_Font2HV( &font);
-      break;
-   default:
-      ret = str ? newSVpv( str, 0) : nilSV;
-      free( str);
-   }
-   return ret;
+   return nilSV;
 }
 
 Handle
@@ -690,18 +653,14 @@ Widget_growMode( Handle self, Bool set, int growMode)
 SV *
 Widget_get_handle( Handle self)
 {
-   char buf[ 256];
-   snprintf( buf, 256, "0x%08lx", apc_widget_get_handle( self));
-   return newSVpv( buf, 0);
+   return nilSV;
 }
 
 
 SV *
 Widget_get_parent_handle( Handle self)
 {
-   char buf[ 256];
-   snprintf( buf, 256, "0x%08lx", apc_widget_get_parent_handle( self));
-   return newSVpv( buf, 0);
+   return nilSV;
 }
 
 int
@@ -935,20 +894,6 @@ auto_enable_children( Handle self, Handle child, void * enable)
 SV *
 Widget_accelItems( Handle self, Bool set, SV * accelItems)
 {
-   dPROFILE;
-   enter_method;
-   if ( var-> stage > csFrozen) return nilSV;
-   if ( !set)
-      return var-> accelTable ?
-             CAbstractMenu( var-> accelTable)-> get_items( var-> accelTable, "") : nilSV;
-   if ( var-> accelTable == nilHandle) {
-      HV * profile = newHV();
-      if ( SvTYPE( accelItems)) pset_sv( items, accelItems);
-      pset_H ( owner, self);
-      my-> set_accelTable( self, create_instance( "Prima::AccelTable"));
-      sv_free(( SV *) profile);
-   } else
-      CAbstractMenu( var-> accelTable)-> set_items( var-> accelTable, accelItems);
    return nilSV;
 }
 
@@ -1144,46 +1089,12 @@ Widget_focused( Handle self, Bool set, Bool focused)
 SV *
 Widget_helpContext( Handle self, Bool set, SV *helpContext)
 {
-   if ( set) {
-      if ( var-> stage > csFrozen) return nilSV;
-      free( var-> helpContext);
-      var-> helpContext = duplicate_string( SvPV_nolen( helpContext));
-      opt_assign( optUTF8_helpContext, prima_is_utf8_sv(helpContext));
-   } else {
-      helpContext = newSVpv( var-> helpContext ? var-> helpContext : "", 0);
-      if ( is_opt( optUTF8_helpContext)) SvUTF8_on( helpContext);
-      return helpContext;
-   }
    return nilSV;
 }
 
 SV *
 Widget_hint( Handle self, Bool set, SV *hint)
 {
-   enter_method;
-   if ( set) {
-      if ( var-> stage > csFrozen) return nilSV;
-      my-> first_that( self, (void*)hint_notify, (void*)hint);
-      free( var-> hint);
-      var-> hint = duplicate_string( SvPV_nolen( hint));
-      opt_assign( optUTF8_hint, prima_is_utf8_sv(hint));
-      if ( application && (( PApplication) application)-> hintVisible &&
-           (( PApplication) application)-> hintUnder == self)
-      {
-         SV   * hintText   = my-> get_hint( self);
-         Handle hintWidget = (( PApplication) application)-> hintWidget;
-         if ( strlen( var-> hint) == 0) 
-            my-> set_hintVisible( self, 0);
-         if ( hintWidget) 
-            CWidget(hintWidget)-> set_text( hintWidget, hintText);
-         sv_free( hintText);
-      }
-      opt_clear( optOwnerHint);
-   } else {
-      hint = newSVpv( var-> hint ? var-> hint : "", 0);
-      if ( is_opt( optUTF8_hint)) SvUTF8_on( hint);
-      return hint;
-   }
    return nilSV;
 }
 
@@ -1247,23 +1158,6 @@ Widget_ownerShowHint( Handle self, Bool set, Bool ownerShowHint )
 SV *
 Widget_palette( Handle self, Bool set, SV * palette)
 {
-   int colors;
-   if ( !set)
-      return inherited-> palette( self, set, palette);
-
-   if ( var-> stage > csFrozen) return nilSV;
-   if ( var-> handle == nilHandle) return nilSV; /* aware of call from Drawable::init */
-
-   colors = var-> palSize;
-   free( var-> palette);
-   var-> palette = read_palette( &var-> palSize, palette);
-   opt_clear( optOwnerPalette);
-   if ( colors == 0 && var-> palSize == 0)
-      return nilSV; /* do not bother apc */
-   if ( opt_InPaint)
-      apc_gp_set_palette( self);
-   else
-      apc_widget_set_palette( self);
    return nilSV;
 }
 
@@ -1364,25 +1258,7 @@ Widget_popupColorIndex( Handle self, Bool set, int index, Color color)
 SV *
 Widget_popupItems( Handle self, Bool set, SV * popupItems)
 {
-   dPROFILE;
-   enter_method;
-   if ( var-> stage > csFrozen) return nilSV;
-   if ( !set)
-      return var-> popupMenu ?
-         CAbstractMenu( var-> popupMenu)-> get_items( var-> popupMenu, "") : nilSV;
-
-   if ( var-> popupMenu == nilHandle) {
-     if ( SvTYPE( popupItems)) {
-         HV * profile = newHV();
-         pset_sv( items, popupItems);
-         pset_H ( owner, self);
-         my-> set_popup( self, create_instance( "Prima::Popup"));
-         sv_free(( SV *) profile);
-      }
-   }
-   else
-      CAbstractMenu( var-> popupMenu)-> set_items( var-> popupMenu, popupItems);
-   return popupItems;
+   return nilSV;
 }
 
 
@@ -1619,16 +1495,6 @@ Widget_transparent( Handle self, Bool set, Bool transparent)
 SV *
 Widget_text( Handle self, Bool set, SV *text)
 {
-   if ( set) {
-      if ( var-> stage > csFrozen) return nilSV;
-      free( var-> text);
-      var-> text = duplicate_string( SvPV_nolen( text));
-      opt_assign( optUTF8_text, prima_is_utf8_sv(text));
-   } else {
-      text = newSVpv( var-> text ? var-> text : "", 0);
-      if ( is_opt( optUTF8_text)) SvUTF8_on( text);
-      return text;
-   }
    return nilSV;
 }
 

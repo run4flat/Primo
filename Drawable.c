@@ -209,7 +209,6 @@ Drawable_get_physical_palette( Handle self)
 SV *
 Drawable_get_font_abc( Handle self, int first, int last, Bool unicode)
 {
-
    return nilSV;
 }
 
@@ -503,7 +502,6 @@ Drawable_translate( Handle self, Bool set, Point translate)
 SV *
 Drawable_fillPattern( Handle self, Bool set, SV * svpattern)
 {
-
    return nilSV;
 }
 

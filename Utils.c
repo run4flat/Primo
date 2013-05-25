@@ -37,9 +37,7 @@ extern "C" {
 
 SV *Utils_query_drives_map( char *firstDrive)
 {
-   char map[ 256];
-   apc_query_drives_map( firstDrive, map, sizeof( map));
-   return newSVpv( map, 0);
+   return nilSV;
 }
 
 int

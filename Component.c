@@ -112,17 +112,6 @@ Component_detach( Handle self, Handle object, Bool kill)
 SV *
 Component_name( Handle self, Bool set, SV * name)
 {
-   if ( set) {
-      free( var-> name);
-      var-> name = duplicate_string( SvPV_nolen( name));
-      opt_assign( optUTF8_name, prima_is_utf8_sv(name));
-      if ( var-> stage >= csNormal)
-         apc_component_fullname_changed_notify( self);
-   } else {
-      name = newSVpv( var-> name ? var-> name : "", 0);
-      if ( is_opt( optUTF8_name)) SvUTF8_on( name);
-      return name;
-   }
    return nilSV;
 }
 
@@ -195,7 +184,7 @@ Component_event_error( Handle self)
 SV *
 Component_get_handle( Handle self)
 {
-   return newSVsv( nilSV);
+   return nilSV;
 }
 
 static Bool
@@ -725,63 +714,6 @@ void Component_set_notification_REDEFINED( Handle self, char * name, SV * subrou
 SV *
 Component_delegations( Handle self, Bool set, SV * delegations)
 {
-   if ( set) {
-      int i, len;
-      AV * av;
-      Handle referer;
-      char *name;
-
-      if ( var-> stage > csNormal) return nilSV;
-      if ( !SvROK( delegations) || SvTYPE( SvRV( delegations)) != SVt_PVAV) return nilSV;
-
-      referer = var-> owner;
-      name    = var-> name;
-      av = ( AV *) SvRV( delegations);
-      len = av_len( av);
-      for ( i = 0; i <= len; i++) {
-         SV **holder = av_fetch( av, i, 0);
-         if ( !holder) continue;
-         if ( SvROK( *holder)) {
-            Handle mate = gimme_the_mate( *holder);
-            if (( mate == nilHandle) || !kind_of( mate, CComponent)) continue;
-            referer = mate;
-         } else if ( SvPOK( *holder)) {
-            CV * sub;
-            SV * subref;
-            char buf[ 1024];
-            char * event = SvPV_nolen( *holder);
-
-	    if ( referer == nilHandle)
-	       croak("Event delegations for objects without owners must be provided with explicit referer");
-            snprintf( buf, 1023, "%s_%s", name, event);
-            sub = query_method( referer, buf, 0);
-            if ( sub == nil) continue;
-            my-> add_notification( self, event, subref = newRV(( SV*) sub), referer, -1);
-            sv_free( subref);
-         }
-      }
-   } else {
-      HE * he;
-      AV * av = newAV();
-      Handle last = nilHandle;
-      if ( var-> stage > csNormal || var-> eventIDs == nil)
-         return newRV_noinc(( SV*) av);
-
-      hv_iterinit( var-> eventIDs);
-      while (( he = hv_iternext( var-> eventIDs)) != nil) {
-         int i;
-         char * event = ( char *) HeKEY( he);
-         PList list = var-> events + PTR2UV( HeVAL( he)) - 1;
-         for ( i = 0; i < list-> count; i += 2) {
-            if ( list-> items[i] != last) {
-               last = list-> items[i];
-               av_push( av, newSVsv((( PAnyObject) last)-> mate));
-            }
-            av_push( av, newSVpv( event, 0));
-         }
-      }
-      return newRV_noinc(( SV*) av);
-   }
    return nilSV;
 }
 
