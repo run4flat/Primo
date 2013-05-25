@@ -160,21 +160,13 @@ Image_set_extended_data( Handle self, HV * profile)
 static size_t
 img_perlio_read( void * f, size_t bufsize, void * buffer)
 {
-#ifdef PerlIO
-    return PerlIO_read(( FileStream) f, buffer, bufsize);
-#else
-    return fread( buffer, 1, bufsize, ( FileStream) f);
-#endif
+   size_t foo; return foo;
 }
 
 static size_t
 img_perlio_write( void * f, size_t bufsize, void * buffer)
 {
-#ifdef PerlIO
-    return PerlIO_write( ( FileStream) f, buffer, bufsize);
-#else
-    return fwrite( buffer, 1, bufsize, ( FileStream) f);
-#endif
+   size_t foo; return foo;
 }
 
 static int
@@ -186,11 +178,7 @@ img_perlio_seek( void * f, long offset, int whence)
 static long 
 img_perlio_tell( void * f)
 {
-#ifdef PerlIO
-    return PerlIO_tell( ( FileStream) f);
-#else
-    return ftell( ( FileStream) f);
-#endif
+   long foo; return foo;
 }
 
 static int
@@ -288,59 +276,7 @@ Image_update_change( Handle self)
 double
 Image_stats( Handle self, Bool set, int index, double value)
 {
-   if ( index < 0 || index > isMaxIndex) return 0;
-   if ( set) {
-      var-> stats[ index] = value;
-      var-> statsCache |= 1 << index;
-      return 0;
-   } else {
-#define gather_stats(TYP) if ( var->data) {                \
-         TYP *src = (TYP*)var->data, *stop, *s;            \
-         maxv = minv = *src;                              \
-         for ( y = 0; y < var->h; y++) {                   \
-            s = src;  stop = s + var->w;                   \
-            while (s != stop) {                           \
-               v = (double)*s;                            \
-               sum += v;                                  \
-               sum2 += v*v;                               \
-               if ( minv > v) minv = v;                   \
-               if ( maxv < v) maxv = v;                   \
-               s++;                                       \
-            }                                             \
-            src = (TYP*)(((Byte *)src) + var->lineSize);   \
-         }                                                \
-      }
-      int y;
-      double sum = 0.0, sum2 = 0.0, minv = 0.0, maxv = 0.0, v;
-
-      if ( var->statsCache & ( 1 << index)) return var->stats[ index];
-      /* calculate image stats */
-      switch ( var->type) {
-         case imByte:    gather_stats(uint8_t);break;
-         case imShort:   gather_stats(int16_t);  break;
-         case imLong:    gather_stats(int32_t);   break;
-         case imFloat:   gather_stats(float);  break;
-         case imDouble:  gather_stats(double); break;
-         default:        return 0;
-      }
-      if ( var->w * var->h > 0)
-      {
-         var->stats[ isSum] = sum;
-         var->stats[ isSum2] = sum2;
-         sum /= var->w * var->h;
-         sum2 /= var->w * var->h;
-         sum2 = sum2 - sum*sum;
-         var->stats[ isMean] = sum;
-         var->stats[ isVariance] = sum2;
-         var->stats[ isStdDev] = sqrt(sum2);
-         var->stats[ isRangeLo] = minv;
-         var->stats[ isRangeHi] = maxv;
-      } else {
-         for ( y = 0; y <= isMaxIndex; y++) var->stats[ y] = 0;
-      }
-      var->statsCache = (1 << (isMaxIndex + 1)) - 1;
-   }
-   return var->stats[ index];
+   double foo; return foo;
 }
 
 void

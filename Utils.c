@@ -54,12 +54,12 @@ Utils_get_gui()
 
 long Utils_ceil( double x)
 {
-    return ceil( x);
+   long foo; return foo;
 }
 
 long Utils_floor( double x)
 {
-    return floor( x);
+   long foo; return foo;
 }
 
 XS(Utils_getdir_FROMPERL) {
