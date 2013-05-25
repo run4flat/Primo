@@ -205,26 +205,7 @@ apc_dbm_get_handle( Handle self)
 static Byte*
 mirror_bits( void)
 {
-   static Bool initialized = false;
-   static Byte bits[256];
-   unsigned int i, j;
-   int k;
-
-   if (!initialized) {
-      for ( i = 0; i < 256; i++) {
-         bits[i] = 0;
-         j = i;
-         for ( k = 0; k < 8; k++) {
-            bits[i] <<= 1;
-            if ( j & 0x1)
-               bits[i] |= 1;
-            j >>= 1;
-         }
-      }
-      initialized = true;
-   }
-
-   return bits;
+   Byte* foo; return foo;
 }
 
 void
