@@ -948,65 +948,7 @@ prima_done_color_subsystem( void)
 int
 prima_color_find( Handle self, long color, int maxDiff, int * diff, int maxRank)
 {
-   int i, j, ret = -1;
-   int global;
-   int b = color & 0xff;
-   int g = (color >> 8) & 0xff;
-   int r = (color >> 16) & 0xff;
-   int lossy = maxDiff != 0;
-   if ( maxDiff < 0) maxDiff = 256 * 256 * 3;
-   global = self ? (X(self)-> type. widget && ( self != application)) : true;
-
-   maxDiff++;
-   if ( global || !guts. dynamicColors || (maxRank > RANK_FREE)) {
-      for ( i = 0; i < guts. palSize; i++) {
-         if ( guts. palette[i]. rank > maxRank) {
-            if ( lossy) {
-               int d = 
-                    ( b - guts. palette[i].b) * ( b - guts. palette[i].b) +
-                    ( g - guts. palette[i].g) * ( g - guts. palette[i].g) +
-                    ( r - guts. palette[i].r) * ( r - guts. palette[i].r);
-               if ( d < maxDiff) {
-                  ret = i;
-                  maxDiff = d;
-                  if ( maxDiff == 0) break;
-               }
-            } else {
-               if ( color == guts. palette[i]. composite) {
-                  ret = i;
-                  break;
-               }
-            }
-         }
-      }
-   } else {
-      for ( j = 0; j < guts. systemColorMapSize + guts. palSize; j++) {
-         if ( j < guts. systemColorMapSize) 
-            i = guts. systemColorMap[j];
-         else {
-            i = j - guts. systemColorMapSize;
-            if ( wlpal_get( self, i) == RANK_FREE) continue;
-         }
-         if ( lossy) {
-            int d = 
-                 ( b - guts. palette[i].b) * ( b - guts. palette[i].b) +
-                 ( g - guts. palette[i].g) * ( g - guts. palette[i].g) +
-                 ( r - guts. palette[i].r) * ( r - guts. palette[i].r);
-            if ( d < maxDiff) {
-               ret = i;
-               maxDiff = d;
-               if ( maxDiff == 0) break;
-            }
-         } else {
-            if ( color == guts. palette[i]. composite) {
-               ret = i;
-               break;
-            }
-         }
-      }
-   }
-   if ( diff) *diff = maxDiff;
-   return ret;
+   int foo; return foo;
 }
 
 static Bool
@@ -1051,38 +993,7 @@ prima_color_add_ref( Handle self, int index, int rank)
 int
 prima_color_sync( void)
 {
-   int i, count = 0, freed = 0;
-   unsigned long free[32];
-   MainColorEntry * p = guts. palette;
-   for ( i = 0; i < guts. palSize; i++, p++) {
-      if ( p-> touched) {
-         int j, max = RANK_FREE;
-         for ( j = 0; j < p-> users. count; j++) {
-            int rank;
-            if ( X(p-> users. items[j])-> type. widget) {
-               rank = wlpal_get( p-> users. items[j], i);
-               if ( rank > 0)
-                  rank = ( rank > 1) ? RANK_PRIORITY : RANK_NORMAL;
-            } else
-               rank = RANK_LOCKED;
-            if ( max < rank) max = rank;
-            if ( max == RANK_LOCKED) break;
-         }
-         p-> rank = max;
-         if ( max == RANK_FREE) {
-            free[ count++] = i;
-            if ( count == 32) {
-               XFreeColors( DISP, guts. defaultColormap, free, 32, 0);
-               count = 0;
-               freed += 32;
-            }
-         }
-         p-> touched = false;
-      }
-   }
-   if ( count > 0)
-      XFreeColors( DISP, guts. defaultColormap, free, count, 0);
-   return freed + count;
+   int foo; return foo;
 }
 
 /* updates contents of DefaultColormap.  */
@@ -1393,7 +1304,7 @@ prima_palette_free( Handle self, Bool priority)
 int
 prima_lpal_get( Byte * palette, int index)
 {
-   return LPAL_GET( index, palette[ LPAL_ADDR( index ) ]);
+   int foo; return foo;
 }
 
 void 

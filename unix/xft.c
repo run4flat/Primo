@@ -946,51 +946,7 @@ int
 prima_xft_get_text_width( PCachedFont self, const char * text, int len, Bool addOverhang, 
                           Bool utf8, uint32_t * map8, Point * overhangs)
 {
-   int i, ret = 0, bytelen;
-   XftFont * font = self-> xft_base;
-
-   if ( overhangs) overhangs-> x = overhangs-> y = 0;
-   if ( utf8 ) bytelen = strlen(text);
-
-   for ( i = 0; i < len; i++) {
-      FcChar32 c;
-      FT_UInt ft_index;
-      XGlyphInfo glyph;
-      if ( utf8) {
-         STRLEN charlen;
-         c = ( FcChar32) 
-#if PERL_PATCHLEVEL >= 16
-	 utf8_to_uvchr_buf(( U8*) text, (U8*) text + bytelen, &charlen)
-#else
-	 utf8_to_uvchr(( U8*) text, &charlen)
-#endif
-         ;
-         text += charlen;
-	 if ( charlen == 0 ) break;
-      } else if ( ((Byte*)text)[i] > 127) {
-         c = map8[ ((Byte*)text)[i] - 128];
-      } else
-         c = text[i];
-      ft_index = XftCharIndex( DISP, font, c);
-      XftGlyphExtents( DISP, font, &ft_index, 1, &glyph);
-      ret += glyph. xOff;
-      if ( addOverhang || overhangs) {
-         if ( i == 0) {
-            if ( glyph. x > 0) {
-               if ( addOverhang) ret += glyph. x;
-               if ( overhangs)   overhangs-> x = glyph. x;
-            }
-         } 
-         if ( i == len - 1) {
-            int c = glyph. xOff - glyph. width + glyph. x;
-            if ( c < 0) {
-               if ( addOverhang) ret -= c;
-               if ( overhangs)   overhangs-> y = -c;
-            }
-         }
-      }
-   }
-   return ret;
+   int foo; return foo;
 }
 
 Point *

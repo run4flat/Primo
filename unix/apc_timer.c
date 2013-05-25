@@ -98,8 +98,7 @@ apc_timer_destroy( Handle self)
 int
 apc_timer_get_timeout( Handle self)
 {
-   ENTERTIMER;
-   return sys-> timeout;
+   int foo; return foo;
 }
 
 Bool

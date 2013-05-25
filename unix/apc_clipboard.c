@@ -362,24 +362,7 @@ typedef struct {
 static int
 selection_filter( Display * disp, XEvent * ev, SelectionProcData * data)
 {
-   switch ( ev-> type) {
-   case PropertyNotify:
-      return (data-> mask & PROPERTY_NOTIFY_MASK) && (data-> selection == ev-> xproperty. atom);
-   case SelectionRequest:
-   case SelectionClear:
-   case MappingNotify:
-      return true;
-   case SelectionNotify:
-      return (data-> mask & SELECTION_NOTIFY_MASK) && (data-> selection == ev-> xselection. selection);
-   case ClientMessage:
-      if ( ev-> xclient. window == WIN ||
-           ev-> xclient. window == guts. root ||
-           ev-> xclient. window == None) return true;
-      if ( hash_fetch( guts.windows, (void*)&ev-> xclient. window, 
-           sizeof(ev-> xclient. window))) return false;
-      return true;
-   }
-   return false;
+   int foo; return foo;
 }
 
 #define CFDATA_NONE            0
@@ -395,53 +378,7 @@ static int
 read_property( Atom property, Atom * type, int * format, 
                unsigned long * size, unsigned char ** data)
 {
-   int ret = ( *size > 0) ? RPS_PARTIAL : RPS_ERROR;
-   unsigned char * prop, *a1;
-   unsigned long n, left, offs = 0, new_size, big_offs = *size;
-
-   XCHECKPOINT;
-   Cdebug("clipboard: read_property: %s\n", XGetAtomName(DISP, property));
-   while ( 1) {
-      if ( XGetWindowProperty( DISP, WIN, property,
-          offs, guts. limits. request_length - 4, false, 
-          AnyPropertyType, 
-          type, format, &n, &left, &prop) != Success) {
-         XDeleteProperty( DISP, WIN, property);
-	 Cdebug("clipboard:fail\n");
-         return ret;
-      }
-      XCHECKPOINT;
-      Cdebug("clipboard: type=0x%x(%s) fmt=%d n=%d left=%d\n", 
-	     *type, XGetAtomName(DISP,*type), *format, n, left);
-      
-      if ( *format == 32) *format = CF_32;
-
-      if ( *type == 0 ) return RPS_NODATA;
-
-      new_size = n * *format / 8;
-
-      if ( new_size > 0) {
-         if ( !( a1 = realloc( *data, big_offs + offs * 4 + new_size))) {
-            warn("Not enough memory: %ld bytes\n", offs * 4 + new_size);
-            XDeleteProperty( DISP, WIN, property);
-            XFree( prop);
-            return ret;
-         }
-         *data = a1;
-         memcpy( *data + big_offs + offs * 4, prop, new_size);
-         *size = big_offs + (offs * 4) + new_size;
-         if ( *size > INT_MAX) *size = INT_MAX;
-         offs += new_size / 4;
-         ret = RPS_PARTIAL;
-      }
-      XFree( prop);
-      if ( left <= 0 || *size == INT_MAX || n * *format == 0) break;
-   }
-
-   XDeleteProperty( DISP, WIN, property);
-   XCHECKPOINT;
-
-   return RPS_OK;
+   int foo; return foo;
 }
 
 static Bool

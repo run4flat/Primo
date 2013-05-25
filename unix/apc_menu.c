@@ -122,13 +122,7 @@ get_window( Handle self, PMenuItemReg m)
 static int
 item_count( PMenuWindow w)
 {
-   int i = 0;
-   PMenuItemReg m = w->m;
-
-   while (m) {
-      i++; m=m->next;
-   }
-   return i;
+   int foo; return foo;
 }
 
 static void
@@ -184,22 +178,7 @@ menu_window_delete_downlinks( PMenuSysData XX, PMenuWindow wx)
 static int
 get_text_width( PCachedFont font, const char * text, int byte_length, Bool utf8, uint32_t * xft_map8)
 {
-   int ret = 0;
-   int char_len = utf8 ? utf8_length(( U8*) text, ( U8*) text + byte_length) : byte_length;
-#ifdef USE_XFT
-   if ( font-> xft)
-      return prima_xft_get_text_width( font, text, char_len, false, utf8, xft_map8, nil);
-#endif   
-   if ( utf8) {
-      XChar2b * xc = prima_alloc_utf8_to_wchar( text, char_len);
-      if ( xc) {
-         ret = XTextWidth16( font-> fs, xc, char_len);
-         free( xc);
-      }
-   } else {
-      ret = XTextWidth( font-> fs, text, byte_length);
-   }
-   return ret;
+   int foo; return foo;
 }
 
 typedef struct {
@@ -355,67 +334,7 @@ update_menu_window( PMenuSysData XX, PMenuWindow w)
 static int
 menu_point2item( PMenuSysData XX, PMenuWindow w, int x, int y, PMenuItemReg * m_ptr)
 {
-   int l = 0, r = 0, index = 0;
-   PMenuItemReg m;
-   PUnixMenuItem ix;
-   if ( !w) return -1;
-   m = w-> m;
-   ix = w-> um;
-   if ( !ix) return -1;
-   if ( w == &XX-> wstatic) {
-      int right = w-> right;
-      l = r = 0;
-      if ( x < l) return -1;
-      while ( m) {
-         if ( m-> flags. divider) {
-            if ( right > 0) {
-               r += right;
-               right = 0;
-            }
-            if ( x < r) return -1;
-         } else {
-            if ( index <= w-> last) {
-               r += MENU_XOFFSET * 2 + ix-> width;
-               if ( m-> accel) r += MENU_XOFFSET/2 + ix-> accel_width;
-            } else
-               r += MENU_XOFFSET * 2 + XX-> guillemots;
-            if (x >= l && x <= r) {
-               if ( m_ptr) *m_ptr = m;
-               return index;
-            }
-            if ( index > w-> last) return -1;
-         }
-         l = r;
-         index++;
-         ix++;
-         m = m-> next;
-      }
-   } else {
-      l = r = 2;
-      if ( y < l) return -1;
-      while ( m) {
-         if ( index > w-> last) {
-            r += MENU_ITEM_GAP * 2 + XX-> font-> font. height;
-            goto CHECK;
-         } else if ( m-> flags. divider) {
-            r += MENU_ITEM_GAP * 2;
-            if ( y < r) return -1;
-         } else {
-            r += ix-> height;
-         CHECK:   
-            if ( y >= l && y <= r) {
-               if ( m_ptr) *m_ptr = m;
-               return index;
-            }
-            if ( index > w-> last) return -1;
-         }
-         l = r;
-         index++;
-         ix++;
-         m = m-> next;
-      }
-   }
-   return -1;
+   int foo; return foo;
 }
 
 static Point
@@ -1344,7 +1263,7 @@ NEXT_STAGE:
 }
 
 int prima_handle_menu_shortcuts( Handle self, XEvent * ev, KeySym keysym) {
-   return 0;
+   int foo; return foo;
 }
 
 void prima_end_menu(void) {}

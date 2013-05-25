@@ -974,7 +974,7 @@ apc_font_default( PFont f)
 int
 apc_font_load( const char* filename)
 {
-   return 0;
+   int foo; return foo;
 }
 
 static void
@@ -1056,72 +1056,7 @@ prima_init_try_height( HeightGuessStack * p, int target, int firstMove )
 int
 prima_try_height( HeightGuessStack * p, int height)
 {
-   int ret = -1;
-   
-   if ( p-> locked != 0) return p-> locked;
-   if ( p-> sp >= MAX_HGS_SIZE) goto DONT_ADVISE;
-
-   if ( p-> sp > 1) {
-      int x0 = p-> xlfd[ p-> sp - 2];
-      int x1 = p-> xlfd[ p-> sp - 1];
-      int y0 = p-> prima[ p-> sp - 2];
-      int y1 = p-> prima[ p-> sp - 1] = height;
-      int d0 = y0 - p-> target;
-      int d1 = y1 - p-> target;
-      if (( d0 < 0 && d1 < 0 && d1 >= d0) || ( d0 > 0 && d1 > 0 && d1 <= d0)) { /* underflow */
-         int sp = p-> sp - 2;
-         while ( d1 == d0 && sp-- > 0) { /* not even moved */
-            x0 = p-> xlfd[ sp];
-            y0 = p-> prima[ sp];
-            d0 = y0 - p-> target;
-         }
-         if ( d1 != d0) {
-            ret = x0 + ( x1 - x0) * ( p-> target - y0) / ( y1 - y0) + 0.5;
-            if ( ret == x1 ) ret += ( d1 < 0) ? 1 : -1;
-            if ( ret < 1 ) ret = 1;
-         }
-      } else if ((( d0 < 0 && d1 > 0) || ( d0 > 0 && d1 < 0)) && ( abs(x0 - x1) > 1)) { /* overflow */
-         ret = x0 + ( x1 - x0) * ( p-> target - y0) / ( y1 - y0) + 0.5;
-         if ( ret == x0 ) ret += ( d0 < 0) ? 1 : -1; else
-         if ( ret == x1 ) ret += ( d1 < 0) ? 1 : -1;
-         if ( ret < 1 ) ret = 1;
-      }
-      /* printf("-- [%d=>%d],[%d=>%d] (%d %d)\n", x0, y0, x1, y1, d0, d1); */
-   } else {
-      if ( height > 0) /* sp == 0 */
-         ret = p-> xlfd[0] * p-> target / height;
-      p-> prima[ p-> sp - 1] = height;
-   }
-
-   if ( ret > 0) {
-      int i;
-      for ( i = 0; i < p-> sp; i++) 
-         if ( p-> xlfd[ i] == ret) { /* advised already? */
-            ret = -1;
-            break;
-         }
-      p-> xlfd[ p-> sp] = ret;
-   } 
-
-   p-> sp++;
-   
-DONT_ADVISE:   
-   if ( ret < 0) { /* select closest match */
-      int i, best_i = -1, best_diff = INT_MAX, diff, sp = p-> sp - 1; 
-      for ( i = 0; i < sp; i++) {
-         diff = p-> target - p-> prima[i];
-         if ( diff < 0) diff += 1000;
-         if ( best_diff > diff) {
-            best_diff = diff;
-            best_i = i;
-         }
-      }
-      if ( best_i >= 0 && p-> xlfd[best_i] != p-> xlfd[ sp - 1]) 
-         ret = p-> xlfd[best_i];
-      p-> locked = -1;
-   }
-
-   return ret;
+   int foo; return foo;
 }
 
 static void

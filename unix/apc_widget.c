@@ -171,38 +171,7 @@ process_transparents( Handle self)
 static int
 flush_events( Display * disp, XEvent * ev, Handle self)
 {
-   XWindow win;
-   /* leave only configuration unrelated commands on the queue */
-   switch ( ev-> type) {
-   case SelectionRequest:
-   case SelectionClear:
-   case MappingNotify:
-   case SelectionNotify:
-   case ClientMessage:
-   case MapNotify:
-   case UnmapNotify:
-   case KeymapNotify:
-   case KeyPress:
-   case KeyRelease:
-   case PropertyNotify:
-   case ColormapNotify:
-   case DestroyNotify:
-      return false;
-   }
-
-   switch ( ev-> type) {
-   case ConfigureNotify:
-   case -ConfigureNotify:
-      win = ev-> xconfigure. window;
-      break;
-   case ReparentNotify:
-      win = ev-> xreparent. window;
-      break;
-   default:
-      win = ev-> xany. window;
-   }
-
-   return win == X(self)-> client || win == X_WINDOW;
+   int foo; return foo;
 }
 
 Bool
@@ -952,9 +921,7 @@ apc_widget_set_first_click( Handle self, Bool firstClick)
 static int
 flush_refocus( Display * disp, XEvent * ev, void * dummy)
 {
-   return ev-> type == ClientMessage && 
-          ev-> xclient. message_type == WM_PROTOCOLS &&
-        (Atom) ev-> xclient. data. l[0] == WM_TAKE_FOCUS;
+   int foo; return foo;
 }
 
 Bool

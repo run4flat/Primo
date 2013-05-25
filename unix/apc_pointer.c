@@ -29,7 +29,7 @@
 #include "unix/guts.h"
 #include "Icon.h"
 
-static int
+ static int
 cursor_map[] = {
    /* crArrow           => */   XC_left_ptr,
    /* crText            => */   XC_xterm,
@@ -49,7 +49,7 @@ cursor_map[] = {
    /* crInvalid         => */   XC_X_cursor,
 };
 
-Cursor
+ Cursor
 predefined_cursors[] = {
    None,
    None,
@@ -72,20 +72,7 @@ predefined_cursors[] = {
 static int
 get_cursor( Handle self, Pixmap *source, Pixmap *mask, Point *hot_spot, Cursor *cursor)
 {
-   int id = X(self)-> pointer_id;
-
-   while ( self && ( id = X(self)-> pointer_id) == crDefault)
-      self = PWidget(self)-> owner;
-   if ( id == crDefault) {
-      id = crArrow;
-   } else if ( id == crUser) {
-      if (source)       *source   = X(self)-> user_p_source;
-      if (mask)         *mask     = X(self)-> user_p_mask;
-      if (hot_spot)     *hot_spot = X(self)-> pointer_hot_spot;
-      if (cursor)       *cursor   = X(self)-> user_pointer;
-   }
-
-   return id;
+   int foo; return foo;
 }
 
 static Bool
@@ -153,7 +140,7 @@ apc_pointer_get_pos( Handle self)
 int
 apc_pointer_get_shape( Handle self)
 {
-   return X(self)->pointer_id;
+   int foo; return foo;
 }
 
 Point

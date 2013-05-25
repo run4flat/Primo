@@ -50,7 +50,7 @@
 #define COLOR_G16(x) ((x)&0xFF00)
 #define COLOR_B16(x) (((x)<<8)&0xFF00)
 
-static int rop_map[] = {
+ static int rop_map[] = {
    GXcopy	/* ropCopyPut */,		/* dest  = src */
    GXxor	/* ropXorPut */,		/* dest ^= src */
    GXand	/* ropAndPut */,		/* dest &= src */
@@ -72,10 +72,7 @@ static int rop_map[] = {
 int
 prima_rop_map( int rop)
 {
-   if ( rop < 0 || rop >= sizeof( rop_map)/sizeof(int))
-      return GXnoop;
-   else
-      return rop_map[ rop];
+   int foo; return foo;
 }
 
 void
@@ -480,38 +477,7 @@ apc_gp_done( Handle self)
 static int
 arc_completion( double * angleStart, double * angleEnd, int * needFigure)
 {
-   int max;
-   double diff = ((long)( fabs( *angleEnd - *angleStart) * 1000 + 0.5)) / 1000;
-
-   if ( diff == 0) {
-      *needFigure = false;
-      return 0;
-   }
-
-   while ( *angleStart > *angleEnd)
-      *angleEnd += 360;
-
-   while ( *angleStart < 0) {
-      *angleStart += 360;
-      *angleEnd   += 360;
-   }
-
-   while ( *angleStart >= 360) {
-      *angleStart -= 360;
-      *angleEnd   -= 360;
-   }
-
-   while ( *angleEnd >= *angleStart + 360)
-      *angleEnd -= 360;
-
-   if ( diff < 360) {
-      *needFigure = true;
-      return 0;
-   }
-
-   max = (int)(diff / 360);
-   *needFigure = ( max * 360) != diff;
-   return ( max % 2) ? 1 : 2;
+   int foo; return foo;
 }
 
 static void
@@ -906,13 +872,8 @@ apc_gp_fill_sector( Handle self, int x, int y, int dX, int dY, double angleStart
 static int
 get_pixel_depth( int depth) 
 {
-   if ( depth ==  1) return  1; else
-   if ( depth <=  4) return  4; else
-   if ( depth <=  8) return  8; else
-   if ( depth <= 16) return 16; else
-   if ( depth <= 24) return 24; else
-   return 32;
-}   
+   int foo; return foo;
+}
    
 
 static uint32_t
@@ -1060,39 +1021,8 @@ hline( FillSession * fs, int x1, int y, int x2)
 static int
 fill( FillSession * fs, int sx, int sy, int d, int pxl, int pxr)
 {
-   int x, xr = sx;
-   while ( sx > fs-> clip. left  && fs_get_pixel( fs, sx - 1, sy)) sx--;
-   while ( xr < fs-> clip. right && fs_get_pixel( fs, xr + 1, sy)) xr++;
-   hline( fs, sx, sy, xr);
-
-   if ( sy + d >= fs-> clip. top && sy + d <= fs-> clip. bottom) {
-      x = sx;
-      while ( x <= xr) {
-         if ( fs_get_pixel( fs, x, sy + d)) {
-            x = fill( fs, x, sy + d, d, sx, xr);
-         }   
-         x++;
-      }   
-   }   
-   
-   if ( sy - d >= fs-> clip. top && sy - d <= fs-> clip. bottom) {
-      x = sx;
-      while ( x < pxl) {
-         if ( fs_get_pixel( fs, x, sy - d)) {
-            x = fill( fs, x, sy - d, -d, sx, xr);
-         }   
-         x++;
-      }   
-      x = pxr;
-      while ( x < xr) {
-         if ( fs_get_pixel( fs, x, sy - d)) {
-            x = fill( fs, x, sy - d, -d, sx, xr);
-         }   
-         x++;
-      }   
-   }   
-   return xr;
-}   
+   int foo; return foo;
+}
 
 Bool
 apc_gp_flood_fill( Handle self, int x, int y, Color color, Bool singleBorder)
@@ -1863,7 +1793,7 @@ apc_gp_get_back_color( Handle self)
 int
 apc_gp_get_bpp( Handle self)
 {
-   return guts. depth;
+   int foo; return foo;
 }
 
 Color
@@ -2029,82 +1959,25 @@ apc_gp_get_fill_pattern( Handle self)
 int
 apc_gp_get_line_end( Handle self)
 {
-   DEFXX;
-   int cap;
-   XGCValues gcv;
-
-   if ( XF_IN_PAINT(XX)) {
-      if ( XGetGCValues( DISP, XX-> gc, GCCapStyle, &gcv) == 0) {
-         warn( "UAG_006: error querying GC values");
-         cap = CapButt;
-      } else {
-         cap = gcv. cap_style;
-      }
-   } else {
-      cap = XX-> gcv. cap_style;
-   }
-   if ( cap == CapRound)
-      return leRound;
-   else if ( cap == CapProjecting)
-      return leSquare;
-   return leFlat;
+   int foo; return foo;
 }
 
 int
 apc_gp_get_line_join( Handle self)
 {
-   DEFXX;
-   int join;
-   XGCValues gcv;
-
-   if ( XF_IN_PAINT(XX)) {
-      if ( XGetGCValues( DISP, XX-> gc, GCJoinStyle, &gcv) == 0) {
-         warn( "UAG_006: error querying GC values");
-         join = JoinRound;
-      } else {
-         join = gcv. join_style;
-      }
-   } else {
-      join = XX-> gcv. join_style;
-   }
-   if ( join == JoinMiter)
-      return ljMiter;
-   else if ( join == JoinBevel)
-      return ljBevel;
-   return ljRound;
+   int foo; return foo;
 }
 
 int
 apc_gp_get_line_width( Handle self)
 {
-   DEFXX;
-   return XF_IN_PAINT(XX) ? XX-> line_width : XX-> gcv. line_width; 
+   int foo; return foo;
 }
 
 int
 apc_gp_get_line_pattern( Handle self, unsigned char *dashes)
 {
-   DEFXX;
-   int n;
-   if ( XF_IN_PAINT(XX)) {
-      n = XX-> paint_ndashes;
-      if ( XX-> paint_dashes) 
-         memcpy( dashes, XX-> paint_dashes, n);
-      else
-         bzero( dashes, n);
-   } else {
-      n = XX-> ndashes;
-      if ( n < 0) {
-	 n = 0;
-	 strcpy(( char*) dashes, "");
-      } else if ( n == 0) {
-	 n = 1;
-	 strcpy(( char*) dashes, "\1");
-      } else {
-	 memcpy( dashes, XX-> dashes, n);
-      }
-   }
-   return n;
+   int foo; return foo;
 }
 
 Point
@@ -2124,60 +1997,25 @@ apc_gp_get_resolution( Handle self)
 int
 apc_gp_get_rop( Handle self)
 {
-   DEFXX;
-   if ( XF_IN_PAINT(XX)) {
-      return XX-> paint_rop;
-   } else {
-      return XX-> rop;
-   }
+   int foo; return foo;
 }
 
 int
 apc_gp_get_rop2( Handle self)
 {
-   DEFXX;
-   if ( XF_IN_PAINT(XX))
-      return XX-> paint_rop2;
-   else
-      return XX-> rop2;
+   int foo; return foo;
 }
 
 static int
 gp_get_text_width( Handle self, const char *text, int len, Bool addOverhang, Bool wide)
 {
-   DEFXX;
-   int ret;
-   /* 
-   if ( !XX-> font) apc_gp_set_font( self, &PDrawable( self)-> font);
-   if ( !XX-> font) return 0;
-   */
-   ret = wide ? 
-      XTextWidth16( XX-> font-> fs, ( XChar2b *) text, len) :
-      XTextWidth  ( XX-> font-> fs, (char*) text, len);
-   if ( addOverhang) {
-      Point ovx = gp_get_text_overhangs( self, text, len, wide);
-      ret += ovx. x + ovx. y;
-   }
-   return ret;
+   int foo; return foo;
 }
 
 int
 apc_gp_get_text_width( Handle self, const char * text, int len, Bool addOverhang, Bool utf8)
 {
-   int ret;
-
-#ifdef USE_XFT
-   if ( X(self)-> font-> xft)
-      return prima_xft_get_text_width( X(self)-> font, text, len, addOverhang, utf8, 
-         X(self)-> xft_map8, nil);
-#endif
-   
-   if ( utf8)  
-      if ( !( text = ( char *) prima_alloc_utf8_to_wchar( text, len))) return 0;
-   ret = gp_get_text_width( self, text, len, addOverhang, utf8);
-   if ( utf8)
-      free(( char*) text);
-   return ret;
+   int foo; return foo;
 }
 
 static Point *

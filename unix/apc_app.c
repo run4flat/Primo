@@ -62,63 +62,13 @@ prima_unix_guts(void)
 static int
 x_error_handler( Display *d, XErrorEvent *ev)
 {
-   int tail = guts. ri_tail; 
-   int prev = tail;
-   char *name = "Prima";
-   char buf[BUFSIZ];
-   char mesg[BUFSIZ];
-   char number[32];
-
-   while ( tail != guts. ri_head) {
-      if ( guts. ri[ tail]. request > ev-> serial)
-	 break;
-      prev = tail;
-      tail++;
-      if ( tail >= REQUEST_RING_SIZE)
-	 tail = 0;
-   }
-
-   switch ( ev-> request_code) {
-   case 38: /* X_QueryPointer - apc_event uses sequence of XQueryPointer calls,
-               to find where the pointer belongs. The error is raised when one
-               of the windows disappears . */
-   case 42: /* X_SetInputFocus */
-      return 0;
-   }
-
-#ifdef NEED_X11_EXTENSIONS_XRENDER_H
-   if ( ev-> request_code == guts. xft_xrender_major_opcode &&
-        ev-> request_code > 127 && 
-        ev-> error_code == BadLength)
-      /* Xrender large polygon request failed */ 
-      guts. xft_disable_large_fonts = 1;
-#endif
-
-   XGetErrorText( d, ev-> error_code, buf, BUFSIZ);
-   XGetErrorDatabaseText( d, name, "XError", "X Error", mesg, BUFSIZ);
-   fprintf( stderr, "%s: %s, request: %d", mesg, buf, ev->request_code);
-   if ( ev->request_code < 128) {
-      sprintf( number, "%d", ev->request_code);
-      XGetErrorDatabaseText( d, "XRequest", number, "", buf, BUFSIZ);
-      fprintf( stderr, "(%s)", buf);
-   }
-   if ( tail == guts. ri_head && prev == guts. ri_head);
-   else if ( tail == guts. ri_head)
-      fprintf( stderr, ", after %s:%d\n",
-	       guts. ri[ prev]. file, guts. ri[ prev]. line);
-   else
-      fprintf( stderr, ", between %s:%d and %s:%d\n",
-	       guts. ri[ prev]. file, guts. ri[ prev]. line,
-	       guts. ri[ tail]. file, guts. ri[ tail]. line);
-   return 0;
+   int foo; return foo;
 }
 
 static int
 x_io_error_handler( Display *d)
 {
-   fprintf( stderr, "Fatal input/output X error\n");
-   _exit( 1);
-   return 0; /* happy now? */
+   int foo; return foo;
 }
 
 static XrmDatabase
@@ -142,19 +92,7 @@ get_database( void)
 static int
 get_idepth( void)
 {
-   int i, n;
-   XPixmapFormatValues *format = XListPixmapFormats( DISP, &n);
-   int idepth = guts.depth;
-
-   if ( !format) return guts.depth;
-
-   for ( i = 0; i < n; i++)
-      if ( format[i]. depth == guts. depth) {
-         idepth = format[i]. bits_per_pixel;
-         break;
-      }
-   XFree( format);
-   return idepth;
+   int foo; return foo;
 }
 
 static Bool  do_x11     = true;
@@ -404,12 +342,7 @@ window_subsystem_init( char * error_buf)
 int
 prima_debug( const char *format, ...)
 {
-   int rc = 0;
-   va_list args;
-   va_start( args, format);
-   rc = vfprintf( stderr, format, args);
-   va_end( args);
-   return rc;
+   int foo; return foo;
 }
 
 Bool
@@ -693,19 +626,7 @@ apc_application_end_paint_info( Handle self)
 int
 apc_application_get_gui_info( char * description, int len)
 {
-#ifdef WITH_GTK2
-   if ( description) {
-      strncpy( description, "X Window System + GTK2", len);
-      description[len-1] = 0;
-   }
-   return guiGTK2;
-#else
-   if ( description) {
-      strncpy( description, "X Window System", len);
-      description[len-1] = 0;
-   }
-   return guiXLib;
-#endif
+   int foo; return foo;
 }
 
 Handle
@@ -799,47 +720,7 @@ apc_application_get_os_info( char *system, int slen,
 			     char *vendor, int vlen,
 			     char *arch, int alen)
 {
-   static struct utsname name;
-   static Bool fetched = false;
-
-#ifndef SYS_NMLN
-#ifdef _SYS_NAMELEN
-#define SYS_NMLN _SYS_NAMELEN
-#else
-#define SYS_NMLN 64
-#endif
-#endif   
-
-   if (!fetched) {
-      if ( uname(&name)!=0) {
-	 strncpy( name. sysname, "Some UNIX", SYS_NMLN);
-	 name. sysname[ SYS_NMLN-1] = 0;
-	 strncpy( name. release, "Unknown version of UNIX", SYS_NMLN);
-	 name. release[ SYS_NMLN-1] = 0;
-	 strncpy( name. machine, "Unknown architecture", SYS_NMLN);
-	 name. machine[ SYS_NMLN-1] = 0;
-      }
-      fetched = true;
-   }
-
-   if (system) {
-      strncpy( system, name. sysname, slen);
-      system[ slen-1] = 0;
-   }
-   if (release) {
-      strncpy( release, name. release, rlen);
-      release[ rlen-1] = 0;
-   }
-   if (vendor) {
-      strncpy( vendor, "Unknown vendor", vlen);
-      vendor[ vlen-1] = 0;
-   }
-   if (arch) {
-      strncpy( arch, name. machine, alen);
-      arch[ alen-1] = 0;
-   }
-
-   return apcUnix;
+   int foo; return foo;
 }
 
 Point

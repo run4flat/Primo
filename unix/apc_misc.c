@@ -123,29 +123,7 @@ update_quarks_cache( Handle self)
 int
 unix_rm_get_int( Handle self, XrmQuark class_detail, XrmQuark name_detail, int default_value)
 {
-   DEFXX;
-   XrmRepresentation type;
-   XrmValue value;
-   long int r;
-   char *end;
-
-   if ( XX && guts.db && XX-> q_class_name && XX-> q_instance_name) {
-      XX-> q_class_name[XX-> n_class_name] = class_detail;
-      XX-> q_class_name[XX-> n_class_name + 1] = 0;
-      XX-> q_instance_name[XX-> n_instance_name] = name_detail;
-      XX-> q_instance_name[XX-> n_instance_name + 1] = 0;
-      if ( XrmQGetResource( guts.db,
-			    XX-> q_instance_name,
-			    XX-> q_class_name,
-			    &type, &value)) {
-	 if ( type == guts.qString) {
-	    r = strtol((char *)value. addr, &end, 0);
-	    if (*(value. addr) && !*end)
-	       return (int)r;
-	 }
-      }
-   }
-   return default_value;
+   int foo; return foo;
 }
 
 Bool
@@ -679,31 +657,13 @@ apc_file_change_mask( Handle self)
 int
 apc_pointer_get_state( Handle self)
 {
-   XWindow foo;
-   int bar;
-   unsigned mask;
-   XQueryPointer( DISP, guts.root,  &foo, &foo, &bar, &bar, &bar, &bar, &mask);
-   return
-      (( mask & Button1Mask) ? mb1 : 0) |
-      (( mask & Button2Mask) ? mb2 : 0) |
-      (( mask & Button3Mask) ? mb3 : 0) |
-      (( mask & Button4Mask) ? mb4 : 0) |
-      (( mask & Button5Mask) ? mb5 : 0) |
-      (( mask & Button6Mask) ? mb6 : 0) |
-      (( mask & Button7Mask) ? mb7 : 0);
+   int foo; return foo;
 }
 
 int
 apc_kbd_get_state( Handle self)
 {
-   XWindow foo;
-   int bar;
-   unsigned int mask;
-   XQueryPointer( DISP, guts.root, &foo, &foo, &bar, &bar, &bar, &bar, &mask);
-   return
-      (( mask & ShiftMask)   ? kmShift : 0) |
-      (( mask & ControlMask) ? kmCtrl  : 0) |
-      (( mask & Mod1Mask)    ? kmAlt   : 0);
+   int foo; return foo;
 }
 
 /* Messages */
@@ -1121,62 +1081,7 @@ apc_sys_get_caption_font( PFont f)
 int
 apc_sys_get_value( int v)  /* XXX one big XXX */
 {
-   switch ( v) {
-   case svYMenu: {
-      Font f;
-      apc_menu_default_font( &f);
-      return f. height + MENU_ITEM_GAP * 2;
-   } 
-   case svYTitleBar: /* XXX */ return 20;
-   case svMousePresent:		return guts. mouse_buttons > 0;
-   case svMouseButtons:		return guts. mouse_buttons;
-   case svSubmenuDelay:  /* XXX ? */ return guts. menu_timeout;
-   case svFullDrag: /* XXX ? */ return false;
-   case svWheelPresent:		return guts.mouse_wheel_up || guts.mouse_wheel_down;
-   case svXIcon: 
-   case svYIcon: 
-   case svXSmallIcon: 
-   case svYSmallIcon: 
-       {
-          int ret[4], n;
-          XIconSize * sz = nil; 
-          if ( XGetIconSizes( DISP, guts.root, &sz, &n) && ( n > 0)) {
-             ret[0] = sz-> max_width; 
-             ret[1] = sz-> max_height;
-             ret[2] = sz-> min_width; 
-             ret[3] = sz-> min_height;
-          } else {
-             ret[0] = ret[1] = 64;
-             ret[2] = ret[3] = 20;
-          }
-          if ( sz) XFree( sz);
-          return ret[v - svXIcon];
-       }
-       break;
-   case svXPointer:		return guts. cursor_width;
-   case svYPointer:		return guts. cursor_height;
-   case svXScrollbar:		return 16;
-   case svYScrollbar:		return 16;
-   case svXCursor:		return 1;
-   case svAutoScrollFirst:	return guts. scroll_first;
-   case svAutoScrollNext:	return guts. scroll_next;
-   case svXbsNone:		return 0;
-   case svYbsNone:		return 0;
-   case svXbsSizeable:		return 3; /* XXX */
-   case svYbsSizeable:		return 3; /* XXX */
-   case svXbsSingle:		return 1; /* XXX */
-   case svYbsSingle:		return 1; /* XXX */
-   case svXbsDialog:		return 2; /* XXX */
-   case svYbsDialog:		return 2; /* XXX */
-   case svShapeExtension:	return guts. shape_extension;
-   case svDblClickDelay:        return guts. double_click_time_frame;
-   case svColorPointer:         return 0;
-   case svCanUTF8_Input:        return 1;
-   case svCanUTF8_Output:       return 1;
-   case svCompositeDisplay:     return 0; /* XXX detect compiz */
-   default:
-      return -1;
-   }
+   int foo; return foo;
 }
 
 Bool
@@ -1338,7 +1243,7 @@ apc_query_drives_map( const char* firstDrive, char *result, int len)
 int
 apc_query_drive_type( const char *drive)
 {
-   return dtNone;
+   int foo; return foo;
 }
 
 char *

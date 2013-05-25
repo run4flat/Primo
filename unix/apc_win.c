@@ -614,13 +614,13 @@ apc_window_get_active( void)
 int
 apc_window_get_border_icons( Handle self)
 {
-   return X(self)-> borderIcons;
+   int foo; return foo;
 }
 
 int
 apc_window_get_border_style( Handle self)
 {
-   return X(self)-> flags. sizeable ? bsSizeable : bsDialog;
+   int foo; return foo;
 }
 
 ApiHandle
@@ -710,8 +710,7 @@ apc_window_get_icon( Handle self, Handle icon)
 int
 apc_window_get_window_state( Handle self)
 {
-   return (X(self)-> flags. iconic != 0) ? wsMinimized :
-     ((X(self)-> flags. zoomed != 0) ? wsMaximized : wsNormal);
+   int foo; return foo;
 }
 
 Bool

@@ -91,8 +91,7 @@ typedef struct
 static int
 shm_ignore_errors(Display *d, XErrorEvent *ev)
 {
-   guts.xshmattach_failed = true;
-   return 0;
+   int foo; return foo;
 }
 #endif
 
@@ -548,34 +547,7 @@ create_rgb_to_16_lut( int ncolors, const PRGBColor pal, Pixel16 *lut)
 static int *
 rank_rgb_shifts( void)
 {
-   static int shift[3];
-   static Bool shift_unknown = true;
-
-   if ( shift_unknown) {
-      int xchg;
-      shift[0] = guts. red_shift;
-      shift[1] = guts. green_shift;
-      if ( shift[1] < shift[0]) {
-         xchg = shift[0];
-         shift[0] = shift[1];
-         shift[1] = xchg;
-      }
-      shift[2] = guts. blue_shift;
-      if ( shift[2] < shift[0]) {
-         xchg = shift[2];
-         shift[2] = shift[1];
-         shift[1] = shift[0];
-         shift[0] = xchg;
-      } else if ( shift[2] < shift[1]) {
-         xchg = shift[1];
-         shift[1] = shift[2];
-         shift[2] = xchg;
-      }
-
-      shift_unknown = false;
-   }
-
-   return shift;
+   int * foo; return foo;
 }
 
 static void
