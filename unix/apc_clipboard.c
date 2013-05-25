@@ -70,39 +70,7 @@ clipboard_free_data( void * data, int size, Handle id)
 static Atom
 get_typename( Handle id, int index, Atom * type)
 {
-   if ( type) *type = None;
-   switch ( id) {
-   case cfUTF8:
-      if ( index > 1) return None;
-      if ( index == 0) {
-         if ( type) *type = CF_TYPE(id);
-         return CF_NAME(id);
-      } else {
-         if ( type) *type = UTF8_MIME;
-         return UTF8_MIME;
-      }
-   case cfBitmap:
-      if ( index > 1) return None;
-      if ( index == 0) {
-         if ( type) *type = CF_TYPE(id);
-	 return CF_NAME(id);
-      } else {
-         if ( type) *type = XA_BITMAP;
-	 return XA_BITMAP;
-      }
-   case cfTargets:
-      if ( index > 1) return None;
-      if ( index == 0) {
-         if ( type) *type = CF_TYPE(id);
-         return CF_NAME(id);
-      } else {
-         if ( type) *type = CF_TARGETS;
-         return CF_NAME(id);
-      }
-   }
-   if ( index > 0) return None;
-   if ( type) *type = CF_TYPE(id);
-   return CF_NAME(id);
+   Atom foo; return foo;
 }
 
 static void
@@ -199,16 +167,7 @@ query_data( Handle self, Handle id)
 static Atom
 find_atoms( Atom * data, int length, int id)
 {
-   int i, index = 0;
-   Atom name;
-   
-   while (( name = get_typename( id, index++, nil)) != None) {
-      for ( i = 0; i < length / sizeof(Atom); i++) {
-         if ( data[i] == name) 
-            return name;
-      }
-   }
-   return None;
+   Atom foo; return foo;
 }
 
 
