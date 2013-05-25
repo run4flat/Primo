@@ -84,51 +84,13 @@ load_pointer_font( void)
 Point
 apc_pointer_get_hot_spot( Handle self)
 {
-   Point hot_spot;
-   int idx;
-   int id = get_cursor(self, nil, nil, &hot_spot, nil);
-   XFontStruct *fs;
-   XCharStruct *cs;
-   Point ret = {0,0};
-
-   if ( id < crDefault || id > crUser)  return ret;
-   if ( id == crUser)                   return hot_spot;
-   if ( !load_pointer_font())           return ret;
-
-   idx = cursor_map[id];
-   fs = guts.pointer_font;
-   if ( !fs-> per_char)
-      cs = &fs-> min_bounds;
-   else if ( idx < fs-> min_char_or_byte2 || idx > fs-> max_char_or_byte2) {
-      int default_char = fs-> default_char;
-      if ( default_char < fs-> min_char_or_byte2 || default_char > fs-> max_char_or_byte2)
-        default_char = fs-> min_char_or_byte2;
-      cs = fs-> per_char + default_char - fs-> min_char_or_byte2;
-   } else
-      cs = fs-> per_char + idx - fs-> min_char_or_byte2;
-   ret. x = -cs->lbearing;
-   ret. y = guts.cursor_height - cs->ascent;
-   if ( ret. x < 0) ret. x = 0;
-   if ( ret. y < 0) ret. y = 0;
-   if ( ret. x >= guts. cursor_width)  ret. x = guts. cursor_width  - 1;
-   if ( ret. y >= guts. cursor_height) ret. y = guts. cursor_height - 1;
-   return ret;
+   Point foo; return foo;
 }
 
 Point
 apc_pointer_get_pos( Handle self)
 {
-   Point p;
-   XWindow root, child;
-   int x, y;
-   unsigned int mask;
-
-   if ( !XQueryPointer( DISP, guts. root,
-			&root, &child, &p. x, &p. y,
-			&x, &y, &mask)) 
-      return guts. displaySize;
-   p. y = guts. displaySize. y - p. y - 1;
-   return p;
+   Point foo; return foo;
 }
 
 int
@@ -140,10 +102,7 @@ apc_pointer_get_shape( Handle self)
 Point
 apc_pointer_get_size( Handle self)
 {
-   Point p;
-   p.x = guts.cursor_width;
-   p.y = guts.cursor_height;
-   return p;
+   Point foo; return foo;
 }
 
 Bool

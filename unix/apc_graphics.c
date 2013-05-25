@@ -585,19 +585,8 @@ apc_gp_set_pixel( Handle self, int x, int y, Color color)
 static Point
 gp_get_text_overhangs( Handle self, const char *text, int len, Bool wide)
 {
-   DEFXX;
-   Point ret;
-   if ( len > 0) {
-      XCharStruct * cs;
-      cs = prima_char_struct( XX-> font-> fs, (void*) text, wide);  
-      ret. x = ( cs-> lbearing < 0) ? - cs-> lbearing : 0;
-      text += (len - 1) * (wide ? 2 : 1);
-      cs = prima_char_struct( XX-> font-> fs, (void*) text, wide);  
-      ret. y = (( cs-> width - cs-> rbearing) < 0) ? cs-> rbearing - cs-> width : 0;
-   } else
-      ret. x = ret. y = 0;
-   return ret;
-}   
+   Point foo; return foo;
+}
 
 static int
 gp_get_text_width( Handle self, const char *text, int len, Bool addOverhang, Bool wide);
@@ -782,15 +771,7 @@ apc_gp_get_line_pattern( Handle self, unsigned char *dashes)
 Point
 apc_gp_get_resolution( Handle self)
 {
-   Point ret;
-   if ( self) {
-      ret.x = X(self)-> resolution.x;
-      ret.y = X(self)-> resolution.y;
-   } else {
-      ret.x = guts.resolution.x;
-      ret.y = guts.resolution.y;
-   }
-   return ret;
+   Point foo; return foo;
 }
 
 int
@@ -820,77 +801,19 @@ apc_gp_get_text_width( Handle self, const char * text, int len, Bool addOverhang
 static Point *
 gp_get_text_box( Handle self, const char * text, int len, Bool wide)
 {
-   DEFXX;
-   Point * pt = ( Point *) malloc( sizeof( Point) * 5);
-   int x;
-   Point ovx;
-   
-   if ( !pt) return nil;
-
-   /*
-   if ( !XX-> font) 
-      apc_gp_set_font( self, &PDrawable( self)-> font);
-   if ( !XX-> font) 
-      return nil;
-    */
-   
-   x = wide ? 
-      XTextWidth16( XX-> font-> fs, ( XChar2b*) text, len) :
-      XTextWidth( XX-> font-> fs, (char*)text, len);
-   ovx = gp_get_text_overhangs( self, text, len, wide);
-
-   pt[0].y = pt[2]. y = XX-> font-> font. ascent - 1;
-   pt[1].y = pt[3]. y = - XX-> font-> font. descent;
-   pt[4].y = 0;
-   pt[4].x = x;
-   pt[3].x = pt[2]. x = x + ovx. y;
-   pt[0].x = pt[1]. x = - ovx. x;
-
-   if ( !XX-> flags. paint_base_line) {
-      int i;
-      for ( i = 0; i < 4; i++) pt[i]. y += XX-> font-> font. descent;
-   }   
-   
-   if ( PDrawable( self)-> font. direction != 0) {
-      int i;
-      double s = sin( PDrawable( self)-> font. direction / 57.29577951);
-      double c = cos( PDrawable( self)-> font. direction / 57.29577951);
-      for ( i = 0; i < 5; i++) {
-         double x = pt[i]. x * c - pt[i]. y * s;
-         double y = pt[i]. x * s + pt[i]. y * c;
-         pt[i]. x = x + (( x > 0) ? 0.5 : -0.5);
-         pt[i]. y = y + (( y > 0) ? 0.5 : -0.5);
-      }
-   }
- 
-   return pt;
+   Point * foo; return foo;
 }
 
 Point *
 apc_gp_get_text_box( Handle self, const char * text, int len, Bool utf8)
 {
-   Point * ret;
-#ifdef USE_XFT
-   if ( X(self)-> font-> xft)
-      return prima_xft_get_text_box( self, text, len, utf8);
-#endif
-   if ( utf8)  
-      if ( !( text = ( char *) prima_alloc_utf8_to_wchar( text, len))) return 0;
-   ret = gp_get_text_box( self, text, len, utf8);
-   if ( utf8)
-      free(( char*) text);
-   return ret;
-}   
+   Point * foo; return foo;
+}
 
 Point
 apc_gp_get_transform( Handle self)
 {
-   DEFXX;
-   if ( XF_IN_PAINT(XX)) {
-      return XX-> gtransform;
-   } else {
-      return XX-> transform;
-   }
+   Point foo; return foo;
 }
 
 Bool

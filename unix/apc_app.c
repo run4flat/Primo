@@ -247,7 +247,7 @@ apc_application_get_os_info( char *system, int slen,
 Point
 apc_application_get_size( Handle self)
 {
-   return guts. displaySize;
+   Point foo; return foo;
 }
 
 typedef struct {

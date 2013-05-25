@@ -178,67 +178,13 @@ menu_point2item( PMenuSysData XX, PMenuWindow w, int x, int y, PMenuItemReg * m_
 static Point
 menu_item_offset( PMenuSysData XX, PMenuWindow w, int index)
 {
-   Point ret = {0,0};
-   PMenuItemReg m = w-> m;
-   PUnixMenuItem ix = w-> um;
-   if ( index < 0 || !ix || !m) return ret;
-   if ( w == &XX-> wstatic) {
-      int right = w-> right;
-      while ( m && index--) {
-         if ( m-> flags. divider) {
-            if ( right > 0) {
-               ret. x += right;
-               right = 0;
-            }
-         } else {
-            ret. x += MENU_XOFFSET * 2 + ix-> width;
-            if ( m-> accel) ret. x += MENU_XOFFSET / 2 + ix-> accel_width;
-         }
-         ix++;
-         m = m-> next;
-      }
-   } else {
-      ret. y = 2;
-      ret. x = 2;
-      while ( m && index--) {
-         ret. y += ix-> height;
-         ix++;
-         m = m-> next;
-      }
-   }
-   return ret;
+   Point foo; return foo;
 }
 
 static Point
 menu_item_size( PMenuSysData XX, PMenuWindow w, int index)
 {
-   PMenuItemReg m = w-> m;
-   PUnixMenuItem ix;
-   Point ret = {0,0};
-   if ( index < 0 || !w-> um || !m) return ret;
-   if ( w == &XX-> wstatic) {
-      if ( index >= 0 && index <= w-> last) {
-         ix = w-> um + index; 
-         while ( index--) m = m-> next; 
-         if ( m-> flags. divider) return ret;
-         ret. x = MENU_XOFFSET * 2 + ix-> width;
-         if ( m-> accel) ret. x += MENU_XOFFSET / 2+ ix-> accel_width;
-      } else if ( index == w-> last + 1) {
-         ret. x = MENU_XOFFSET * 2 + XX-> guillemots;
-      } else
-         return ret;
-      ret. y = XX-> font-> font. height + MENU_ITEM_GAP * 2; 
-   } else {
-      if ( index >= 0 && index <= w-> last) {
-         ix = w-> um + index; 
-         ret. y = ix-> height;
-      } else if ( index == w-> last + 1) {
-         ret. y = 2 * MENU_ITEM_GAP + XX-> font-> font. height;
-      } else
-         return ret;
-      ret. x = w-> sz. x - 4;
-   }
-   return ret;
+   Point foo; return foo;
 }
 
 static void

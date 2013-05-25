@@ -380,40 +380,7 @@ prima_xft_get_text_width( PCachedFont self, const char * text, int len, Bool add
 Point *
 prima_xft_get_text_box( Handle self, const char * text, int len, Bool utf8)
 {
-   DEFXX;
-   Point ovx;
-   int width;
-   Point * pt = ( Point *) malloc( sizeof( Point) * 5);
-   if ( !pt) return nil;
-
-   width = prima_xft_get_text_width( XX-> font, text, len, 
-      false, utf8, X(self)-> xft_map8, &ovx);
-
-   pt[0].y = pt[2]. y = XX-> font-> font. ascent - 1;
-   pt[1].y = pt[3]. y = - XX-> font-> font. descent;
-   pt[4].y = 0;
-   pt[4].x = width;
-   pt[3].x = pt[2]. x = width + ovx. y;
-   pt[0].x = pt[1]. x = - ovx. x;
-
-   if ( !XX-> flags. paint_base_line) {
-      int i;
-      for ( i = 0; i < 4; i++) pt[i]. y += XX-> font-> font. descent;
-   }   
-   
-   if ( PDrawable( self)-> font. direction != 0) {
-      int i;
-      double s = sin( PDrawable( self)-> font. direction / 57.29577951);
-      double c = cos( PDrawable( self)-> font. direction / 57.29577951);
-      for ( i = 0; i < 5; i++) {
-         double x = pt[i]. x * c - pt[i]. y * s;
-         double y = pt[i]. x * s + pt[i]. y * c;
-         pt[i]. x = x + (( x > 0) ? 0.5 : -0.5);
-         pt[i]. y = y + (( y > 0) ? 0.5 : -0.5);
-      }
-   }
- 
-   return pt;
+   Point * foo; return foo;
 }
 
 static XftFont *

@@ -163,29 +163,7 @@ apc_widget_get_invalid_rect( Handle self)
 Point
 apc_widget_get_pos( Handle self)
 {
-   DEFXX;
-   XWindow r;
-   Point ret;
-   int x, y;
-   unsigned int w, h, d, b;
-
-   if ( XX-> type. window) {
-      Rect rc;
-      Point p = apc_window_get_client_pos( self);
-      prima_get_frame_info( self, &rc);
-      p. x -= rc. left;
-      p. y -= rc. bottom;
-      return p;
-   }   
-      
-   if ( XX-> parentHandle == nilHandle)
-      return XX-> origin;
-   
-   XGetGeometry( DISP, X_WINDOW, &r, &x, &y, &w, &h, &b, &d);
-   XTranslateCoordinates( DISP, XX-> parentHandle, guts. root, x, y, &x, &y, &r);
-   ret. x = x;
-   ret. y = DisplayHeight( DISP, SCREEN) - y - w; 
-   return ret;
+   Point foo; return foo;
 }
 
 Bool
@@ -197,17 +175,7 @@ apc_widget_get_shape( Handle self, Handle mask)
 Point
 apc_widget_get_size( Handle self)
 {
-   DEFXX;
-   if ( XX-> type. window) {
-      Rect rc;
-      Point p = apc_window_get_client_size( self);
-      prima_get_frame_info( self, &rc);
-      p. x += rc. left + rc. right;
-      p. y += rc. bottom + rc. top;
-      return p;
-   }   
-   
-   return XX-> size;
+   Point foo; return foo;
 }
 
 Bool

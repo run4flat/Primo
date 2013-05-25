@@ -209,15 +209,13 @@ apc_window_get_client_handle( Handle self)
 Point
 apc_window_get_client_pos( Handle self)
 {
-   if ( !X(self)-> flags. configured) prima_wm_sync( self, ConfigureNotify);
-   return X(self)-> origin;
+   Point foo; return foo;
 }
 
 Point
 apc_window_get_client_size( Handle self)
 {
-   if ( !X(self)-> flags. configured) prima_wm_sync( self, ConfigureNotify);
-   return X(self)-> size;
+   Point foo; return foo;
 }
 
 Bool

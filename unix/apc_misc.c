@@ -285,13 +285,13 @@ apc_cursor_set_visible( Handle self, Bool visible)
 Point
 apc_cursor_get_pos( Handle self)
 {
-   return X(self)-> cursor_pos;
+   Point foo; return foo;
 }
 
 Point
 apc_cursor_get_size( Handle self)
 {
-   return X(self)-> cursor_size;
+   Point foo; return foo;
 }
 
 Bool
