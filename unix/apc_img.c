@@ -163,7 +163,7 @@ apc_image_destroy( Handle self)
 ApiHandle
 apc_image_get_handle( Handle self)
 {
-   return (ApiHandle) X(self)-> gdrawable;
+   return nilHandle;
 }
 
 Bool
@@ -199,7 +199,7 @@ apc_dbm_destroy( Handle self)
 ApiHandle
 apc_dbm_get_handle( Handle self)
 {
-   return (ApiHandle) X(self)-> gdrawable;
+   return nilHandle;
 }
 
 static Byte*

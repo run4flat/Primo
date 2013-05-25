@@ -203,7 +203,7 @@ apc_window_get_border_style( Handle self)
 ApiHandle
 apc_window_get_client_handle( Handle self)
 {
-   return X(self)-> client;
+   return nilHandle;
 }
 
 Point

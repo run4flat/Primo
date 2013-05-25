@@ -210,7 +210,7 @@ apc_clipboard_deregister_format( Handle self, Handle id)
 ApiHandle
 apc_clipboard_get_handle( Handle self)
 {
-  return C(self)-> selection;
+   return nilHandle;
 }
 
 static Bool

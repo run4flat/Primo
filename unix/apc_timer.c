@@ -84,7 +84,6 @@ apc_timer_stop( Handle self)
 ApiHandle
 apc_timer_get_handle( Handle self)
 {
-   ENTERTIMER;
-   return (ApiHandle) sys;
+   return nilHandle;
 }
 

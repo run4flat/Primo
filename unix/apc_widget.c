@@ -48,7 +48,7 @@ apc_widget_map_points( Handle self, Bool toScreen, int n, Point *p)
 ApiHandle
 apc_widget_get_parent_handle( Handle self)
 {
-   return X(self)-> parentHandle;
+   return nilHandle;
 }
 
 Handle
@@ -138,7 +138,7 @@ apc_widget_get_focused( void)
 ApiHandle
 apc_widget_get_handle( Handle self)
 {
-   return X_WINDOW;
+   return nilHandle;
 }
 
 Rect

@@ -617,6 +617,6 @@ apc_gp_set_text_out_baseline( Handle self, Bool baseline)
 ApiHandle
 apc_gp_get_handle( Handle self)
 {
-   return ( ApiHandle) X(self)-> gdrawable;
+   return nilHandle;
 }
 
