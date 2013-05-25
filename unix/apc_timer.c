@@ -68,31 +68,13 @@ fetch_sys_timer( Handle self, PTimerSysData *s, Bool *real_timer)
 Bool
 apc_timer_create( Handle self, Handle owner, int timeout)
 {
-   Bool recreate;
-   ENTERTIMER;
-
-   sys-> type.timer = true;
-   recreate = real && sys-> who != nilHandle;
-   inactivate_timer( sys);
-   sys-> timeout = timeout;
-   sys-> who = self;
-   if (real) {
-      if ( !recreate) opt_clear( optActive);
-      apc_component_fullname_changed_notify( self);
-      if ( is_opt( optActive)) apc_timer_start( self);
-   }
-   return true;
+   Bool foo; return foo;
 }
 
 Bool
 apc_timer_destroy( Handle self)
 {
-   ENTERTIMER;
-
-   inactivate_timer( sys);
-   sys-> timeout = 0;
-   if (real) opt_clear( optActive);
-   return true;
+   Bool foo; return foo;
 }
 
 int
@@ -104,63 +86,19 @@ apc_timer_get_timeout( Handle self)
 Bool
 apc_timer_set_timeout( Handle self, int timeout)
 {
-   ENTERTIMER;
-
-   sys-> timeout = timeout;
-   if ( !real || is_opt( optActive))
-      apc_timer_start( self);
-   return true;
+   Bool foo; return foo;
 }
 
 Bool
 apc_timer_start( Handle self)
 {
-   PTimerSysData before;
-   ENTERTIMER;
-
-   inactivate_timer( sys);
-   gettimeofday( &sys-> when, nil);
-   sys-> when. tv_sec += sys-> timeout / 1000;
-   sys-> when. tv_usec += (sys-> timeout % 1000) * 1000;
-
-   before = guts. oldest;
-   if ( before) {
-      while ( before-> when. tv_sec < sys-> when. tv_sec ||
-	      ( before-> when. tv_sec == sys-> when. tv_sec &&
-		before-> when. tv_usec <= sys-> when. tv_usec)) {
-	 if ( !before-> younger) {
-	    before-> younger = sys;
-	    sys-> older = before;
-	    before = nil;
-	    break;
-	 }
-	 before = before-> younger;
-      }
-      if ( before) {
-	 if ( before-> older) {
-	    sys-> older = before-> older;
-            before-> older-> younger = sys;
-	 } else {
-	    guts. oldest = sys;
-	 }
-	 sys-> younger = before;
-         before-> older = sys;
-      }
-   } else {
-      guts. oldest = sys;
-   }
-
-   if ( real) opt_set( optActive);
-   return true;
+   Bool foo; return foo;
 }
 
 Bool
 apc_timer_stop( Handle self)
 {
-   ENTERTIMER;
-   inactivate_timer( sys);
-   if ( real) opt_clear( optActive);
-   return true;
+   Bool foo; return foo;
 }
 
 

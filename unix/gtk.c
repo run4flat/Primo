@@ -56,42 +56,13 @@ static int	gtk_filter_index       = 0;
 Bool
 prima_gtk_init(void)
 {
-	int argc = 0;
-
-	gboolean r;
-	
-	switch ( gtk_initialized) {
-	case -1:
-		return false;
-	case 1:
-		return true;
-	}
-
-	r = gtk_init_check( &argc, NULL);
-
-	if ( r == gtk_true()) {
-		XSetErrorHandler( guts. main_error_handler);
-		gtk_initialized = 1;
-		return true;
-	} else {
-		gtk_initialized = -1;
-		warn("** Cannot initialize GTK");
-		return false;
-	}
+   Bool foo; return foo;
 }
 
 Bool
 prima_gtk_done(void)
 {
-	if ( gtk_filters) {
-		int i;
-		for ( i = 0; i < gtk_filters-> count; i++) 
-			g_object_unref(( GObject*) gtk_filters-> items[i]);
-		plist_destroy( gtk_filters);
-		gtk_filters = NULL;
-	}
-	gtk_initialized = 0;
-	return true;
+   Bool foo; return foo;
 }
 
 static gboolean do_events(gpointer data)

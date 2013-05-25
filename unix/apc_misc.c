@@ -50,7 +50,7 @@
 Bool
 log_write( const char *format, ...)
 {
-   return false;
+   Bool foo; return foo;
 }
 
 static XrmQuark
@@ -84,40 +84,7 @@ get_instance_quark( const char *name)
 static Bool
 update_quarks_cache( Handle self)
 {
-   PComponent me = PComponent( self);
-   XrmQuark qClass, qInstance;
-   int n;
-   DEFXX;
-   PDrawableSysData UU;
-
-   if (!XX)
-      return false;
-
-   qClass = get_class_quark( self == application ? "Prima" : me-> self-> className);
-   qInstance = get_instance_quark( me-> name ? me-> name : "noname");
-
-   free( XX-> q_class_name); XX-> q_class_name = nil;
-   free( XX-> q_instance_name); XX-> q_instance_name = nil;
-
-   if ( me-> owner && me-> owner != self && PComponent(me-> owner)-> sysData && X(PComponent( me-> owner))-> q_class_name) {
-      UU = X(PComponent( me-> owner));
-      XX-> n_class_name = n = UU-> n_class_name + 1;
-      if (( XX-> q_class_name = malloc( sizeof( XrmQuark) * (n + 3))))
-         memcpy( XX-> q_class_name, UU-> q_class_name, sizeof( XrmQuark) * n);
-      XX-> q_class_name[n-1] = qClass;
-      XX-> n_instance_name = n = UU-> n_instance_name + 1;
-      if (( XX-> q_instance_name = malloc( sizeof( XrmQuark) * (n + 3))))
-         memcpy( XX-> q_instance_name, UU-> q_instance_name, sizeof( XrmQuark) * n);
-      XX-> q_instance_name[n-1] = qInstance;
-   } else {
-      XX-> n_class_name = n = 1;
-      if (( XX-> q_class_name = malloc( sizeof( XrmQuark) * (n + 3))))
-         XX-> q_class_name[n-1] = qClass;
-      XX-> n_instance_name = n = 1;
-      if (( XX-> q_instance_name = malloc( sizeof( XrmQuark) * (n + 3))))
-         XX-> q_instance_name[n-1] = qInstance;
-   }
-   return true;
+   Bool foo; return foo;
 }
 
 int
@@ -132,82 +99,7 @@ apc_fetch_resource( const char *className, const char *name,
                     Handle owner, int resType,
                     void *result)
 {
-   PDrawableSysData XX;
-   XrmQuark *classes, *instances, backup_classes[3], backup_instances[3];
-   XrmRepresentation type;
-   XrmValue value;
-   int nc, ni;
-   char *s;
-   XColor clr;
-
-   if ( owner == nilHandle) {
-      classes           = backup_classes;
-      instances         = backup_instances;
-      nc = ni = 0;
-   } else {
-      if (!update_quarks_cache( owner)) return false;
-      XX                   = X(owner);
-      if (!XX) return false;
-      classes              = XX-> q_class_name;
-      instances            = XX-> q_instance_name;
-      if ( classes == nil || instances == nil) return false;
-      nc                   = XX-> n_class_name;
-      ni                   = XX-> n_instance_name;
-   }
-   classes[nc++]        = get_class_quark( className);
-   instances[ni++]      = get_instance_quark( name);
-   classes[nc++]        = get_class_quark( resClass);
-   instances[ni++]      = get_instance_quark( res);
-   classes[nc]          = 0;
-   instances[ni]        = 0;
-
-   if (guts. debug & DEBUG_XRDB) {
-      int i;
-      _debug( "misc: inst: ");
-      for ( i = 0; i < ni; i++) {
-         _debug( "%s ", XrmQuarkToString( instances[i]));
-      }
-      _debug( "\nmisc: class: ");
-      for ( i = 0; i < nc; i++) {
-         _debug( "%s ", XrmQuarkToString( classes[i]));
-      }
-      _debug( "\n");
-   }
-   
-   if ( XrmQGetResource( guts.db,
-                         instances,
-                         classes,
-                         &type, &value)) {
-      if ( type == guts.qString) {
-         s = (char *)value.addr;
-	 Xdebug("found %s\n", s);
-         switch ( resType) {
-         case frString:
-            *((char**)result) = duplicate_string( s);
-            break;
-         case frColor:
-            if (!XParseColor( DISP, DefaultColormap( DISP, SCREEN), s, &clr))
-               return false;
-            *((Color*)result) = X_COLOR_TO_RGB(clr);
-	    Xdebug("color: %06x\n", *((Color*)result));
-            break;
-         case frFont:
-            prima_font_pp2font( s, ( Font *) result);
-#define DEBUG_FONT(font) font.height,font.width,font.size,font.name,font.encoding
-            Xdebug("font: %d.[w=%d,s=%d].%s.%s\n", DEBUG_FONT((*(( Font *) result))));
-            break;
-         case frUnix_int:
-            *((int*)result) = atoi( s);
-	    Xdebug("int: %d\n", *((int*)result));
-            break;
-         default:
-            return false;
-         }
-         return true;
-      }
-   }
-
-   return false;
+   Bool foo; return foo;
 }
 
 Color
@@ -340,54 +232,19 @@ apc_lookup_color( const char * colorName)
 Bool
 apc_component_create( Handle self)
 {
-   if ( !PComponent( self)-> sysData) {
-      if ( !( PComponent( self)-> sysData = malloc( sizeof( UnixSysData))))
-         return false;
-      bzero( PComponent( self)-> sysData, sizeof( UnixSysData));
-      ((PUnixSysData)(PComponent(self)->sysData))->component. self = self;
-   }
-   return true;
+   Bool foo; return foo;
 }
 
 Bool
 apc_component_destroy( Handle self)
 {
-   DEFXX;
-   if ( XX-> q_instance_name) {
-      free( XX-> q_instance_name);
-      XX-> q_instance_name = nil;
-   }
-   if ( XX-> q_class_name) {
-      free( XX-> q_class_name);
-      XX-> q_class_name = nil;
-   }
-   free( PComponent( self)-> sysData);
-   PComponent( self)-> sysData = nil;
-   X_WINDOW = nilHandle;
-   return true;
+   Bool foo; return foo;
 }
 
 Bool
 apc_component_fullname_changed_notify( Handle self)
 {
-   Handle *list;
-   PComponent me = PComponent( self);
-   int i, n;
-
-   if ( self == nilHandle) return false;
-   if (!update_quarks_cache( self)) return false;
-
-   if ( me-> components && (n = me-> components-> count) > 0) {
-      if ( !( list = allocn( Handle, n))) return false;
-      memcpy( list, me-> components-> items, sizeof( Handle) * n);
-
-      for ( i = 0; i < n; i++) {
-	 apc_component_fullname_changed_notify( list[i]);
-      }
-      free( list);
-   }
-
-   return true;
+   Bool foo; return foo;
 }
 
 /* Cursor support */
@@ -536,40 +393,19 @@ prima_cursor_tick( void)
 Bool
 apc_cursor_set_pos( Handle self, int x, int y)
 {
-   DEFXX;
-   prima_no_cursor( self);
-   RANGE2(x,y);
-   XX-> cursor_pos. x = x;
-   XX-> cursor_pos. y = y;
-   prima_update_cursor( self);
-   return true;
+   Bool foo; return foo;
 }
 
 Bool
 apc_cursor_set_size( Handle self, int x, int y)
 {
-   DEFXX;
-   prima_no_cursor( self);
-   if ( x < 0) x = 1;
-   if ( y < 0) y = 1;
-   if ( x > 16383) x = 16383;
-   if ( y > 16383) y = 16383;
-   XX-> cursor_size. x = x;
-   XX-> cursor_size. y = y;
-   prima_update_cursor( self);
-   return true;
+   Bool foo; return foo;
 }
 
 Bool
 apc_cursor_set_visible( Handle self, Bool visible)
 {
-   DEFXX;
-   if ( XX-> flags. cursor_visible != visible) {
-      prima_no_cursor( self);
-      XX-> flags. cursor_visible = visible;
-      prima_update_cursor( self);
-   }
-   return true;
+   Bool foo; return foo;
 }
 
 Point
@@ -587,7 +423,7 @@ apc_cursor_get_size( Handle self)
 Bool
 apc_cursor_get_visible( Handle self)
 {
-   return X(self)-> flags. cursor_visible;
+   Bool foo; return foo;
 }
 
 /* File */
@@ -626,32 +462,19 @@ prima_rebuild_watchers( void)
 Bool
 apc_file_attach( Handle self)
 {
-   if ( list_index_of( guts.files, self) >= 0) {
-      prima_rebuild_watchers();
-      return true;
-   }
-   protect_object( self);
-   list_add( guts.files, self);
-   prima_rebuild_watchers();
-   return true;
+   Bool foo; return foo;
 }
 
 Bool
 apc_file_detach( Handle self)
 {
-   int i;
-   if (( i = list_index_of( guts.files, self)) >= 0) {
-      list_delete_at( guts.files, i);
-      unprotect_object( self);
-      prima_rebuild_watchers();
-   }
-   return true;
+   Bool foo; return foo;
 }
 
 Bool
 apc_file_change_mask( Handle self)
 {
-   return apc_file_attach( self);
+   Bool foo; return foo;
 }
 
 int
@@ -671,36 +494,13 @@ apc_kbd_get_state( Handle self)
 Bool
 prima_simple_message( Handle self, int cmd, Bool is_post)
 {
-   Event e;
-
-   bzero( &e, sizeof(e));
-   e. cmd = cmd;
-   e. gen. source = self;
-   return apc_message( self, &e, is_post);
+   Bool foo; return foo;
 }
 
 Bool
 apc_message( Handle self, PEvent e, Bool is_post)
 {
-   PendingEvent *pe;
-
-   switch ( e-> cmd) {
-   /* XXX  insert more messages here */
-   case cmPost:
-      /* FALLTHROUGH */
-   default:
-      if ( is_post) {
-         if (!( pe = alloc1(PendingEvent))) return false;
-         memcpy( &pe->event, e, sizeof(pe->event));
-         pe-> recipient = self;
-         TAILQ_INSERT_TAIL( &guts.peventq, pe, peventq_link);
-      } else {
-         CComponent(self)->message( self, e);
-         if ( PObject( self)-> stage == csDead) return false; 
-      }
-      break;
-   }
-   return true;
+   Bool foo; return foo;
 }
 
 static void 
@@ -847,213 +647,7 @@ extern char ** Drawable_do_text_wrap( Handle, TextWrapRec *);
 Bool
 apc_show_message( const char * message, Bool utf8)
 {
-   char ** wrapped;
-   Font f;
-   Point appSz; 
-   Point textSz;
-   Point winSz;
-   TextWrapRec twr;
-   int i;
-   struct MsgDlg md, **storage;
-   Bool ret = true;
-   PList font_abc_unicode = nil;
-   PFontABC font_abc_ascii = nil;
-
-   if ( !DISP) {
-      warn( "%s", message);
-      return true;
-   }   
-      
-   if ( guts. grab_widget)
-      apc_widget_set_capture( guts. grab_widget, 0, 0);
-  
-   appSz = apc_application_get_size( nilHandle);
-   /* acquiring message font and wrapping message text */
-   {
-      PCachedFont cf;
-      XFontStruct *fs;
-      int max;
-      
-      apc_sys_get_msg_font( &f);
-      prima_core_font_pick( nilHandle, &f, &f);
-      cf = prima_find_known_font( &f, false, false);
-      if ( !cf || !cf-> id) {
-         warn( "%s", message);
-         return false;
-      }
-      fs = XQueryFont( DISP, cf-> id);
-      if (!fs) {
-         warn( "%s", message);
-         return false;
-      }   
-      
-      twr. text      = ( char *) message;
-      twr. utf8_text = utf8;
-      twr. textLen   = strlen( message);
-      twr. utf8_textLen = utf8 ? prima_utf8_length( message) : twr. textLen;
-      twr. width     = appSz. x * 2 / 3;
-      twr. tabIndent = 3;
-      twr. options   = twNewLineBreak | twWordBreak | twReturnLines;
-      twr. ascii     = &font_abc_ascii;
-      twr. unicode   = &font_abc_unicode;
-      guts. font_abc_nil_hack = fs;
-      wrapped = Drawable_do_text_wrap( nilHandle, &twr);
-
-      if ( font_abc_ascii) free( font_abc_ascii);
-      if ( font_abc_unicode) {
-         int i;
-         for ( i = 0; i < font_abc_unicode-> count; i += 2) 
-            free(( void*) font_abc_unicode-> items[ i + 1]);
-         plist_destroy( font_abc_unicode);
-      }
-
-      if ( !( md. widths  = malloc( twr. count * sizeof(int)))) {
-         XFreeFontInfo( nil, fs, 1);
-         warn( "%s", message);
-         return false;
-      }
-         
-      if ( !( md. lengths = malloc( twr. count * sizeof(int)))) {
-         free( md. widths);
-         XFreeFontInfo( nil, fs, 1);
-         warn( "%s", message);
-         return false;
-      }
-
-      /* find text extensions */
-      max = 0;
-      for ( i = 0; i < twr. count; i++) {
-         if ( utf8) {
-            char * w;
-            md. lengths[i] = prima_utf8_length( wrapped[i]);
-            w = ( char *) prima_alloc_utf8_to_wchar( wrapped[i], md. lengths[i]);
-            if ( !w) goto EXIT;
-            free( wrapped[i]);
-            wrapped[i] = w;
-            md. widths[i] = XTextWidth16( fs, ( XChar2b*) wrapped[i], md. lengths[i]);
-         } else {
-            md. widths[i] = XTextWidth( fs, wrapped[i], 
-               md. lengths[i] = strlen( wrapped[i]));
-         } 
-         if ( md. widths[i] > max) max = md. widths[i];
-      }   
-      textSz. x = max;
-      textSz. y = twr. count * ( f. height + f. externalLeading);
-      
-      md. wrapped       = wrapped;
-      md. wrappedCount  = twr. count;
-      md. font          = &f;
-      md. fontId        = cf-> id;
-      md. OKwidth       = XTextWidth( fs, "OK", 2);
-      md. btnSz.x       = md. OKwidth + 2 + 10;
-      if ( md. btnSz. x < 56) md. btnSz. x = 56;
-      md. btnSz.y       = f. height + f. externalLeading + 2 + 12;
-         
-      winSz. x = textSz. x + 4;
-      if ( winSz. x < md. btnSz. x + 2) winSz. x = md. btnSz.x + 2;
-      winSz. x += f. width * 4;
-      winSz. y = textSz. y + 2 + 12 + md. btnSz. y + f. height;
-      while ( winSz. y + 12 >= appSz.y) {
-         winSz. y -= f. height + f. externalLeading;
-         md. wrappedCount--;
-      }      
-      md. btnPos. x = ( winSz. x - md. btnSz. x) / 2;
-      md. btnPos. y = winSz. y - 2 - md. btnSz. y - f. height / 2;
-      md. textPos. x = 2;
-      md. textPos. y = f. height * 3 / 2 + 2;
-      md. winSz = winSz;
-      
-      XFreeFontInfo( nil, fs, 1);
-   }
-
-   md. wide    = utf8;
-   md. active  = true;
-   md. next    = nil;
-   md. pressed = false;
-   md. grab    = false;
-   XGetInputFocus( DISP, &md. focus, &md. focus_revertTo);
-   XCHECKPOINT;
-   {
-      char * prima = "Prima";
-      XTextProperty p;
-      XSizeHints xs;
-      XSetWindowAttributes attrs;
-      Atom net_data[2];
-      attrs. event_mask = 0
-	 | KeyPressMask
-	 | ButtonPressMask
-	 | ButtonReleaseMask
-	 | ButtonMotionMask
-	 | PointerMotionMask
-         | StructureNotifyMask
-	 | ExposureMask;
-      attrs. override_redirect = false;
-      attrs. do_not_propagate_mask = attrs. event_mask;
-         
-      md. w = XCreateWindow( DISP, guts. root,
-         ( appSz.x - winSz.x) / 2, ( appSz.y - winSz.y) / 2,
-         winSz.x, winSz.y, 0, CopyFromParent, InputOutput, 
-         CopyFromParent, CWEventMask | CWOverrideRedirect, &attrs);  
-      XCHECKPOINT;
-      if ( !md. w) {
-         ret = false;
-         goto EXIT;
-      }   
-      XSetWMProtocols( DISP, md. w, &WM_DELETE_WINDOW, 1);
-      XCHECKPOINT;
-      xs. flags = PMinSize | PMaxSize | USPosition;
-      xs. min_width  = xs. max_width  = winSz.x;
-      xs. min_height = xs. max_height = winSz. y;
-      xs. x = ( appSz.x - winSz.x) / 2;
-      xs. y = ( appSz.y - winSz.y) / 2;
-      XSetWMNormalHints( DISP, md. w, &xs);
-      if ( XStringListToTextProperty( &prima, 1, &p) != 0) {
-         XSetWMIconName( DISP, md. w, &p);
-         XSetWMName( DISP, md. w, &p);
-         XFree( p. value);
-      }
-      net_data[0] = NET_WM_STATE_SKIP_TASKBAR;
-      net_data[1] = NET_WM_STATE_MODAL;
-      XChangeProperty( DISP, md. w, NET_WM_STATE, XA_ATOM, 32,
-          PropModeReplace, ( unsigned char *) net_data, 2);
-   }
-
-   storage = &guts. message_boxes;
-   while ( *storage) storage = &((*storage)-> next);
-   *storage = &md;
-
-   {
-#define CLR(x) prima_allocate_color( nilHandle,prima_map_color(x,nil),nil)
-      XGCValues gcv;
-      gcv. font = md. fontId;
-      md. gc = XCreateGC( DISP, md. w, GCFont, &gcv);
-      md. fg  = CLR(clFore | wcDialog);
-      prima_allocate_color( nilHandle, prima_map_color(clBack | wcDialog,nil), &md. bg);
-      md. l3d = CLR(clLight3DColor | wcDialog);
-      md. d3d = CLR(clDark3DColor  | wcDialog);
-#undef CLR      
-   }
-   
-   
-   XMapWindow( DISP, md. w);
-   XMoveResizeWindow( DISP, md. w, 
-      ( appSz.x - winSz.x) / 2, ( appSz.y - winSz.y) / 2, winSz.x, winSz.y);
-   XNoOp( DISP);
-   XFlush( DISP);
-   while ( md. active && !guts. applicationClose) 
-      prima_one_loop_round( true, false);
-   
-   XFreeGC( DISP, md. gc);
-   XDestroyWindow( DISP, md. w);
-   *storage = md. next;
-EXIT:   
-   free( md. widths);
-   free( md. lengths);
-   for ( i = 0; i < twr. count; i++)
-      free( wrapped[i]);
-   free( wrapped);
-   
-   return ret;
+   Bool foo; return foo;
 }
 
 /* system metrics */
@@ -1061,7 +655,7 @@ EXIT:
 Bool
 apc_sys_get_insert_mode( void)
 {
-   return guts. insert;
+   Bool foo; return foo;
 }
 
 PFont
@@ -1087,8 +681,7 @@ apc_sys_get_value( int v)  /* XXX one big XXX */
 Bool
 apc_sys_set_insert_mode( Bool insMode)
 {
-   guts. insert = !!insMode;
-   return true;
+   Bool foo; return foo;
 }
 
 /* etc */
@@ -1096,38 +689,13 @@ apc_sys_set_insert_mode( Bool insMode)
 Bool
 apc_beep( int style)
 {
-   /* XXX - mbError, mbQuestion, mbInformation, mbWarning */
-   if ( DISP)
-      XBell( DISP, 0);
-   return true;
+   Bool foo; return foo;
 }
 
 Bool
 apc_beep_tone( int freq, int duration)
 {
-   XKeyboardControl xkc;
-   XKeyboardState   xks;
-   struct timeval timeout;
-   
-   if ( !DISP) return false;
-   
-   XGetKeyboardControl( DISP, &xks);
-   xkc. bell_pitch    = freq;
-   xkc. bell_duration = duration;
-   XChangeKeyboardControl( DISP, KBBellPitch | KBBellDuration, &xkc);
-   
-   XBell( DISP, 100);
-   XFlush( DISP);
-   
-   xkc. bell_pitch    = xks. bell_pitch;
-   xkc. bell_duration = xks. bell_duration;
-   XChangeKeyboardControl( DISP, KBBellPitch | KBBellDuration, &xkc);
-   
-   timeout. tv_sec  = duration / 1000;
-   timeout. tv_usec = 1000 * (duration % 1000);
-   select( 0, nil, nil, nil, &timeout);
-
-   return true;
+   Bool foo; return foo;
 }
 
 char *
@@ -1235,9 +803,7 @@ apc_system_action( const char *s)
 Bool
 apc_query_drives_map( const char* firstDrive, char *result, int len)
 {
-   if ( !result || len <= 0) return true;
-   *result = 0;
-   return true;
+   Bool foo; return foo;
 }
 
 int
@@ -1256,8 +822,7 @@ apc_get_user_name( void)
 Bool
 apc_dl_export(char *path)
 {
-   /* XXX */
-   return true;
+   Bool foo; return foo;
 }
 
 PList

@@ -592,30 +592,13 @@ handle_key_event( Handle self, XKeyEvent *ev, Event *e, KeySym * sym, Bool relea
 static Bool
 input_disabled( PDrawableSysData XX, Bool ignore_horizon)
 {
-   Handle horizon = application;
-
-   if ( guts. message_boxes) return true;
-   if ( guts. modal_count > 0 && !ignore_horizon) {
-      horizon = CApplication(application)-> map_focus( application, XX-> self);
-      if ( XX-> self == horizon) return !XF_ENABLED(XX);
-   }
-   while (XX->self && XX-> self != horizon && XX-> self != application) {
-      if (!XF_ENABLED(XX)) return true;
-      XX = X(PWidget(XX->self)->owner);
-   }
-   return XX->self && XX-> self != horizon;
+   Bool foo; return foo;
 }
 
 Bool
 prima_no_input( PDrawableSysData XX, Bool ignore_horizon, Bool beep)
 {
-   if ( input_disabled(XX, ignore_horizon)) {
-      if ( beep) {
-         apc_beep( mbWarning);
-      }
-      return true;
-   }
-   return false;
+   Bool foo; return foo;
 }
 
 static void
@@ -690,189 +673,13 @@ open_wm_sync_data( Handle self, WMSyncData * wmsd)
 static Bool
 process_wm_sync_data( Handle self, WMSyncData * wmsd)
 {
-   DEFXX;
-   Event e;
-   Bool size_changed = false;
-   Point old_size = XX-> size, old_pos = XX-> origin;
-
-   if ( wmsd-> origin. x != PWidget(self)-> pos. x || wmsd-> origin. y != PWidget(self)-> pos. y) {
-      Edebug("event: GOT move to %d %d / %d %d\n", wmsd-> origin.x, wmsd-> origin.y, PWidget(self)->pos. x, PWidget(self)->pos. y);
-      bzero( &e, sizeof( Event));
-      e. cmd      = cmMove;
-      e. gen. P   = XX-> origin = wmsd-> origin;
-      e. gen. source = self;
-      CComponent( self)-> message( self, &e);
-      if ( PObject( self)-> stage == csDead) return false; 
-   }
-
-   if ( wmsd-> allow_cmSize && 
-      ( wmsd-> size. x != XX-> size. x || wmsd-> size. y != XX-> size. y + XX-> menuHeight)) {
-      XX-> size. x = wmsd-> size. x;
-      XX-> size. y = wmsd-> size. y - XX-> menuHeight;
-      PWidget( self)-> virtualSize = XX-> size; 
-      Edebug("event: got size to %d %d\n", XX-> size.x, XX-> size.y);
-      prima_send_cmSize( self, old_size);
-      if ( PObject( self)-> stage == csDead) return false; 
-      size_changed = true;
-   }
-   
-   if ( wmsd-> above != XX-> above) {
-      XX-> above = wmsd-> above;
-      bzero( &e, sizeof( Event));
-      e. cmd = cmZOrderChanged;
-      CComponent( self)-> message( self, &e);
-      if ( PObject( self)-> stage == csDead) return false; 
-   }
-   
-   if ( size_changed && XX-> flags. want_visible && !guts. net_wm_maximization) {
-      int qx = guts. displaySize.x * 4 / 5, qy = guts. displaySize.y * 4 / 5;
-      bzero( &e, sizeof( Event));
-      if ( !XX-> flags. zoomed) {
-         if ( XX-> size. x > qx && XX-> size. y > qy) {
-            e. cmd = cmWindowState;
-            e. gen. i = wsMaximized;
-            XX-> zoomRect.left = old_pos.x;
-            XX-> zoomRect.bottom = old_pos.y;
-            XX-> zoomRect.right = old_size.x;
-            XX-> zoomRect.top = old_size.y;
-            XX-> flags. zoomed = 1;
-         }   
-      } else {
-         if ( old_size.x > XX-> size.x && old_size.y > XX-> size.y) {
-            e. cmd = cmWindowState;
-            e. gen. i = wsNormal;
-            XX-> flags. zoomed = 0;
-         } else {
-            XX-> zoomRect.left = XX-> origin.x;
-            XX-> zoomRect.bottom = XX-> origin.y;
-            XX-> zoomRect.right = XX-> size.x;
-            XX-> zoomRect.top = XX-> size.y;
-         }
-      }   
-      if ( e. cmd) CComponent( self)-> message( self, &e);
-      if ( PObject( self)-> stage == csDead) return false; 
-   }
-
-   if ( !XX-> flags. mapped && wmsd-> mapped) {
-      Event f;
-      bzero( &e, sizeof( Event));
-      bzero( &f, sizeof( Event));
-      if ( XX-> type. window && XX-> flags. iconic) {
-         f. cmd = cmWindowState;
-         f. gen. i = XX-> flags. zoomed ? wsMaximized : wsNormal;
-         f. gen. source = self;
-         XX-> flags. iconic = 0;
-      }   
-      if ( XX-> flags. withdrawn)
-         XX-> flags. withdrawn = 0;
-      XX-> flags. mapped = 1;
-      e. cmd = cmShow;
-      CComponent( self)-> message( self, &e);
-      if ( PObject( self)-> stage == csDead) return false; 
-      if ( f. cmd) {
-         CComponent( self)-> message( self, &f);
-         if ( PObject( self)-> stage == csDead) return false; 
-      }
-    } else if ( XX-> flags. mapped && !wmsd-> mapped) {
-      Event f;
-      bzero( &e, sizeof( Event));
-      bzero( &f, sizeof( Event));
-      if ( !XX-> flags. iconic && XX-> type. window && !XX-> flags. suppress_cmMinimize) {
-         f. cmd = cmWindowState;
-         f. gen. i = wsMinimized;
-         f. gen. source = self;
-         XX-> flags. iconic = 1;
-      }   
-      e. cmd = cmHide;
-      XX-> flags. mapped = 0;
-      CComponent( self)-> message( self, &e);
-      if ( PObject( self)-> stage == csDead) return false; 
-      if ( f. cmd) {
-         CComponent( self)-> message( self, &f);
-         if ( PObject( self)-> stage == csDead) return false; 
-      }
-    }   
-    return true;
+   Bool foo; return foo;
 }
 
 static Bool
 wm_event( Handle self, XEvent *xev, PEvent ev)
 {
-
-   switch ( xev-> xany. type) {
-   case ClientMessage:
-      if ( xev-> xclient. message_type == WM_PROTOCOLS) {
-         if ((Atom) xev-> xclient. data. l[0] == WM_DELETE_WINDOW) {
-            if ( guts. message_boxes) return false;
-            if ( self != CApplication(application)-> map_focus( application, self))
-               return false;
-            ev-> cmd = cmClose;
-            return true;
-         } else if ((Atom) xev-> xclient. data. l[0] == WM_TAKE_FOCUS) {
-            Handle selectee;
-            if ( guts. message_boxes) {
-               struct MsgDlg * md = guts. message_boxes;
-               while ( md) {
-	          if ( md-> w) XMapRaised( DISP, md-> w);
-                  md = md-> next;
-               }
-               return false;
-            }
-
-            selectee = CApplication(application)-> map_focus( application, self);
-
-	    /* under modal window? */
-
-            if ( selectee && selectee != self) 
-	       XMapRaised( DISP, PWidget(selectee)-> handle);
-
-	    if ( !guts. currentMenu) {
-   	       if ( selectee) {
-                  int rev;
-                  XWindow focus = None;
-		  Handle selectee2 = Widget_get_selectee( selectee);
-		  if ( selectee2) {
-                     XGetInputFocus( DISP, &focus, &rev);
-		     /* protection against openbox who fires WM_TAKE_FOCUS no matter what */
-                     if ( selectee2 && focus != None && focus == PWidget(selectee2)-> handle)
-		        return false;
-		  }
-	       }
-	       guts. currentFocusTime = xev-> xclient. data. l[1];
-	       /* Refuse to take focus unless there are no modal windows above */
-	       if ( !selectee || selectee == self)
-	          XSetInputFocus( DISP, X_WINDOW, RevertToParent, xev-> xclient. data. l[1]);
-	       if ( selectee) 
-	          Widget_selected( selectee, true, true);
-	       guts. currentFocusTime = CurrentTime;
-	    }
-            return false;
-         }
-      }
-      break;
-   case PropertyNotify:
-      if ( xev-> xproperty. atom == NET_WM_STATE && xev-> xproperty. state == PropertyNewValue) {
-         DEFXX;
-         ev-> cmd = cmWindowState;
-         ev-> gen. source = self; 
-         if ( prima_wm_net_state_read_maximization( xev-> xproperty. window, NET_WM_STATE)) {
-            if ( !XX-> flags. zoomed) {
-               ev-> gen. i = wsMaximized;
-               XX-> flags. zoomed = 1;
-            } else 
-               ev-> cmd = 0;
-         } else {
-            if ( XX-> flags. zoomed) {
-               ev-> gen. i = wsNormal;
-               XX-> flags. zoomed = 0;
-            } else 
-               ev-> cmd = 0; 
-         }
-      }
-      break;
-   }
-   
-   return false;
+   Bool foo; return foo;
 }
 
 static int

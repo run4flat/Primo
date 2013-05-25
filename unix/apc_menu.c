@@ -434,115 +434,13 @@ menu_select_item( PMenuSysData XX, PMenuWindow w, int index)
 static Bool
 send_cmMenu( Handle self, PMenuItemReg m)
 {
-    Event ev;
-    Handle owner = PComponent( self)-> owner;
-    bzero( &ev, sizeof( ev));
-    ev. cmd = cmMenu;
-    ev. gen. H = self;
-    ev. gen. i = m ? m-> id : 0; 
-    CComponent(owner)-> message( owner, &ev);
-    if ( PComponent( owner)-> stage == csDead ||
-         PComponent( self)->  stage == csDead) return false;
-    if ( self != guts. currentMenu) return false;
-    return true;
+   Bool foo; return foo;
 }
 
 static Bool
 menu_enter_item( PMenuSysData XX, PMenuWindow w, int index, int type)
 {
-   PMenuItemReg m = w-> m;
-   int index2 = index, div = 0;
-
-   XX-> focused = w;
-   
-   if ( index < 0 || index > w-> last + 1 || !w-> um || !m) return false;
-   while ( index2--) {
-      if ( m-> flags. divider) div = 1;
-      m = m-> next;
-   }
-   if ( index == w-> last + 1) div = 0;
-   
-   if ( m-> flags. disabled && index <= w-> last) return false;
-        
-   if ( m-> down || index == w-> last + 1) {
-      PMenuWindow w2;
-      Point p, s, n = w-> pos;
-
-      if ( w-> next && w-> next-> m == m-> down) {
-         XX-> focused = w-> next;
-         return true;
-      }
-      
-      if ( index != w-> last + 1) {
-         if ( !send_cmMenu( w-> self, m)) return false;
-         m = m-> down;
-      }
-
-      menu_window_delete_downlinks( XX, w);
-      w2 = get_window( w-> self, m); 
-      if ( !w2) return false;
-      
-      update_menu_window( XX, w2);
-      p = menu_item_offset( XX, w, index);
-      s = menu_item_size( XX, w, index);
-      
-      if ( &XX-> wstatic == w) {
-         XWindow dummy;
-         XTranslateCoordinates( DISP, w->w, guts. root, 0, 0, &n.x, &n.y, &dummy);
-         w-> pos = n;
-      }
-      
-      n. x += p. x;
-      n. y += p. y;
-      p. x += w-> pos. x;
-      p. y += w-> pos. y;
-      if ( &XX-> wstatic == w) {
-         if ( div) n. x -= w2-> sz. x - s. x;
-         if ( p.y + s.y + w2-> sz.y <= guts. displaySize.y)
-            n. y = p. y + s. y;
-         else if ( w2-> sz.y <= p. y)
-            n. y = p. y - w2-> sz. y;
-         else 
-            n. y = 0;
-         if ( n. x + w2-> sz. x > guts. displaySize. x)
-            n. x = guts. displaySize. x - w2-> sz. x;
-         else if ( n. x < 0)
-            n. x = 0;
-      } else {
-         div = 0;
-         if ( p.y + w2-> sz.y <= guts. displaySize.y)
-            n. y = p. y;
-         else if ( w2-> sz.y <= p. y + s. y)
-            n. y = p. y + s. y - w2-> sz. y;
-         else 
-            n. y = 0;
-         if ( p.x + s. x + w2-> sz.x <= guts. displaySize.x)
-            n. x = p. x + s. x;
-         else if ( w2-> sz.x <= p.x)
-            n. x = p. x - w2-> sz. x;
-         else {
-            n. x = 0;
-            if ( p.y + w2-> sz.y + s.y <= guts. displaySize.y)
-               n. y += s.y;
-            else if ( w2-> sz.y <= p. y)
-               n. y -= s.y;
-         }
-      }
-      XMoveWindow( DISP, w2-> w, n. x, n. y);
-      XMapRaised( DISP, w2-> w);
-      w2-> pos = n;
-      XX-> focused = w2;
-   } else {
-      Handle self = w-> self;
-      if (( &XX-> wstatic == w) && ( type == 0)) {
-         menu_window_delete_downlinks( XX, w);
-         return true;
-      }
-      prima_end_menu();
-      CAbstractMenu( self)-> sub_call( self, m);
-      return false;
-   }
-   return true;
+   Bool foo; return foo;
 }
 
 
@@ -1268,9 +1166,9 @@ int prima_handle_menu_shortcuts( Handle self, XEvent * ev, KeySym keysym) {
 
 void prima_end_menu(void) {}
 
-Bool apc_menu_create( Handle self, Handle owner) { return false; }
+Bool apc_menu_create( Handle self, Handle owner) { Bool foo; return foo; }
 
-Bool apc_menu_destroy( Handle self) { return false; }
+Bool apc_menu_destroy( Handle self) { Bool foo; return foo; }
 
 PFont apc_menu_default_font( PFont f) { return f; }
 
@@ -1286,28 +1184,28 @@ static void menubar_repaint( Handle self) {}
 
 Bool
 apc_menu_update( Handle self, PMenuItemReg oldBranch, PMenuItemReg newBranch)
-{ return false; }
+{ Bool foo; return foo; }
  
-Bool apc_menu_item_delete( Handle self, PMenuItemReg m) { return false; }
+Bool apc_menu_item_delete( Handle self, PMenuItemReg m) { Bool foo; return foo; }
 
-Bool apc_menu_item_set_accel( Handle self, PMenuItemReg m) { return false; }
+Bool apc_menu_item_set_accel( Handle self, PMenuItemReg m) { Bool foo; return foo; }
 
-Bool apc_menu_item_set_check( Handle self, PMenuItemReg m) { return false; }
+Bool apc_menu_item_set_check( Handle self, PMenuItemReg m) { Bool foo; return foo; }
 
-Bool apc_menu_item_set_enabled( Handle self, PMenuItemReg m) { return false; }
+Bool apc_menu_item_set_enabled( Handle self, PMenuItemReg m) { Bool foo; return foo; }
 
-Bool apc_menu_item_set_image( Handle self, PMenuItemReg m) { return false; }
+Bool apc_menu_item_set_image( Handle self, PMenuItemReg m) { Bool foo; return foo; }
 
-Bool apc_menu_item_set_key( Handle self, PMenuItemReg m) { return false; }
+Bool apc_menu_item_set_key( Handle self, PMenuItemReg m) { Bool foo; return foo; }
 
-Bool apc_menu_item_set_text( Handle self, PMenuItemReg m) { return false; }
+Bool apc_menu_item_set_text( Handle self, PMenuItemReg m) { Bool foo; return foo; }
 
 ApiHandle apc_menu_get_handle( Handle self) { return nilHandle; }
 
-Bool apc_popup_create( Handle self, Handle owner) { return false; }
+Bool apc_popup_create( Handle self, Handle owner) { Bool foo; return foo; }
 
 PFont apc_popup_default_font( PFont f) { return nil; }
 
-Bool apc_popup( Handle self, int x, int y, Rect *anchor) { return false; }
+Bool apc_popup( Handle self, int x, int y, Rect *anchor) { Bool foo; return foo; }
 
-Bool apc_window_set_menu( Handle self, Handle menu) { return false; }
+Bool apc_window_set_menu( Handle self, Handle menu) { Bool foo; return foo; }
