@@ -73,15 +73,8 @@ Icon_autoMasking( Handle self, Bool set, int autoMasking)
 Color
 Icon_maskColor( Handle self, Bool set, Color color)
 {
-   if ( !set)
-      return var-> maskColor;
-   if ( var-> maskColor == color) return 0;
-   var-> maskColor = color;
-   if ( is_opt( optInDraw)) return 0;
-   if ( var-> autoMasking == amMaskColor) 
-      my-> update_change( self);
-   return clInvalid;
-}   
+   Color c; return c;
+}
 
 int
 Icon_maskIndex( Handle self, Bool set, int index)

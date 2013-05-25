@@ -755,10 +755,7 @@ Widget_accelTable( Handle self, Bool set, Handle accelTable)
 Color
 Widget_backColor( Handle self, Bool set, Color color)
 {
-   enter_method;
-   if (!set) return my-> colorIndex( self, false, ciBack, 0);
-   my-> colorIndex( self, true, ciBack, color);
-   return color;
+   Color c; return c;
 }
 
 int
@@ -800,61 +797,13 @@ Widget_clipOwner( Handle self, Bool set, Bool clipOwner)
 Color
 Widget_color( Handle self, Bool set, Color color)
 {
-   enter_method;
-   if (!set)
-      return my-> colorIndex( self, false, ciFore, 0);
-   return my-> colorIndex( self, true, ciFore, color);
+   Color c; return c;
 }
 
 Color
 Widget_colorIndex( Handle self, Bool set, int index, Color color)
 {
-   if ( !set) {
-      if ( index < 0 || index > ciMaxId) return clInvalid;
-      switch ( index) {
-        case ciFore:
-           return opt_InPaint ? inherited-> get_color ( self) : apc_widget_get_color( self, ciFore);
-        case ciBack:
-           return opt_InPaint ? inherited-> get_backColor ( self) : apc_widget_get_color( self, ciBack);
-        default:
-           return apc_widget_get_color( self, index);
-      }
-   } else {
-      enter_method;
-      SingleColor s;
-      s. color = color;
-      s. index = index;
-      if (( index < 0) || ( index > ciMaxId)) return clInvalid;
-      if ( !opt_InPaint) my-> first_that( self, (void*)single_color_notify, &s);
-
-      if ( var-> handle == nilHandle) return clInvalid; /* aware of call from Drawable::init */
-      if ((( color & clSysFlag) != 0) && (( color & wcMask) == 0))
-         color |= var-> widgetClass;
-      if ( opt_InPaint) {
-         switch ( index) {
-            case ciFore:
-               inherited-> set_color ( self, color);
-               break;
-            case ciBack:
-               inherited-> set_backColor ( self, color);
-               break;
-            default:
-               apc_widget_set_color ( self, color, index);
-         }
-      } else {
-         switch ( index) {
-            case ciFore:
-               opt_clear( optOwnerColor);
-               break;
-            case ciBack:
-               opt_clear( optOwnerBackColor);
-               break;
-         }
-         apc_widget_set_color( self, color, index);
-         my-> repaint( self);
-      }
-   }
-   return 0;
+   Color c; return c;
 }
 
 Bool
@@ -1041,12 +990,7 @@ Widget_popup( Handle self, Bool set, Handle popup)
 Color
 Widget_popupColorIndex( Handle self, Bool set, int index, Color color)
 {
-   if (( index < 0) || ( index > ciMaxId)) return clInvalid;
-   if ( !set)
-      return var-> popupColor[ index];
-   if ((( color & clSysFlag) != 0) && (( color & wcMask) == 0)) color |= wcPopup;
-   var-> popupColor[ index] = color;
-   return color;
+   Color c; return c;
 }
 
 SV *

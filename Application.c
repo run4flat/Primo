@@ -270,35 +270,7 @@ typedef struct _SingleColor
 Color
 Application_colorIndex( Handle self, Bool set, int index, Color color)
 {
-   if ( var->  stage > csFrozen) return clInvalid;
-   if (( index < 0) || ( index > ciMaxId)) return clInvalid;
-   if ( !set) {
-      switch ( index) {
-        case ciFore:
-           return opt_InPaint ?
-              CDrawable-> get_color ( self) : var-> colors[ index];
-        case ciBack:
-           return opt_InPaint ?
-              CDrawable-> get_backColor ( self) : var-> colors[ index];
-        default:
-           return  var->  colors[ index];
-      }
-   } else {
-      SingleColor s;
-      s. color = color;
-      s. index = index;
-      if ( !opt_InPaint) my-> first_that( self, (void*)single_color_notify, &s);
-      if ( opt_InPaint) switch ( index) {
-         case ciFore:
-            CDrawable-> set_color ( self, color);
-            break;
-         case ciBack:
-            CDrawable-> set_backColor ( self, color);
-            break;
-       }
-       var-> colors[ index] = color;
-   }
-   return clInvalid;
+   Color c; return c;
 }
 
 void
@@ -358,17 +330,13 @@ Application_set_hint_action( Handle self, Handle view, Bool show, Bool byMouse)
 Color
 Application_hintColor( Handle self, Bool set, Color hintColor)
 {
-   if ( !set)
-      return CWidget( var-> hintWidget)-> get_color( var->  hintWidget);
-   return CWidget( var->  hintWidget)-> set_color( var->  hintWidget, hintColor);
+   Color c; return c;
 }
 
 Color
 Application_hintBackColor( Handle self, Bool set, Color hintBackColor)
 {
-   if ( !set)
-      return CWidget( var->  hintWidget)-> get_backColor( var-> hintWidget);
-   return CWidget( var->  hintWidget)-> set_backColor( var->  hintWidget, hintBackColor);
+   Color c; return c;
 }
 
 int

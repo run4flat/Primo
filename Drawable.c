@@ -191,7 +191,7 @@ Drawable_linePattern( Handle self, Bool set, SV * pattern)
 Color
 Drawable_get_nearest_color( Handle self, Color color)
 {
-   return color;
+   Color c; return c;
 }
 
 Point
@@ -406,13 +406,13 @@ read_palette( int * palSize, SV * palette)
 Color
 Drawable_backColor( Handle self, Bool set, Color color)
 {
-   return color;
+   Color c; return c;
 }
 
 Color
 Drawable_color( Handle self, Bool set, Color color)
 {
-   return color;
+   Color c; return c;
 }
 
 Rect
