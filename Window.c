@@ -238,10 +238,7 @@ Window_origin( Handle self, Bool set, Point origin)
 Rect
 Window_rect( Handle self, Bool set, Rect r)
 {
-   if ( !set) 
-      return inherited rect( self, set, r); 
-   apc_window_set_client_rect( self, r. left, r. bottom, r. right - r. left, r. top - r. bottom);
-   return r;
+   Rect foo; return foo;
 }
 
 Bool

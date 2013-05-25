@@ -412,7 +412,7 @@ Drawable_color( Handle self, Bool set, Color color)
 Rect
 Drawable_clipRect( Handle self, Bool set, Rect clipRect)
 {
-   return clipRect;
+   Rect foo; return foo;
 }
 
 Bool

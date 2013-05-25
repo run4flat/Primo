@@ -206,42 +206,7 @@ XExpansion(slavePtr, cavityWidth)
     int cavityWidth;			/* Horizontal space left for all
 					 * remaining slaves. */
 {
-    int numExpand, minExpand, curExpand;
-    int childWidth;
-
-    /*
-     * This procedure is tricky because windows packed top or bottom can
-     * be interspersed among expandable windows packed left or right.
-     * Scan through the list, keeping a running sum of the widths of
-     * all left and right windows (actually, count the cavity space not
-     * allocated) and a running count of all expandable left and right
-     * windows.  At each top or bottom window, and at the end of the
-     * list, compute the expansion factor that seems reasonable at that
-     * point.  Return the smallest factor seen at any of these points.
-     */
-
-    minExpand = cavityWidth;
-    numExpand = 0;
-    for (; slavePtr != NULL;
-        slavePtr = ( PWidget) slavePtr-> geomInfo. next) {
-	childWidth = slave_width(slavePtr, 0);
-	if ((slavePtr-> geomInfo. side == TOP) || (slavePtr-> geomInfo. side == BOTTOM)) {
-	    curExpand = (cavityWidth - childWidth)/numExpand;
-	    if (curExpand < minExpand) {
-		minExpand = curExpand;
-	    }
-	} else {
-	    cavityWidth -= childWidth;
-	    if (slavePtr->geomInfo. expand) {
-		numExpand++;
-	    }
-	}
-    }
-    curExpand = cavityWidth/numExpand;
-    if (curExpand < minExpand) {
-	minExpand = curExpand;
-    }
-    return (minExpand < 0) ? 0 : minExpand;
+   return 0;
 }
 /*
  *----------------------------------------------------------------------
@@ -269,34 +234,7 @@ YExpansion(slavePtr, cavityHeight)
     int cavityHeight;			/* Vertical space left for all
 					 * remaining slaves. */
 {
-    int numExpand, minExpand, curExpand;
-    int childHeight;
-
-    /*
-     * See comments for XExpansion.
-     */
-
-    minExpand = cavityHeight;
-    numExpand = 0;
-    for (; slavePtr != NULL; slavePtr = (PWidget) slavePtr->geomInfo. next) {
-	childHeight = slave_height(slavePtr, 0);
-	if ((slavePtr-> geomInfo. side == LEFT) || (slavePtr-> geomInfo. side == RIGHT)) {
-	    curExpand = (cavityHeight - childHeight)/numExpand;
-	    if (curExpand < minExpand) {
-		minExpand = curExpand;
-	    }
-	} else {
-	    cavityHeight -= childHeight;
-	    if (slavePtr-> geomInfo. expand) {
-		numExpand++;
-	    }
-	}
-    }
-    curExpand = cavityHeight/numExpand;
-    if (curExpand < minExpand) {
-	minExpand = curExpand;
-    }
-    return (minExpand < 0) ? 0 : minExpand;
+    return 0;
 }
 
 void

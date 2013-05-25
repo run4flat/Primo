@@ -397,12 +397,7 @@ Widget_get_default_popup_font( char * dummy)
 NPoint
 Widget_designScale( Handle self, Bool set, NPoint designScale)
 {
-   if ( !set)
-      return var-> designScale;
-   if ( designScale. x < 0) designScale. x = 0;
-   if ( designScale. y < 0) designScale. y = 0;
-   var-> designScale = designScale;
-   return designScale;
+   NPoint foo; return foo;
 }
 
 int
@@ -835,17 +830,7 @@ Widget_popupItems( Handle self, Bool set, SV * popupItems)
 Rect
 Widget_rect( Handle self, Bool set, Rect r)
 {
-   enter_method;
-   if ( !set) {
-      Point p   = my-> get_origin( self);
-      Point s   = my-> get_size( self);
-      r. left   = p. x;
-      r. bottom = p. y;
-      r. right  = p. x + s. x;
-      r. top    = p. y + s. y;
-   } else 
-      apc_widget_set_rect( self, r. left, r. bottom, r. right - r. left, r. top - r. bottom);
-   return r;
+   Rect foo; return foo;
 }
 
 int
