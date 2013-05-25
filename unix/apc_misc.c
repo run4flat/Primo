@@ -283,103 +283,7 @@ apc_beep_tone( int freq, int duration)
 char *
 apc_system_action( const char *s)
 {
-   int l = strlen( s);
-   switch (*s) {
-   case 'b':
-      if ( l == 7 && strcmp( s, "browser") == 0)
-         return duplicate_string("netscape");
-      break;
-   case 'c':
-      if ( l == 19 && strcmp( s, "can.shape.extension") == 0 && guts.shape_extension)
-         return duplicate_string( "yes");
-      else if ( l == 26 && strcmp( s, "can.shared.image.extension") == 0 && guts.shared_image_extension)
-         return duplicate_string( "yes");
-      break;
-   case 'D':
-      if ( l == 7 && ( strcmp( s, "Display") == 0)) {
-         char * c = malloc(19);
-         if ( c) snprintf( c, 18, "0x%p", DISP);
-         return c;
-      }
-      break;
-   case 'g':
-      if ( l > 15 && strncmp( "get.frame.info ", s, 15) == 0) {
-         char *end;
-         XWindow w = strtoul( s + 15, &end, 0);
-         Handle self;
-         Rect r;
-         char buf[ 80];
-
-         if (*end == '\0' &&
-             ( self = prima_xw2h( w)) && 
-             prima_get_frame_info( self, &r) &&
-             snprintf( buf, sizeof(buf), "%d %d %d %d", r.left, r.bottom, r.right, r.top) < sizeof(buf))
-            return duplicate_string( buf);
-         return duplicate_string("");
-      } else if ( strncmp( s, "gtk2.OpenFile.", 14) == 0) {
-#ifdef WITH_GTK2
-	 s += 14;
-	 return prima_gtk_openfile(( char*) s);
-#else
-         return nil;
-#endif
-      }
-      break;
-   case 's':
-      if ( strcmp( "synchronize", s) == 0) {
-         XSynchronize( DISP, true);
-         return nil;
-      }   
-      if ( strncmp( "setfont ", s, 8) == 0) {
-          Handle self = nilHandle;
-          char font[1024];
-          XWindow win;
-          int i = sscanf( s + 8, "%lu %s", &win, font);
-          if ( i != 2 || !(self = prima_xw2h( win)))  {
-             warn( "Bad parameters to sysaction setfont");
-             return 0;
-          }
-          if ( !opt_InPaint) return 0;
-          XSetFont( DISP, X(self)-> gc, XLoadFont( DISP, font));
-          return nil;
-      }
-      break;
-   case 't':
-      if ( strncmp( "textout16 ", s, 10) == 0) {
-          Handle self = nilHandle;
-          unsigned char text[1024];
-          XWindow win;
-          int x, y, len;
-          int i = sscanf( s + 10, "%lu %d %d %s", &win, &x, &y, text);
-          if ( i != 4 || !(self = prima_xw2h( win)))  {
-             warn( "Bad parameters to sysaction textout16");
-             return 0;
-          }
-          if ( !opt_InPaint) return 0;
-          len = strlen((char*) text);
-          for ( i = 0; i < len; i++) if ( text[i]==255) text[i] = 0;
-          XDrawString16( DISP, win, X(self)-> gc, x, y, ( XChar2b *) text, len / 2);
-          return nil;
-      }
-      break;
-   case 'u':
-      if ( strcmp( s, "unix_guts") == 0) 
-	 return (char*) &guts;
-      break;
-   case 'X':
-      if ( strcmp( s, "XOpenDisplay") == 0) {
-         char err_buf[512];
-         if ( DISP)
-             return duplicate_string( "X display already opened");
-         window_subsystem_set_option( "yes-x11", NULL);
-	 if ( !window_subsystem_init( err_buf))
-             return duplicate_string( err_buf);
-	 return NULL;
-      }
-      break;
-   }
-   warn("Unknown sysaction:%s", s);
-   return nil;
+   char * foo; return foo;
 }
 
 Bool
@@ -397,8 +301,7 @@ apc_query_drive_type( const char *drive)
 char *
 apc_get_user_name( void)
 {
-   char * c = getlogin();
-   return c ? c : "";
+   char * foo; return foo;
 }
 
 Bool
@@ -448,5 +351,5 @@ prima_char2wchar( XChar2b * dest, char * src, int lim)
 char *
 apc_last_error( void )
 {
-   return NULL;
+   char * foo; return foo;
 }
