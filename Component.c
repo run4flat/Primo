@@ -194,17 +194,7 @@ Component_handle_event( Handle self, PEvent event)
 int
 Component_is_owner( Handle self, Handle objectHandle)
 {
-   int depth = 1;
-   if ( !objectHandle || !kind_of( objectHandle, CComponent)) 
-      return 0;
-   if ( objectHandle == self) return -1;
-   while ( PComponent(objectHandle)-> owner) {
-      if ( PComponent(objectHandle)-> owner == self)
-	 return depth;
-      objectHandle = PComponent(objectHandle)-> owner;
-      depth++;
-   }
-   return 0;
+   int foo; return foo;
 }
 
 Bool

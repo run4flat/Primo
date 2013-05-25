@@ -85,11 +85,7 @@ File_get_handle( Handle self)
 int
 File_mask( Handle self, Bool set, int mask)
 {
-   if ( !set)
-      return var-> userMask;
-   var-> userMask = mask;
-   File_reset_notifications( self);
-   return mask;
+   int foo; return foo;
 }
 
 UV

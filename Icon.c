@@ -61,14 +61,8 @@ Icon_mask( Handle self, Bool set, SV * svmask)
 int
 Icon_autoMasking( Handle self, Bool set, int autoMasking)
 {
-   if ( !set)
-      return var-> autoMasking;
-   if ( var-> autoMasking == autoMasking) return 0;
-   var-> autoMasking = autoMasking;
-   if ( is_opt( optInDraw)) return 0;
-   my-> update_change( self);
-   return 0;
-}   
+   int foo; return foo;
+}
 
 Color
 Icon_maskColor( Handle self, Bool set, Color color)
@@ -79,14 +73,8 @@ Icon_maskColor( Handle self, Bool set, Color color)
 int
 Icon_maskIndex( Handle self, Bool set, int index)
 {
-   if ( !set)
-      return var-> maskIndex;
-   var-> maskIndex = index;
-   if ( is_opt( optInDraw)) return 0;
-   if ( var-> autoMasking == amMaskIndex) 
-      my-> update_change( self);
-   return -1;
-}   
+   int foo; return foo;
+}
 
 void
 Icon_update_change( Handle self)

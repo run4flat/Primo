@@ -46,9 +46,9 @@ extern "C" {
 typedef Bool MenuProc ( Handle self, PMenuItemReg m, void * params);
 typedef MenuProc *PMenuProc;
 
-static int key_normalize( const char * key) { return 0; }
+static int key_normalize( const char * key) { int foo; return foo; }
 
-static int is_var_id_name( char * name) { return 0; }
+static int is_var_id_name( char * name) { int foo; return foo; }
 
 void AbstractMenu_dispose_menu( Handle self, void * menu) {}
 
@@ -211,13 +211,13 @@ Bool AbstractMenu_selected( Handle self, Bool set, Bool selected)
 
 SV * AbstractMenu_get_handle( Handle self) { return nilSV; }
 
-int AbstractMenu_translate_accel( Handle self, char * accel) { return 0; }
+int AbstractMenu_translate_accel( Handle self, char * accel) { int foo; return foo; }
 
 int AbstractMenu_translate_key( Handle self, int code, int key, int mod) {
-   return 0;
+   int foo; return foo;
 }
 
-int AbstractMenu_translate_shortcut( Handle self, char * key) { return 0; }
+int AbstractMenu_translate_shortcut( Handle self, char * key) { int foo; return foo; }
 
 static Bool up_match   ( Handle self, PMenuItemReg m, void * params) { return false; }
 static Bool prev_match ( Handle self, PMenuItemReg m, void * params) { return false; }

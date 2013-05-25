@@ -180,11 +180,7 @@ img_perlio_write( void * f, size_t bufsize, void * buffer)
 static int
 img_perlio_seek( void * f, long offset, int whence)
 {
-#ifdef PerlIO
-    return PerlIO_seek( ( FileStream) f, offset, whence);
-#else
-    return fseek( ( FileStream) f, offset, whence);
-#endif
+   int foo; return foo;
 }
 
 static long 
@@ -200,21 +196,13 @@ img_perlio_tell( void * f)
 static int
 img_perlio_flush( void * f)
 {
-#ifdef PerlIO
-    return PerlIO_flush( ( FileStream) f);
-#else
-    return fflush( ( FileStream) f);
-#endif
+   int foo; return foo;
 }
 
 static int
 img_perlio_error( void * f)
 {
-#ifdef PerlIO
-    return PerlIO_error( ( FileStream) f);
-#else
-    return ferror( ( FileStream) f);
-#endif
+   int foo; return foo;
 }
 
 XS( Image_load_FROMPERL) 
@@ -295,10 +283,7 @@ XS( Image_load_FROMPERL)
 int
 Image_lineSize( Handle self, Bool set, int dummy)
 {
-   if ( set)
-      croak("Image::lineSize: attempt to write read-only property");
-
-   return var-> lineSize;
+   int foo; return foo;
 }
 
 PList
@@ -376,36 +361,25 @@ XS( Image_save_FROMPERL)
 int
 Image_save_REDEFINED( SV * who, char *filename, HV * profile)
 {
-   return 0;
+   int foo; return foo;
 }
 
 int
 Image_save( SV * who, char *filename, HV * profile)
 {
-   Handle self = gimme_the_mate( who);
-   char error[ 256];
-   if ( !pexist( className)) 
-      pset_c( className, self ? my-> className : ( char*) SvPV_nolen( who));
-   return apc_img_save( self, filename, NULL, profile, error);
+   int foo; return foo;
 }
 
 int
 Image_type( Handle self, Bool set, int type)
 {
-   HV * profile;
-   if ( !set)
-      return var->type;
-   profile = newHV();
-   pset_i( type, type);
-   my-> set( self, profile);
-   sv_free(( SV *) profile);
-   return nilHandle;
+   int foo; return foo;
 }
 
 int
 Image_get_bpp( Handle self)
 {
-   return var->type & imBPP;
+   int foo; return foo;
 }
 
 
@@ -509,9 +483,7 @@ Image_palette( Handle self, Bool set, SV * palette)
 int
 Image_conversion( Handle self, Bool set, int conversion)
 {
-   if ( !set)
-      return var-> conversion;
-   return var-> conversion = conversion;
+   int foo; return foo;
 }
 
 void

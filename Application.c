@@ -159,7 +159,7 @@ Application_get_caption_font( char * dummy)
 int
 Application_get_default_cursor_width( char * dummy)
 {
-   return apc_sys_get_value( svXCursor);
+   int foo; return foo;
 }
 
 Point
@@ -177,7 +177,7 @@ Application_get_default_window_borders( char * dummy, int borderStyle)
 int
 Application_get_system_value( char * dummy, int sysValue)
 {
-   return apc_sys_get_value( sysValue);
+   int foo; return foo;
 }
 
 SV *
@@ -313,9 +313,7 @@ Application_hintBackColor( Handle self, Bool set, Color hintBackColor)
 int
 Application_hintPause( Handle self, Bool set, int hintPause)
 {
-   if ( !set)
-      return CTimer( var->  hintTimer)-> get_timeout( var->  hintTimer);
-   return CTimer( var->  hintTimer)-> set_timeout( var->  hintTimer, hintPause);
+   int foo; return foo;
 }
 
 void
@@ -421,7 +419,7 @@ Bool   Application_syncPaint( Handle self, Bool set, Bool syncPaint)   { return 
 Bool   Application_visible( Handle self, Bool set, Bool visible)       { return false; }
 Bool   Application_buffered( Handle self, Bool set, Bool buffered)     { return false; }
 Bool   Application_enabled( Handle self, Bool set, Bool enable)        { return false; }
-int    Application_growMode( Handle self, Bool set, int flags)         { return 0; }
+int    Application_growMode( Handle self, Bool set, int flags)         { int foo; return foo; }
 Bool   Application_hintVisible( Handle self, Bool set, Bool visible)   { return false; }
 Handle Application_owner( Handle self, Bool set, Handle owner)         { return nilHandle; }
 Bool   Application_ownerColor( Handle self, Bool set, Bool ownerColor) { return false; }
@@ -430,7 +428,7 @@ Bool   Application_ownerFont( Handle self, Bool set, Bool ownerFont)   { return 
 Bool   Application_ownerShowHint( Handle self, Bool set, Bool ownerShowHint) { return false; }
 Bool   Application_ownerPalette( Handle self, Bool set, Bool ownerPalette) { return false; }
 Bool   Application_clipOwner( Handle self, Bool set, Bool clipOwner)   { return false; }
-int    Application_tabOrder( Handle self, Bool set, int tabOrder)      { return 0; }
+int    Application_tabOrder( Handle self, Bool set, int tabOrder)      { int foo; return foo; }
 SV   * Application_text    ( Handle self, Bool set, SV * text)       { return nilSV; }
 Bool   Application_transparent( Handle self, Bool set, Bool transparent) { return false; }
 Bool   Application_validate_owner( Handle self, Handle * owner, HV * profile) { return false; }

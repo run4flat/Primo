@@ -173,13 +173,13 @@ Drawable_font_add( Handle self, Font * source, Font * dest)
 int
 Drawable_get_paint_state( Handle self)
 {
-   return 0;
+   int foo; return foo;
 }
 
 int
 Drawable_get_bpp( Handle self)
 {
-   return 0;
+   int foo; return foo;
 }
 
 SV *
@@ -228,7 +228,7 @@ Drawable_get_handle( Handle self)
 int
 Drawable_height( Handle self, Bool set, int height)
 {
-   return 0;
+   int foo; return foo;
 }
 
 Point
@@ -240,7 +240,7 @@ Drawable_size ( Handle self, Bool set, Point size)
 int
 Drawable_width( Handle self, Bool set, int width)
 {
-   return width;
+   int foo; return foo;
 }
 
 Bool
@@ -308,7 +308,7 @@ TkMakeBezierCurve(
 					 * for display.  NULL means don't
 					 * fill in any Points. */
 {
-    return 0;
+   int foo; return foo;
 }
 
 #define STATIC_ARRAY_SIZE 200
@@ -352,7 +352,7 @@ Drawable_render_spline( SV * obj, SV * points, int precision)
 int
 Drawable_get_text_width( Handle self, SV * text, Bool addOverhang)
 {
-   return 0;
+   int foo; return foo;
 }
 
 SV *
@@ -429,19 +429,19 @@ Drawable_fillWinding( Handle self, Bool set, Bool fillWinding)
 int
 Drawable_lineEnd( Handle self, Bool set, int lineEnd)
 {
-   return lineEnd;
+   int foo; return foo;
 }
 
 int
 Drawable_lineJoin( Handle self, Bool set, int lineJoin)
 {
-   return lineJoin;
+   int foo; return foo;
 }
 
 int
 Drawable_lineWidth( Handle self, Bool set, int lineWidth)
 {
-   return lineWidth;
+   int foo; return foo;
 }
 
 SV *
@@ -465,19 +465,19 @@ Drawable_region( Handle self, Bool set, Handle mask)
 int
 Drawable_rop( Handle self, Bool set, int rop)
 {
-   return rop;
+   int foo; return foo;
 }
 
 int
 Drawable_rop2( Handle self, Bool set, int rop2)
 {
-   return rop2;
+   int foo; return foo;
 }
 
 int
 Drawable_splinePrecision( Handle self, Bool set, int splinePrecision)
 {
-   return splinePrecision;
+   int foo; return foo;
 }
 
 Bool

@@ -84,41 +84,7 @@ geometry_reset( Handle self, int geometry)
 int
 Widget_geometry( Handle self, Bool set, int geometry)
 {
-   if ( !set)
-      return var-> geometry;
-   if ( geometry == var-> geometry) {
-      /* because called within set_owner() */
-      if ((var-> geometry == gtGrowMode) && (var-> growMode & gmCenter)) 
-         my-> set_centered( self, var-> growMode & gmXCenter, var-> growMode & gmYCenter);
-      return geometry;
-   }
-
-   if ( geometry < gtDefault || geometry > gtMax)
-      croak("Prima::Widget::geometry: invalid value passed");
-   
-   switch ( var-> geometry) {
-   case gtPlace:
-      Widget_place_leave( self);
-      break;
-   case gtPack:
-      Widget_pack_leave( self);
-      break;
-   }
-   var-> geometry = geometry;
-   switch ( var-> geometry) {
-   case gtGrowMode:
-      if ( var-> growMode & gmCenter)
-         my-> set_centered( self, var-> growMode & gmXCenter, var-> growMode & gmYCenter);
-      break;
-   case gtPlace:
-      Widget_place_enter( self);
-      break;
-   case gtPack:
-      Widget_pack_enter( self);
-      break;
-   }
-   geometry_reset_all();
-   return var-> geometry;
+   int foo; return foo;
 }
 
 Point
@@ -130,21 +96,13 @@ Widget_geomSize( Handle self, Bool set, Point geomSize)
 int
 Widget_geomHeight( Handle self, Bool set, int geomHeight)
 {
-   if ( set) {
-      Point p = { var-> geomSize. x, geomHeight};
-      my-> set_geomSize( self, p);
-   }
-   return var-> geomSize. y;
+   int foo; return foo;
 }
 
 int
 Widget_geomWidth( Handle self, Bool set, int geomWidth)
 {
-   if ( set) {
-      Point p = { geomWidth, var-> geomSize. y};
-      my-> set_geomSize( self, p);
-   }
-   return var-> geomSize. x;
+   int foo; return foo;
 }
 
 Bool
@@ -233,21 +191,13 @@ Widget_move_notify( Handle self, Handle child, Point * moveTo)
 static int
 slave_width( register PWidget slavePtr, register int plus)
 {
-   register int width = slavePtr-> geomSize. x + slavePtr-> geomInfo. pad.x + 
-                        slavePtr-> geomInfo. ipad.x + plus;
-   if ( width < slavePtr-> sizeMin.x) width = slavePtr-> sizeMin.x;
-   if ( width > slavePtr-> sizeMax.x) width = slavePtr-> sizeMax.x;
-   return width;
+   int foo; return foo;
 }
 
 static int
 slave_height( register PWidget slavePtr, register int plus)
 {
-   register int height = slavePtr-> geomSize.y + slavePtr-> geomInfo. pad.y + 
-                        slavePtr-> geomInfo. ipad.y + plus;
-   if ( height < slavePtr-> sizeMin.y) height = slavePtr-> sizeMin.y;
-   if ( height > slavePtr-> sizeMax.y) height = slavePtr-> sizeMax.y;
-   return height;
+   int foo; return foo;
 }
 
 static int

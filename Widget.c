@@ -256,81 +256,20 @@ Widget_next_positional( Handle self, int dx, int dy)
 
 static int compare_taborders_forward( const void *a, const void *b)
 {
-   if ((*(PWidget*) a)-> tabOrder < (*(PWidget*) b)-> tabOrder)
-      return -1; else
-   if ((*(PWidget*) a)-> tabOrder > (*(PWidget*) b)-> tabOrder)
-      return 1; 
-   else
-      return 0;
-}   
+   int foo; return foo;
+}
 
 static int compare_taborders_backward( const void *a, const void *b)
 {
-   if ((*(PWidget*) a)-> tabOrder < (*(PWidget*) b)-> tabOrder)
-      return 1; else
-   if ((*(PWidget*) a)-> tabOrder > (*(PWidget*) b)-> tabOrder)
-      return -1; 
-   else
-      return 0;
-}   
+   int foo; return foo;
+}
 
 static int
 do_taborder_candidates( Handle level, Handle who, 
      int (*compareProc)(const void *, const void *), 
      int * stage, Handle * result)
 {
-   int i, fsel = -1;
-   PList w = &(PWidget( level)-> widgets);
-   Handle * ordered;
-
-   if ( w-> count == 0) return true;
-      
-   ordered = ( Handle *) malloc( w-> count * sizeof( Handle));
-   if ( !ordered) return true;
-   
-   memcpy( ordered, w-> items, w-> count * sizeof( Handle));
-   qsort( ordered, w-> count, sizeof( Handle), compareProc);
-
-   /* finding current widget in the group */
-   for ( i = 0; i < w-> count; i++) {
-      Handle x = ordered[i];
-      if ( CWidget( x)-> get_current( x)) {
-         fsel = i;
-         break;
-      }   
-   }   
-   if ( fsel < 0) fsel = 0;
-   
-   for ( i = 0; i < w-> count; i++) {
-      int j;
-      Handle x;
-
-      j = i + fsel;
-      if ( j >= w-> count) j -= w-> count;
-      
-      x = ordered[j];
-      if ( CWidget( x)-> get_visible( x) && CWidget( x)-> get_enabled( x)) {
-         if ( CWidget( x)-> get_selectable( x) && CWidget( x)-> get_tabStop( x)) {
-            if ( *result == nilHandle) *result = x; 
-            switch( *stage) {
-            case 0: /* nothing found yet */
-               if ( x == who) *stage = 1;
-               break;
-            default:
-               /* next widget after 'who' is ours */
-               *result = x;
-               free( ordered);
-               return false;
-            }   
-         }   
-         if ( !do_taborder_candidates( x, who, compareProc, stage, result)) {
-            free( ordered);
-            return false; /* fall through */
-         }   
-      }
-   }   
-   free( ordered);
-   return true;
+   int foo; return foo;
 }
 
 Handle 
@@ -514,15 +453,7 @@ Widget_designScale( Handle self, Bool set, NPoint designScale)
 int
 Widget_growMode( Handle self, Bool set, int growMode)
 {
-   enter_method;
-   Bool x = false, y = false;
-   if ( !set)
-      return var-> growMode;
-   var-> growMode = growMode;
-   if ( var-> growMode & gmXCenter) x = true;
-   if ( var-> growMode & gmYCenter) y = true;
-   if ( x || y) my-> set_centered( self, x, y);
-   return var-> growMode;
+   int foo; return foo;
 }
 
 SV *
@@ -541,18 +472,7 @@ Widget_get_parent_handle( Handle self)
 int
 Widget_hintVisible( Handle self, Bool set, int hintVisible)
 {
-   Bool wantVisible;
-   if ( !set)
-      return PApplication( application)-> hintVisible;
-   if ( var-> stage >= csDead) return false;
-   wantVisible = ( hintVisible != 0);
-   if ( wantVisible == PApplication( application)-> hintVisible) return false;
-   if ( wantVisible) {
-      if ( strlen( var-> hint) == 0) return false;
-      if ( hintVisible > 0) PApplication(application)-> hintActive = -1; /* immediate */
-   }
-   CApplication( application)-> set_hint_action( application, self, wantVisible, false);
-   return false;
+   int foo; return foo;
 }
 
 Bool
@@ -761,13 +681,7 @@ Widget_backColor( Handle self, Bool set, Color color)
 int
 Widget_bottom( Handle self, Bool set, int bottom)
 {
-   enter_method;
-   Point p = my-> get_origin( self);
-   if ( !set)
-      return p. y;
-   p. y = bottom;
-   my-> set_origin( self, p);
-   return 0;
+   int foo; return foo;
 }
 
 Bool
@@ -869,13 +783,7 @@ Widget_hint( Handle self, Bool set, SV *hint)
 int
 Widget_left( Handle self, Bool set, int left)
 {
-   enter_method;
-   Point p = my-> get_origin( self);
-   if ( !set)
-      return p. x;
-   p. x = left;
-   my-> set_origin( self, p);
-   return 0;
+   int foo; return foo;
 }
 
 Point
@@ -941,14 +849,7 @@ Widget_pointerHotSpot( Handle self, Bool set, Point hotSpot)
 int
 Widget_pointerType( Handle self, Bool set, int type)
 {
-   enter_method;
-   if ( var-> stage > csFrozen) return 0;
-   if ( !set)
-      return var-> pointerType;
-   var-> pointerType = type;
-   apc_pointer_set_shape( self, type);
-   my-> first_that( self, (void*)sptr, nil);
-   return type;
+   int foo; return foo;
 }
 
 Point
@@ -995,15 +896,7 @@ Widget_rect( Handle self, Bool set, Rect r)
 int
 Widget_right( Handle self, Bool set, int right)
 {
-   enter_method;
-   Point p;
-   Rect r = my-> get_rect( self);
-   if ( !set)
-      return r. right;
-   p. x = r. left - r. right + right;
-   p. y = r. bottom;
-   my-> set_origin( self, p);
-   return 0;
+   int foo; return foo;
 }
 
 Bool
@@ -1033,9 +926,7 @@ Widget_selectedWidget( Handle self, Bool set, Handle widget)
 int
 Widget_selectingButtons( Handle self, Bool set, int sb)
 {
-   if ( !set)
-      return var-> selectingButtons;
-   return var-> selectingButtons = sb;
+   int foo; return foo;
 }
 
 Handle
@@ -1065,66 +956,7 @@ Widget_syncPaint( Handle self, Bool set, Bool syncPaint)
 int
 Widget_tabOrder( Handle self, Bool set, int tabOrder)
 {
-    int count;
-    PWidget owner;
-
-    if ( var-> stage > csFrozen) return 0;
-    if ( !set)
-       return var-> tabOrder;
-
-    owner = ( PWidget) var-> owner;
-    count = owner-> widgets. count;
-    if ( tabOrder < 0) {
-       int i, maxOrder = -1;
-       /* finding maximal tabOrder value among the siblings */
-       for ( i = 0; i < count; i++) {
-          PWidget ctrl = ( PWidget) owner-> widgets. items[ i];
-          if ( self == ( Handle) ctrl) continue;
-          if ( maxOrder < ctrl-> tabOrder) maxOrder = ctrl-> tabOrder;
-       }
-       if ( maxOrder < INT_MAX) {
-          var-> tabOrder = maxOrder + 1;
-          return 0;
-       }
-       /* maximal value found, but has no use; finding gaps */
-       {
-          int j = 0;
-          Bool match = 1;
-          while ( !match) {
-             for ( i = 0; i < count; i++) {
-                PWidget ctrl = ( PWidget) owner-> widgets. items[ i];
-                if ( self == ( Handle) ctrl) continue;
-                if ( ctrl-> tabOrder == j) {
-                   match = 1;
-                   break;
-                }
-             }
-             j++;
-          }
-          var-> tabOrder = j - 1;
-       }
-    } else {
-       int i;
-       Bool match = 0;
-       /* finding exact match among the siblings */
-       for ( i = 0; i < count; i++) {
-          PWidget ctrl = ( PWidget) owner-> widgets. items[ i];
-          if ( self == ( Handle) ctrl) continue;
-          if ( ctrl-> tabOrder == tabOrder) {
-             match = 1;
-             break;
-          }
-       }
-       if ( match)
-          /* incrementing all tabOrders that greater than ours */
-          for ( i = 0; i < count; i++) {
-             PWidget ctrl = ( PWidget) owner-> widgets. items[ i];
-             if ( self == ( Handle) ctrl) continue;
-             if ( ctrl-> tabOrder >= tabOrder) ctrl-> tabOrder++;
-          }
-       var-> tabOrder = tabOrder;
-    }
-    return 0;
+   int foo; return foo;
 }
 
 Bool
@@ -1148,15 +980,7 @@ Widget_text( Handle self, Bool set, SV *text)
 int
 Widget_top( Handle self, Bool set, int top)
 {
-   enter_method;
-   Point p;
-   Rect  r   = my-> get_rect( self);
-   if ( !set)
-      return r. top;
-   p. x = r. left;
-   p. y = r. bottom - r. top + top;
-   my-> set_origin( self, p);
-   return 0;
+   int foo; return foo;
 }
 
 Bool
@@ -1168,12 +992,7 @@ Widget_visible( Handle self, Bool set, Bool visible)
 int
 Widget_widgetClass( Handle self, Bool set, int widgetClass)
 {
-   enter_method;
-   if ( !set)
-      return var-> widgetClass;
-   var-> widgetClass = widgetClass;
-   my-> repaint( self);
-   return 0;
+   int foo; return foo;
 }
 
 /* XS section */

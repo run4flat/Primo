@@ -99,9 +99,7 @@ Timer_get_handle( Handle self)
 int
 Timer_timeout( Handle self, Bool set, int timeout)
 {
-   if ( !set)
-      return apc_timer_get_timeout( self);
-   return ( int) apc_timer_set_timeout( self, timeout);
+   int foo; return foo;
 }
 
 #ifdef __cplusplus

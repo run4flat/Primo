@@ -43,13 +43,13 @@ SV *Utils_query_drives_map( char *firstDrive)
 int
 Utils_get_os()
 {
-   return apc_application_get_os_info( nil, 0, nil, 0, nil, 0, nil, 0);
+   int foo; return foo;
 }
 
 int
 Utils_get_gui()
 {
-   return apc_application_get_gui_info( nil, 0);
+   int foo; return foo;
 }
 
 long Utils_ceil( double x)

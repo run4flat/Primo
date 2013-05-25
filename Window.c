@@ -80,7 +80,7 @@ Window_end_modal( Handle self)
 int
 Window_get_modal( Handle self)
 {
-   return var-> modal;
+   int foo; return foo;
 }
 
 SV *
@@ -121,20 +121,7 @@ Window_cancel_children( Handle self)
 int
 Window_execute( Handle self, Handle insertBefore)
 {
-   if ( var-> modal)
-      return mbCancel;
-
-   protect_object( self);
-   if ( insertBefore
-	&& ( insertBefore == self
-	     || !kind_of( insertBefore, CWindow)
-	     || PWindow( insertBefore)-> modal != mtExclusive))
-      insertBefore = nilHandle;
-   if ( !apc_window_execute( self, insertBefore))
-      var-> modalResult = mbCancel;
-
-   unprotect_object( self);
-   return var-> modalResult;
+   int foo; return foo;
 }
 
 Bool
@@ -152,9 +139,7 @@ Window_modalHorizon( Handle self, Bool set, Bool modalHorizon)
 int
 Window_modalResult ( Handle self, Bool set, int modalResult)
 {
-   if ( !set)
-      return var-> modalResult;
-   return var-> modalResult = modalResult;
+   int foo; return foo;
 }
 
 static void
@@ -223,27 +208,13 @@ Window_transparent( Handle self, Bool set, Bool transparent)
 int
 Window_borderIcons( Handle self, Bool set, int borderIcons)
 {
-   HV * profile;
-   if ( !set)
-      return apc_window_get_border_icons( self);
-   profile = newHV();
-   pset_i( borderIcons, borderIcons);
-   my-> set( self, profile);
-   sv_free(( SV *) profile);
-   return nilHandle;
+   int foo; return foo;
 }
 
 int
 Window_borderStyle( Handle self, Bool set, int borderStyle)
 {
-   HV * profile;
-   if ( !set)
-      return apc_window_get_border_style( self);
-   profile = newHV();
-   pset_i( borderStyle, borderStyle);
-   my-> set( self, profile);
-   sv_free(( SV *) profile);
-   return nilHandle;
+   int foo; return foo;
 }
 
 Point
@@ -307,9 +278,7 @@ Window_validate_owner( Handle self, Handle * owner, HV * profile)
 int
 Window_windowState( Handle self, Bool set, int windowState)
 {
-   if ( !set)
-      return apc_window_get_window_state( self);
-   return ( int) apc_window_set_window_state( self, windowState);
+   int foo; return foo;
 }
 
 #ifdef __cplusplus
