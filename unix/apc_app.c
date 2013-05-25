@@ -74,19 +74,7 @@ x_io_error_handler( Display *d)
 static XrmDatabase
 get_database( void)
 {
-   XrmDatabase db = XrmGetStringDatabase( "");
-   char filename[PATH_MAX];
-   char *c;
-   char *resource_data = XResourceManagerString( DISP);
-   if ( resource_data) {
-      XrmCombineDatabase( XrmGetStringDatabase( resource_data), &db, false);
-   } else {
-      c = getenv( "HOME");
-      if (!c) c = "";
-      snprintf( filename, PATH_MAX, "%s/.Xdefaults", c);
-      XrmCombineFileDatabase( filename, &db, false);
-   }
-   return db;
+   XrmDatabase foo; return foo;
 }
 
 static int
