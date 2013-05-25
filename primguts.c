@@ -627,13 +627,13 @@ XS(Prima_init)
    }
    
    if ( prima_init_ok == 1) {
-      prima_init_image_subsystem();
+//      prima_init_image_subsystem();
       prima_init_ok++;
    }
 
    if ( prima_init_ok == 2) {
-      if ( !window_subsystem_init( error_buf)) 
-	 croak( "%s", error_buf);
+//      if ( !window_subsystem_init( error_buf)) 
+//	 croak( "%s", error_buf);
       prima_init_ok++;
    }
    SPAGAIN;
@@ -1220,15 +1220,15 @@ XS( prima_cleanup)
    hash_first_that( primaObjects, (void*)kill_objects, nil, nil, nil);
    hash_destroy( primaObjects, false);
    primaObjects = nil;
-   if ( prima_init_ok > 1) prima_cleanup_image_subsystem();
-   if ( prima_init_ok > 2) window_subsystem_cleanup();
+//   if ( prima_init_ok > 1) prima_cleanup_image_subsystem();
+//   if ( prima_init_ok > 2) window_subsystem_cleanup();
    hash_destroy( vmtHash, false);
    vmtHash = nil;
    list_delete_all( &staticObjects, true);
    list_destroy( &staticObjects);
    list_destroy( &postDestroys);
    kill_zombies();
-   if ( prima_init_ok > 2) window_subsystem_done();
+//   if ( prima_init_ok > 2) window_subsystem_done();
    list_first_that( &staticHashes, (void*)kill_hashes, nil);
    list_destroy( &staticHashes);
 #ifdef PARANOID_MALLOC

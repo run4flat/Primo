@@ -256,7 +256,6 @@ sub setup_files
 	@pm_files  = ffind( qr/\.pm$/ );
 	@c_files    = ( 
 		<*.c>,
-		(grep { not $PASSIVE_CODECS{$_} } <img/*.c>),
 		(grep { !m/xft.c/ || $cmd_options{WITH_XFT} } <$platform/*.c>),
 	);
 	@cls_files  = ( <*.cls> );
@@ -276,7 +275,6 @@ sub setup_files
 	@target_clean = (
 		"include/generic/*",
 		"*$Config{_o}",
-		"img/*$Config{_o}",
 		"$platform/*$Config{_o}",
 	);
 
@@ -1767,7 +1765,7 @@ bindist: all
 \t$^X $0 --bindist $DISTNAME
 
 devclean:
-\t\$(RM_F) *$Config{_o} img/*$Config{_o} $platform/*$Config{_o}
+\t\$(RM_F) *$Config{_o} $platform/*$Config{_o}
 
 deinstall:
 $pm_deinstall
