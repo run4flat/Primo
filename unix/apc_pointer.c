@@ -187,34 +187,5 @@ apc_pointer_set_visible( Handle self, Bool visible)
 Cursor
 prima_null_pointer( void)
 {
-   if ( guts. null_pointer == nilHandle) {
-      Handle nullc = ( Handle) create_object( "Prima::Icon", "", nil);
-      PIcon  n = ( PIcon) nullc;
-      Pixmap xor, and;
-      XColor xc;      
-      if ( nullc == nilHandle) {
-         warn("Error creating icon object");
-         return nilHandle;
-      }   
-      n-> self-> create_empty( nullc, 16, 16, imBW);
-      memset( n-> mask, 0xFF, n-> maskSize);
-      if ( !prima_create_icon_pixmaps( nullc, &xor, &and)) {
-         warn( "Error creating null cursor pixmaps"); 
-         Object_destroy( nullc);
-         return nilHandle;
-      }  
-      Object_destroy( nullc);
-      xc. red = xc. green = xc. blue = 0;
-      xc. pixel = guts. monochromeMap[0];
-      xc. flags = DoRed | DoGreen | DoBlue;
-      guts. null_pointer = XCreatePixmapCursor( DISP, xor, and, &xc, &xc, 0, 0);                                      
-      XCHECKPOINT;
-      XFreePixmap( DISP, xor);
-      XFreePixmap( DISP, and);
-      if ( !guts. null_pointer) {
-         warn( "Error creating null cursor from pixmaps");
-         return nilHandle;
-      }   
-   }
-   return guts. null_pointer;
+   Cursor foo; return foo;
 }
