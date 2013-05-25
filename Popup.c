@@ -55,22 +55,12 @@ Popup_update_sys_handle( Handle self, HV * profile)
 Bool
 Popup_autoPopup( Handle self, Bool set, Bool autoPopup)
 {
-   if ( set)
-      opt_assign( optAutoPopup, autoPopup);
-   return is_opt( optAutoPopup);
+   return false;
 }
 
 Bool
 Popup_selected( Handle self, Bool set, Bool selected)
 {
-   if ( !set)
-       return CWidget( var-> owner)-> get_popup( var->  owner) == self;
-   if ( var-> stage > csFrozen)
-      return false;
-   if ( selected)
-      CWidget( var-> owner)-> set_popup( var-> owner, self);
-   else if ( my-> get_selected( self))
-      CWidget( var-> owner)-> set_popup( var-> owner, nilHandle);
    return false;
 }
 

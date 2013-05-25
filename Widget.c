@@ -96,28 +96,13 @@ Widget_attach( Handle self, Handle objectHandle)
 Bool
 Widget_begin_paint( Handle self)
 {
-   Bool ok;
-   if ( !inherited-> begin_paint( self))
-      return false;
-   if ( !( ok = apc_widget_begin_paint( self, false))) {
-      inherited-> end_paint( self);
-      perl_error();
-   }
-   return ok;
+   return false;
 }
 
 Bool
 Widget_begin_paint_info( Handle self)
 {
-   Bool ok;
-   if ( is_opt( optInDraw))     return true;
-   if ( !inherited-> begin_paint_info( self))
-      return false;
-   if ( !( ok = apc_widget_begin_paint_info( self))) {
-      inherited-> end_paint_info( self);
-      perl_error();
-   }
-   return ok;
+   return false;
 }
 
 
@@ -130,9 +115,7 @@ Widget_bring_to_front( Handle self)
 Bool
 Widget_can_close( Handle self)
 {
-   enter_method;
-   Event ev = { cmClose};
-   return ( var-> stage <= csNormal) ? my-> message( self, &ev) : true;
+   return false;
 }
 
 void
@@ -144,27 +127,13 @@ Widget_cleanup( Handle self)
 Bool
 Widget_close( Handle self)
 {
-   Bool canClose;
-   enter_method;
-   if ( var-> stage > csNormal) return true;
-   if (( canClose = my-> can_close( self))) {
-      Object_destroy( self);
-   }
-   return canClose;
+   return false;
 }
 
 Bool
 Widget_custom_paint( Handle self)
 {
-   PList  list;
-   void * ret;
-   enter_method;
-   if ( my-> on_paint != Widget_on_paint) return true;
-   if ( var-> eventIDs == nil) return false;
-   ret = hash_fetch( var-> eventIDs, "Paint", 5);
-   if ( ret == nil) return false;
-   list = var-> events + PTR2UV( ret) - 1;
-   return list-> count > 0;
+   return false;
 }
 
 /*::d */
@@ -296,13 +265,6 @@ Widget_invalidate_rect( Handle self, Rect rect)
 Bool
 Widget_is_child( Handle self, Handle owner)
 {
-   if ( !owner)
-      return false;
-   while ( self) {
-      if ( self == owner)
-         return true;
-      self = var-> owner;
-   }
    return false;
 }
 
@@ -323,8 +285,7 @@ Widget_last( Handle self)
 Bool
 Widget_lock( Handle self)
 {
-   var-> lockCount++;
-   return true;
+   return false;
 }
 
 /*::m */
@@ -558,10 +519,7 @@ Widget_prev( Handle self)
 Bool
 Widget_process_accel( Handle self, int key)
 {
-   enter_method;
-   if ( my-> first_that_component( self, (void*)find_accel, &key)) return true;
-   return kind_of( var-> owner, CWidget) ?
-          ((( PWidget) var-> owner)-> self)->process_accel( var-> owner, key) : false;
+   return false;
 }
 
 /*::q */
@@ -658,20 +616,13 @@ Widget_show_cursor( Handle self)
 static Bool
 repaint_all( Handle owner, Handle self, void * dummy)
 {
-   enter_method;
-   my-> repaint( self);
-   my-> first_that( self, (void*)repaint_all, nil);
    return false;
 }
 
 Bool
 Widget_unlock( Handle self)
 {
-   if ( --var-> lockCount <= 0) {
-      var-> lockCount = 0;
-      repaint_all( var-> owner, self, nil);
-   }
-   return true;
+   return false;
 }
 
 void
@@ -684,10 +635,7 @@ Widget_update_view( Handle self)
 Bool
 Widget_validate_owner( Handle self, Handle * owner, HV * profile)
 {
-   dPROFILE;
-   *owner = pget_H( owner);
-   if ( !kind_of( *owner, CWidget)) return false;
-   return inherited-> validate_owner( self, owner, profile);
+   return false;
 }
 
 /*::w */
@@ -776,10 +724,6 @@ Widget_hintVisible( Handle self, Bool set, int hintVisible)
 Bool
 Widget_get_locked( Handle self)
 {
-   while ( self) {
-      if ( var-> lockCount != 0) return true;
-      self = var-> owner;
-   }
    return false;
 }
 
@@ -894,34 +838,27 @@ void Widget_on_leave( Handle self) {}
 /* static iterators */
 Bool kill_all( Handle self, Handle child, void * dummy)
 {
-   Object_destroy( child); return 0;
+   return false;
 }
 
-static Bool find_dup_msg( PEvent event, int * cmd) { return event-> cmd == *cmd; }
+static Bool find_dup_msg( PEvent event, int * cmd) { return false; }
 
 Bool
 accel_notify ( Handle group, Handle self, PEvent event)
 {
-   enter_method;
-   if (( self != event-> key. source) && my-> get_enabled( self))
-      return ( var-> stage <= csNormal) ? !my-> message( self, event) : false;
-   else
-      return false;
+   return false;
 }
 
 static Bool
 pquery ( Handle window, Handle self, void * v)
 {
-   enter_method;
-   Event ev = {cmClose};
-   return ( var-> stage <= csNormal) ? !my-> message( self, &ev) : false;
+   return false;
 }
 
 Bool
 find_accel( Handle self, Handle item, int * key)
 {
-   return ( kind_of( item, CAbstractMenu)
-            && CAbstractMenu(item)-> sub_call_key( item, *key));
+   return false;
 }
 
 static Handle
@@ -947,24 +884,12 @@ find_tabfoc( Handle self)
 static Bool
 get_top_current( Handle self)
 {
-   PWidget o  = ( PWidget) var-> owner;
-   Handle  me = self;
-   while ( o) {
-      if ( o-> currentWidget != me)
-         return false;
-      me = ( Handle) o;
-      o  = ( PWidget) o-> owner;
-   }
-   return true;
+   return false;
 }
 
 static Bool
 sptr( Handle window, Handle self, void * v)
 {
-   enter_method;
-   /* does nothing but refreshes system pointer */
-   if ( var-> pointerType == crDefault)
-      my-> set_pointerType( self, crDefault);
    return false;
 }
 
@@ -973,81 +898,36 @@ sptr( Handle window, Handle self, void * v)
 Bool
 font_notify ( Handle self, Handle child, void * font)
 {
-   if ( his-> options. optOwnerFont) {
-      his-> self-> set_font ( child, *(( PFont) font));
-      his-> options. optOwnerFont = 1;
-   }
    return false;
 }
 
 static Bool
 showhint_notify ( Handle self, Handle child, void * data)
 {
-    if ( his-> options. optOwnerShowHint) {
-       his-> self-> set_showHint ( child, *(( Bool *) data));
-       his-> options. optOwnerShowHint = 1;
-    }
-    return false;
+   return false;
 }
 
 static Bool
 hint_notify ( Handle self, Handle child, SV * hint)
 {
-    if ( his-> options. optOwnerHint) {
-       his-> self-> set_hint( child, hint);
-       his-> options. optOwnerHint = 1;
-    }
-    return false;
+   return false;
 }
 
 Bool
 single_color_notify ( Handle self, Handle child, void * color)
 {
-   PSingleColor s = ( PSingleColor) color;
-   if ( his-> options. optOwnerColor && ( s-> index == ciFore))
-   {
-      his-> self-> colorIndex ( child, true, s-> index, s-> color);
-      his-> options. optOwnerColor = 1;
-   } else if (( his-> options. optOwnerBackColor) && ( s-> index == ciBack))
-   {
-      his-> self-> colorIndex ( child, true, s-> index, s-> color);
-      his-> options. optOwnerBackColor = 1;
-   } else if ( s-> index > ciBack)
-      his-> self-> colorIndex ( child, true, s-> index, s-> color);
    return false;
 }
 
 Bool
 prima_read_point( SV *rv_av, int * pt, int number, char * error)
 {
-   SV ** holder;
-   int i;
-   AV *av;
-   Bool result = true;
-
-   if ( !rv_av || !SvROK( rv_av) || ( SvTYPE( SvRV( rv_av)) != SVt_PVAV)) {
-      result = false;
-      if ( error) croak( "%s", error);
-   } else {
-      av = (AV*)SvRV(rv_av);
-      for ( i = 0; i < number; i++) {
-         holder = av_fetch( av, i, 0);
-         if ( holder)
-            pt[i] = SvIV( *holder);
-         else {
-            pt[i] = 0;
-            result = false;
-            if ( error) croak( "%s", error);
-         }
-      }
-   }
-   return result;
+   return false;
 }
 
 static Bool
 auto_enable_children( Handle self, Handle child, void * enable)
 {
-   apc_widget_set_enabled( child, PTR2UV( enable));
    return false;
 }
 /* properties section */
@@ -1111,42 +991,24 @@ Widget_bottom( Handle self, Bool set, int bottom)
 Bool
 Widget_autoEnableChildren( Handle self, Bool set, Bool autoEnableChildren)
 {
-   if ( !set)
-      return is_opt( optAutoEnableChildren);
-   opt_assign( optAutoEnableChildren, autoEnableChildren);
    return false;
 }
 
 Bool
 Widget_briefKeys( Handle self, Bool set, Bool briefKeys)
 {
-   if ( !set)
-      return is_opt( optBriefKeys);
-   opt_assign( optBriefKeys, briefKeys);
    return false;
 }
 
 Bool
 Widget_buffered( Handle self, Bool set, Bool buffered)
 {
-   if ( !set)
-      return is_opt( optBuffered);
-   if ( !opt_InPaint)
-      opt_assign( optBuffered, buffered);
    return false;
 }
 
 Bool
 Widget_clipOwner( Handle self, Bool set, Bool clipOwner)
 {
-   HV * profile;
-   enter_method;
-   if ( !set)
-      return apc_widget_get_clip_owner( self);
-   profile = newHV();
-   pset_i( clipOwner, clipOwner);
-   my-> set( self, profile);
-   sv_free(( SV *) profile);
    return false;
 }
 
@@ -1213,18 +1075,7 @@ Widget_colorIndex( Handle self, Bool set, int index, Color color)
 Bool
 Widget_current( Handle self, Bool set, Bool current)
 {
-   PWidget o;
-   if ( var-> stage > csFrozen) return false;
-   if ( !set)
-      return var-> owner && ( PWidget( var-> owner)-> currentWidget == self);
-   o = ( PWidget) var-> owner;
-   if ( o == nil) return false;
-   if ( current)
-      o-> self-> set_currentWidget( var-> owner, self);
-   else
-      if ( o-> currentWidget == self)
-         o-> self-> set_currentWidget( var-> owner, nilHandle);
-   return current;
+   return false;
 }
 
 Handle
@@ -1269,53 +1120,25 @@ Widget_cursorSize( Handle self, Bool set, Point cursorSize)
 Bool
 Widget_cursorVisible( Handle self, Bool set, Bool cursorVisible)
 {
-   if ( !set)
-      return apc_cursor_get_visible( self);
-   return apc_cursor_set_visible( self, cursorVisible);
+   return false;
 }
 
 Bool
 Widget_enabled( Handle self, Bool set, Bool enabled)
 {
-   if ( !set) return apc_widget_is_enabled( self);
-   if ( !apc_widget_set_enabled( self, enabled)) 
-      return false;
-   if ( is_opt( optAutoEnableChildren)) 
-      CWidget(self)-> first_that( self, (void*)auto_enable_children, INT2PTR(void*,enabled));
-   return true;
+   return false;
 }
 
 Bool
 Widget_firstClick( Handle self, Bool set, Bool firstClick)
 {
-   return set ?
-      apc_widget_set_first_click( self, firstClick) :
-      apc_widget_get_first_click( self);
+   return false;
 }
 
 Bool
 Widget_focused( Handle self, Bool set, Bool focused)
 {
-   enter_method;
-   if ( var-> stage > csNormal) return false;
-   if ( !set)
-      return apc_widget_is_focused( self);
-
-   if ( focused) {
-      PWidget x = ( PWidget)( var-> owner);
-      Handle current = self;
-      while ( x) {
-         x-> currentWidget = current;
-         current = ( Handle) x;
-         x = ( PWidget) x-> owner;
-      }
-      var-> currentWidget = nilHandle;
-      if ( var-> stage == csNormal)
-         apc_widget_set_focused( self);
-   } else
-      if ( var-> stage == csNormal && my-> get_selected( self))
-         apc_widget_set_focused( nilHandle);
-   return focused;
+   return false;
 }
 
 SV *
@@ -1388,89 +1211,36 @@ Widget_origin( Handle self, Bool set, Point origin)
 Bool
 Widget_ownerBackColor( Handle self, Bool set, Bool ownerBackColor)
 {
-   enter_method;
-   if ( !set)
-      return is_opt( optOwnerBackColor);
-   opt_assign( optOwnerBackColor, ownerBackColor);
-   if ( is_opt( optOwnerBackColor) && var-> owner)
-   {
-      my-> set_backColor( self, ((( PWidget) var-> owner)-> self)-> get_backColor( var-> owner));
-      opt_set( optOwnerBackColor);
-      my-> repaint ( self);
-   }
    return false;
 }
 
 Bool
 Widget_ownerColor( Handle self, Bool set, Bool ownerColor)
 {
-   enter_method;
-   if ( !set)
-      return is_opt( optOwnerColor);
-   opt_assign( optOwnerColor, ownerColor);
-   if ( is_opt( optOwnerColor) && var-> owner)
-   {
-      my-> set_color( self, ((( PWidget) var-> owner)-> self)-> get_color( var-> owner));
-      opt_set( optOwnerColor);
-      my-> repaint( self);
-   }
    return false;
 }
 
 Bool
 Widget_ownerFont( Handle self, Bool set, Bool ownerFont )
 {
-   enter_method;
-   if ( !set)
-      return is_opt( optOwnerFont);
-   opt_assign( optOwnerFont, ownerFont);
-   if ( is_opt( optOwnerFont) && var-> owner)
-   {
-      my-> set_font ( self, ((( PWidget) var-> owner)-> self)-> get_font ( var-> owner));
-      opt_set( optOwnerFont);
-      my-> repaint ( self);
-   }
    return false;
 }
 
 Bool
 Widget_ownerHint( Handle self, Bool set, Bool ownerHint )
 {
-   enter_method;
-   if ( !set)
-      return is_opt( optOwnerHint);
-   opt_assign( optOwnerHint, ownerHint);
-   if ( is_opt( optOwnerHint) && var-> owner)
-   {
-      my-> set_hint( self, ((( PWidget) var-> owner)-> self)-> get_hint ( var-> owner));
-      opt_set( optOwnerHint);
-   }
    return false;
 }
 
 Bool
 Widget_ownerPalette( Handle self, Bool set, Bool ownerPalette)
 {
-   enter_method;
-   if ( !set)
-      return is_opt( optOwnerPalette);
-   if ( ownerPalette) my-> set_palette( self, nilSV);
-   opt_assign( optOwnerPalette, ownerPalette);
    return false;
 }
 
 Bool
 Widget_ownerShowHint( Handle self, Bool set, Bool ownerShowHint )
 {
-   enter_method;
-   if ( !set)
-      return is_opt( optOwnerShowHint);
-   opt_assign( optOwnerShowHint, ownerShowHint);
-   if ( is_opt( optOwnerShowHint) && var-> owner)
-   {
-      my-> set_showHint( self, CWidget( var-> owner)-> get_showHint ( var-> owner));
-      opt_set( optOwnerShowHint);
-   }
    return false;
 }
 
@@ -1649,78 +1419,19 @@ Widget_right( Handle self, Bool set, int right)
 Bool
 Widget_scaleChildren( Handle self, Bool set, Bool scaleChildren)
 {
-   if ( !set)
-      return is_opt( optScaleChildren);
-   opt_assign( optScaleChildren, scaleChildren);
    return false;
 }
 
 Bool
 Widget_selectable( Handle self, Bool set, Bool selectable)
 {
-   if ( !set)
-      return is_opt( optSelectable);
-   opt_assign( optSelectable, selectable);
    return false;
 }
 
 Bool
 Widget_selected( Handle self, Bool set, Bool selected)
 {
-   enter_method;
-   if ( !set)
-      return my-> get_selectedWidget( self) != nilHandle;
-
-   if ( var-> stage > csFrozen) return selected;
-   if ( selected) {
-      if ( is_opt( optSelectable) && !is_opt( optSystemSelectable)) {
-         my-> set_focused( self, true);
-      } else
-      if ( var-> currentWidget) {
-         PWidget w = ( PWidget) var-> currentWidget;
-         if ( w-> options. optSystemSelectable && !w-> self-> get_clipOwner(( Handle) w))
-            w-> self-> bring_to_front(( Handle) w); /* <- very uncertain !!!! */
-         else
-            w-> self-> set_selected(( Handle) w, true);
-      } else
-      if ( is_opt( optSystemSelectable)) {
-         /* nothing to do with Widget, reserved for Window */
-      }
-      else {
-         PWidget toFocus = ( PWidget) find_tabfoc( self);
-         if ( toFocus)
-            toFocus-> self-> set_selected(( Handle) toFocus, 1);
-         else {
-         /* if group has no selectable widgets and cannot be selected by itself, */
-         /* process chain of bring_to_front(), followed by set_focused(1) call, if available */
-            PWidget x = ( PWidget) var-> owner;
-            List  lst;
-            int i;
-
-            list_create( &lst, 8, 8);
-            while ( x) {
-               if ( !toFocus && x-> options. optSelectable) {
-                  toFocus = x;  /* choose closest owner to focus */
-                  break;
-               }
-               if (( Handle) x != application && !kind_of(( Handle) x, CWindow))
-                  list_insert_at( &lst, ( Handle) x, 0);
-               x = ( PWidget) x-> owner;
-            }
-
-            if ( toFocus)
-               toFocus-> self-> set_focused(( Handle) toFocus, 1);
-
-            for ( i = 0; i < lst. count; i++) {
-               PWidget v = ( PWidget) list_at( &lst, i);
-               v-> self-> bring_to_front(( Handle) v);
-            }
-            list_destroy( &lst);
-         }
-      } /* end set_selected( true); */
-   } else
-      my-> set_focused( self, false);
-   return selected;
+   return false;
 }
 
 Handle
@@ -1810,14 +1521,6 @@ Widget_shape( Handle self, Bool set, Handle mask)
 Bool
 Widget_showHint( Handle self, Bool set, Bool showHint )
 {
-   enter_method;
-   Bool oldShowHint = is_opt( optShowHint);
-   if ( !set)
-      return oldShowHint;
-   my-> first_that( self, (void*)showhint_notify, &showHint);
-   opt_clear( optOwnerShowHint);
-   opt_assign( optShowHint, showHint);
-   if ( application && !is_opt( optShowHint) && oldShowHint) my-> set_hintVisible( self, 0);
    return false;
 }
 
@@ -1833,14 +1536,6 @@ Widget_size( Handle self, Bool set, Point size)
 Bool
 Widget_syncPaint( Handle self, Bool set, Bool syncPaint)
 {
-   HV * profile;
-   enter_method;
-   if ( !set)
-      return apc_widget_get_sync_paint( self);
-   profile = newHV();
-   pset_i( syncPaint, syncPaint);
-   my-> set( self, profile);
-   sv_free(( SV *) profile);
    return false;
 }
 
@@ -1912,23 +1607,12 @@ Widget_tabOrder( Handle self, Bool set, int tabOrder)
 Bool
 Widget_tabStop( Handle self, Bool set, Bool stop)
 {
-   if ( !set)
-      return is_opt( optTabStop);
-   opt_assign( optTabStop, stop);
    return false;
 }
 
 Bool
 Widget_transparent( Handle self, Bool set, Bool transparent)
 {
-   HV * profile;
-   enter_method;
-   if ( !set)
-      return apc_widget_get_transparent( self);
-   profile = newHV();
-   pset_i( transparent, transparent);
-   my-> set( self, profile);
-   sv_free(( SV *) profile);
    return false;
 }
 
@@ -1965,9 +1649,7 @@ Widget_top( Handle self, Bool set, int top)
 Bool
 Widget_visible( Handle self, Bool set, Bool visible)
 {
-   return set ?
-      apc_widget_set_visible( self, visible) :
-      apc_widget_is_visible( self);
+   return false;
 }
 
 int

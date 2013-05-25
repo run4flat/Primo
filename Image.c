@@ -103,18 +103,12 @@ Image_make_empty( Handle self)
 Bool
 Image_hScaling( Handle self, Bool set, Bool scaling)
 {
-   if ( !set)
-      return is_opt( optHScaling);
-   opt_assign( optHScaling, scaling);
    return false;
 }
 
 Bool
 Image_vScaling( Handle self, Bool set, Bool scaling)
 {
-   if ( !set)
-      return is_opt( optVScaling);
-   opt_assign( optVScaling, scaling);
    return false;
 }
 
@@ -210,105 +204,7 @@ Image_data( Handle self, Bool set, SV * svdata)
 Bool
 Image_set_extended_data( Handle self, HV * profile)
 {
-   dPROFILE;
-   void *data, *proc;
-   STRLEN dataSize;
-   int lineSize = 0, newType = var-> type, fixType, oldType = -1;
-   Bool pexistType, pexistLine, pexistReverse, supp, reverse = false;
-
-   if ( !pexist( data)) {
-      if ( pexist( lineSize)) {
-         warn( "Image: lineSize supplied without data property.");
-         pdelete( lineSize);
-      }
-      return false;
-   }   
-   
-   data = SvPV( pget_sv( data), dataSize);
-
-   /* parameters check */
-   pexistType = pexist( type) && ( newType = pget_i( type)) != var-> type;
-   pexistLine = pexist( lineSize) && ( lineSize = pget_i( lineSize)) != var-> lineSize;
-   pexistReverse = pexist( reverse) && ( reverse = pget_B( reverse));
-
-   pdelete( lineSize);
-   pdelete( type);
-   pdelete( reverse);
-   
-   if ( !pexistLine && !pexistType && !pexistReverse) return false;
-
-   if ( is_opt( optInDraw) || dataSize <= 0) 
-      goto GOOD_RETURN;
-
-   /* determine line size, if any */
-   if ( pexistLine) {
-      if ( lineSize <= 0) {
-         warn( "Image::set_data: invalid lineSize:%d passed", lineSize);
-         goto GOOD_RETURN;
-      }   
-      if ( !pexistType) { /* plain repadding */
-         ibc_repad(( Byte*) data, var-> data, lineSize, var-> lineSize, dataSize, var-> dataSize, 1, 1, nil, reverse);
-         my-> update_change( self);
-         goto GOOD_RETURN;
-      }   
-   }
-
-   /* pre-fetch auto conversion, if set in same clause */
-   if ( pexist( preserveType))
-       opt_assign( optPreserveType, pget_B( preserveType));
-   if ( is_opt( optPreserveType))
-      oldType = var-> type;
-
-    /* getting closest type */
-   if (( supp = itype_supported( newType))) {
-      fixType = newType;
-      proc    = nil;
-   } else if ( !itype_importable( newType, &fixType, &proc, nil)) {
-      warn( "Image::set_data: invalid image type %08x", newType);
-      goto GOOD_RETURN;
-   }
-      
-   /* fixing image and maybe palette - for known type it's same code as in ::set, */
-   /* but here's no sense calling it, just doing what we need. */
-   if ( fixType != var-> type || pexist( palette) || pexist( colormap)) {
-      SV * palette;
-      Bool triplets;
-      if ( pexist( palette)) {
-         palette = pget_sv( palette);
-	 triplets = true;
-      } else if ( pexist( colormap)) {
-         palette = pget_sv( colormap);
-	 triplets = false;
-      } else {
-         palette = nilSV;
-	 triplets = false;
-      }
-      Image_reset_sv( self, fixType, palette, triplets);
-      pdelete( palette);
-      pdelete( colormap);
-   }   
-
-    /* copying user data */
-   if ( supp && lineSize == 0 && !reverse) 
-       /* same code as in ::set_data */
-      memcpy( var->data, data, dataSize > var->dataSize ? var->dataSize : dataSize);
-   else {
-      /* if no explicit lineSize set, assuming x4 padding */
-      if ( lineSize == 0)
-         lineSize = (( var-> w * ( newType & imBPP) + 31) / 32) * 4;
-      /* copying using repadding routine */
-      ibc_repad(( Byte*) data, var-> data, lineSize, var-> lineSize, dataSize, var-> dataSize, 
-              ( newType & imBPP) / 8, ( var-> type & imBPP) / 8, proc, reverse
-      );
-   }   
-   my-> update_change( self);
-   /* if want to keep original type, restoring */
-   if ( is_opt( optPreserveType))
-      my-> set_type( self, oldType);
-   
-GOOD_RETURN:   
-   pdelete(data);
-   return true;
+   return false;
 }
 
 static size_t
@@ -566,28 +462,13 @@ Image_get_bpp( Handle self)
 Bool
 Image_begin_paint( Handle self)
 {
-   Bool ok;
-   if ( !inherited begin_paint( self))
-      return false;
-   if ( !( ok = apc_image_begin_paint( self))) {
-      inherited end_paint( self);
-      perl_error();
-   }
-   return ok;
+   return false;
 }
 
 Bool
 Image_begin_paint_info( Handle self)
 {
-   Bool ok;
-   if ( is_opt( optInDraw))     return true;
-   if ( !inherited begin_paint_info( self))
-      return false;
-   if ( !( ok = apc_image_begin_paint_info( self))) {
-      inherited end_paint_info( self);
-      perl_error();
-   }
-   return ok;
+   return false;
 }
 
 
@@ -713,9 +594,6 @@ Image_create_empty( Handle self, int width, int height, int type)
 Bool
 Image_preserveType( Handle self, Bool set, Bool preserveType)
 {
-   if ( !set)
-      return is_opt( optPreserveType);
-   opt_assign( optPreserveType, preserveType);
    return false;
 }
 
@@ -1058,15 +936,7 @@ Image_codecs( SV * dummy)
 Bool
 Image_put_image_indirect( Handle self, Handle image, int x, int y, int xFrom, int yFrom, int xDestLen, int yDestLen, int xLen, int yLen, int rop)
 {
-   Bool ret;
-   if ( is_opt( optInDrawInfo)) return false;
-   if ( image == nilHandle) return false;
-   if ( is_opt( optInDraw))
-      return inherited put_image_indirect( self, image, x, y, xFrom, yFrom, xDestLen, yDestLen, xLen, yLen, rop);
-   if ( !kind_of( image, CImage)) return false;
-   ret = img_put( self, image, x, y, xFrom, yFrom, xDestLen, yDestLen, xLen, yLen, rop);
-   my-> update_change( self);
-   return ret;
+   return false;
 }
 
 UV

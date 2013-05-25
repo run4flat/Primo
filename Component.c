@@ -56,7 +56,7 @@ Component_setup( Handle self)
 
 static Bool bring_by_name( Handle self, PComponent item, char * name)
 {
-   return strcmp( name, item-> name) == 0;
+   return false;
 }
 
 Handle
@@ -68,7 +68,6 @@ Component_bring( Handle self, char * componentName)
 static Bool
 detach_all( Handle child, Handle self)
 {
-   my-> detach( self, child, true);
    return false;
 }
 
@@ -80,24 +79,18 @@ Component_cleanup( Handle self)
 static Bool
 free_private_posts( PostMsg * msg, void * dummy)
 {
-   sv_free( msg-> info1);
-   sv_free( msg-> info2);
-   free( msg);
    return false;
 }
 
 static Bool
 free_queue( PEvent event, void * dummy)
 {
-   free( event);
    return false;
 }
 
 static Bool
 free_eventref( Handle self, Handle * org)
 {
-   if ( var-> refs) list_delete( var-> refs, *org);
-   my-> unlink_notifier( self, *org);
    return false;
 }
 
@@ -155,52 +148,20 @@ Component_set( Handle self, HV * profile)
 static Bool
 find_dup_msg( PEvent event, int * cmd)
 {
-   return event-> cmd == *cmd;
+   return false;
 }
 
 Bool
 Component_message( Handle self, PEvent event)
 {
-   Bool ret      = false;
-   if ( var-> stage == csNormal) {
-      if ( var-> evQueue) goto Constructing;
-ForceProcess:
-      protect_object( self);
-      my-> push_event( self);
-      my-> handle_event( self, event);
-      ret = my-> pop_event( self);
-      if ( !ret) event-> cmd = 0;
-      unprotect_object( self);
-   } else if ( var-> stage == csConstructing) {
-      if ( var-> evQueue == nil)
-          croak("RTC0041: Object set twice to constructing stage");
-Constructing:      
-      switch ( event-> cmd & ctQueueMask) {
-      case ctDiscardable:
-         break;
-      case ctPassThrough:
-         goto ForceProcess;
-      case ctSingle:
-         event-> cmd = ( event-> cmd & ~ctQueueMask) | ctSingleResponse;
-         if ( list_first_that( var-> evQueue, (void*)find_dup_msg, &event-> cmd) >= 0)
-	      break;
-      default:
-         {
-            void * ev = malloc( sizeof( Event));
-            if ( ev)
-               list_add( var-> evQueue, ( Handle) memcpy( ev, event, sizeof( Event)));
-         }
-      }
-   } else if (( var-> stage < csFinalizing) && ( event-> cmd & ctNoInhibit))
-      goto ForceProcess;
-   return ret;
+   return false;
 }
 
 
 Bool
 Component_can_event( Handle self)
 {
-   return var-> stage == csNormal;
+   return false;
 }
 
 void
@@ -216,28 +177,14 @@ Component_push_event( Handle self)
 Bool
 Component_pop_event( Handle self)
 {
-   if ( var-> stage == csDead)
-      return false;
-   if ( !var-> evStack || var-> evPtr <= 0) {
-      warn("RTC0042: Component::pop_event call not within message()");
-      return false;
-   }
-   return var-> evStack[ --var-> evPtr];
+   return false;
 }
 
 
 Bool
 Component_eventFlag( Handle self, Bool set, Bool eventFlag)
 {
-   if ( var-> stage == csDead)
-      return false;
-   if ( !var-> evStack || var-> evPtr <= 0) {
-      warn("RTC0043: Component::eventFlag call not within message()");
-      return false;
-   }
-   if ( set)
-      var-> evStack[ var-> evPtr - 1] = eventFlag;
-   return set ? eventFlag : var-> evStack[ var-> evPtr - 1];
+   return false;
 }
 
 void
@@ -254,8 +201,6 @@ Component_get_handle( Handle self)
 static Bool
 oversend( PEvent event, Handle self)
 {
-   my-> message( self, event);
-   free( event);
    return false;
 }
 
@@ -283,17 +228,7 @@ Component_is_owner( Handle self, Handle objectHandle)
 Bool
 Component_migrate( Handle self, Handle attachTo)
 {
-    PComponent detachFrom = PComponent( var-> owner ? var-> owner : application);
-    PComponent attachTo_  = PComponent( attachTo  ? attachTo  : application);
-
-    if ( detachFrom != attachTo_) {
-       if ( attachTo_)
-          attachTo_ -> self-> attach(( Handle) attachTo_, self);
-       if ( detachFrom)
-          detachFrom-> self-> detach(( Handle) detachFrom, self, false);
-    }
-
-    return detachFrom != attachTo_;
+   return false;
 }
 
 void
@@ -341,23 +276,7 @@ Component_update_sys_handle( Handle self, HV * profile)
 Bool
 Component_validate_owner( Handle self, Handle * owner, HV * profile)
 {
-   dPROFILE;
-   *owner = pget_H( owner);
-
-   if ( *owner != nilHandle) {
-      Handle x = *owner;
-      
-      if (((( PObject) x)-> stage > csNormal) || !kind_of( x, CComponent))
-         return false;
-
-      while ( x) {
-         if ( x == self)
-            return false;
-         x = PComponent( x)-> owner;
-      }
-   }
-
-   return true;
+   return false;
 }
 
 void
@@ -607,37 +526,13 @@ XS( Component_notify_FROMPERL)
 Bool
 Component_notify( Handle self, char * format, ...)
 {
-   Bool r;
-   SV * ret;
-   va_list args;
-   va_start( args, format);
-   ENTER;
-   SAVETMPS;
-   ret = call_perl_indirect( self, "notify", format, true, false, args);
-   va_end( args);
-   r = ( ret && SvIOK( ret)) ? SvIV( ret) : 0;
-   if ( ret) my-> set_eventFlag( self, r);
-   FREETMPS;
-   LEAVE;
-   return r;
+   return false;
 }
 
 Bool
 Component_notify_REDEFINED( Handle self, char * format, ...)
 {
-   Bool r;
-   SV * ret;
-   va_list args;
-   va_start( args, format);
-   ENTER;
-   SAVETMPS;
-   ret = call_perl_indirect( self, "notify", format, true, false, args);
-   va_end( args);
-   r = ( ret && SvIOK( ret)) ? SvIV( ret) : 0;
-   if ( ret) my-> set_eventFlag( self, r);
-   FREETMPS;
-   LEAVE;
-   return r;
+   return false;
 }
 
 XS( Component_get_components_FROMPERL)

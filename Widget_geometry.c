@@ -158,12 +158,7 @@ Widget_geomWidth( Handle self, Bool set, int geomWidth)
 Bool
 Widget_packPropagate( Handle self, Bool set, Bool propagate)
 {
-   Bool repack;
-   if ( !set) return is_opt( optPackPropagate);
-   repack = !(is_opt( optPackPropagate)) && propagate;
-   opt_assign( optPackPropagate, propagate);
-   if ( repack) geometry_reset(self,-1);
-   return is_opt( optPackPropagate);
+   return false;
 }
 
 void
@@ -273,60 +268,12 @@ Widget_sizeMax( Handle self, Bool set, Point max)
 Bool
 Widget_size_notify( Handle self, Handle child, const Rect* metrix)
 {
-   if ( his-> growMode) {
-      Point size  =  his-> self-> get_virtual_size( child);
-      Point pos   =  his-> self-> get_origin( child);
-      Point osize = size, opos = pos;
-      int   dx    = ((Rect *) metrix)-> right - ((Rect *) metrix)-> left;
-      int   dy    = ((Rect *) metrix)-> top   - ((Rect *) metrix)-> bottom;
-
-      if ( his-> growMode & gmGrowLoX) pos.  x += dx;
-      if ( his-> growMode & gmGrowHiX) size. x += dx;
-      if ( his-> growMode & gmGrowLoY) pos.  y += dy;
-      if ( his-> growMode & gmGrowHiY) size. y += dy;
-      if ( his-> growMode & gmXCenter) pos. x = (((Rect *) metrix)-> right - size. x) / 2;
-      if ( his-> growMode & gmYCenter) pos. y = (((Rect *) metrix)-> top   - size. y) / 2;
-
-      if ( pos.x != opos.x || pos.y != opos.y || size.x != osize.x || size.y != osize.y) {
-         if ( pos.x == opos.x && pos.y == opos.y) {
-            his-> self-> set_size( child, size);
-         } else if ( size.x == osize.x && size.y == osize.y) {
-            his-> self-> set_origin( child, pos);
-         } else {
-            Rect r;
-            r. left   = pos. x;
-            r. bottom = pos. y;
-            r. right  = pos. x + size. x;
-            r. top    = pos. y + size. y;
-            his-> self-> set_rect( child, r);
-         }
-      }
-   }
    return false;
 }
 
 Bool
 Widget_move_notify( Handle self, Handle child, Point * moveTo)
 {
-   Bool clp = his-> self-> get_clipOwner( child);
-   int  dx  = moveTo-> x - var-> pos. x;
-   int  dy  = moveTo-> y - var-> pos. y;
-   Point p;
-
-   if ( his-> growMode & gmDontCare) {
-      if ( !clp) return false;
-      p = his-> self-> get_origin( child);
-      p. x -= dx;
-      p. y -= dy;
-      his-> self-> set_origin( child, p);
-   } else {
-      if ( clp) return false;
-      p = his-> self-> get_origin( child);
-      p. x += dx;
-      p. y += dy;
-      his-> self-> set_origin( child, p);
-   }
-
    return false;
 }
 
