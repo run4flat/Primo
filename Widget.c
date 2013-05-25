@@ -319,47 +319,6 @@ Widget_scroll_REDEFINED( Handle self, int dx, int dy, Rect *confine, Rect *clip,
 
 XS( Widget_scroll_FROMPERL)
 {
-   dPROFILE;
-   dXSARGS;
-   Handle self;
-   int dx, dy;
-   Rect *confine = nil;
-   Rect *clip = nil;
-   Rect confine_rect, clip_rect;
-   Bool withChildren = false;
-   HV *profile;
-   int rect[4];
-
-   if ( items < 3 || (items - 3) % 2) goto invalid_usage;
-   if (!( self = gimme_the_mate( ST(0)))) goto invalid_usage;
-   dx = SvIV( ST(1));
-   dy = SvIV( ST(2));
-   profile = parse_hv( ax, sp, items, mark, 3, "Widget::scroll");
-   if ( pexist( confineRect)) {
-      prima_read_point( pget_sv( confineRect), rect, 4, "RTC008B: Array panic on 'confineRect'");
-      confine = &confine_rect;
-      confine-> left = rect[0];
-      confine-> bottom = rect[1];
-      confine-> right = rect[2];
-      confine-> top = rect[3];
-   }
-   if ( pexist( clipRect)) {
-      prima_read_point( pget_sv( clipRect), rect, 4, "RTC008C: Array panic on 'clipRect'");
-      clip = &clip_rect;
-      clip-> left = rect[0];
-      clip-> bottom = rect[1];
-      clip-> right = rect[2];
-      clip-> top = rect[3];
-   }
-   if ( pexist( withChildren)) withChildren = pget_B( withChildren);
-   sv_free((SV*)profile);
-   Widget_scroll( self, dx, dy, confine, clip, withChildren);
-   SPAGAIN;
-   SP -= items;
-   PUTBACK;
-   XSRETURN_EMPTY;
-invalid_usage:
-   croak ("Invalid usage of %s", "Widget::scroll");
 }
 
 void
@@ -994,91 +953,15 @@ Widget_widgetClass( Handle self, Bool set, int widgetClass)
 /* XS section */
 XS( Widget_client_to_screen_FROMPERL)
 {
-   dXSARGS;
-   Handle self;
-   int i, count;
-   Point * points;
-
-   if (( items % 2) != 1)
-      croak ("Invalid usage of Widget::client_to_screen");
-   SP -= items;
-   self = gimme_the_mate( ST( 0));
-   if ( self == nilHandle)
-      croak( "Illegal object reference passed to Widget::client_to_screen");
-   count  = ( items - 1) / 2;
-   if ( !( points = allocn( Point, count))) {
-      PUTBACK;
-      return;
-   }
-   for ( i = 0; i < count; i++) {
-      points[i]. x = SvIV( ST( i * 2 + 1));
-      points[i]. y = SvIV( ST( i * 2 + 2));
-   }
-   apc_widget_map_points( self, true, count, points);
-   EXTEND( sp, count * 2);
-   for ( i = 0; i < count; i++) {
-      PUSHs( sv_2mortal( newSViv( points[i].x)));
-      PUSHs( sv_2mortal( newSViv( points[i].y)));
-   }
-   PUTBACK;
-   free( points);
-   return;
 }
 
 XS( Widget_screen_to_client_FROMPERL)
 {
-   dXSARGS;
-   Handle self;
-   int i, count;
-   Point * points;
-
-   if (( items % 2) != 1)
-      croak ("Invalid usage of Widget::screen_to_client");
-   SP -= items;
-   self = gimme_the_mate( ST( 0));
-   if ( self == nilHandle)
-      croak( "Illegal object reference passed to Widget::screen_to_client");
-   count  = ( items - 1) / 2;
-   if ( !( points = allocn( Point, count))) {
-      PUTBACK;
-      return;
-   }
-   for ( i = 0; i < count; i++) {
-      points[i]. x = SvIV( ST( i * 2 + 1));
-      points[i]. y = SvIV( ST( i * 2 + 2));
-   }
-   apc_widget_map_points( self, false, count, points);
-   EXTEND( sp, count * 2);
-   for ( i = 0; i < count; i++) {
-      PUSHs( sv_2mortal( newSViv( points[i].x)));
-      PUSHs( sv_2mortal( newSViv( points[i].y)));
-   }
-   PUTBACK;
-   free( points);
-   return;
 }
 
 
 XS( Widget_get_widgets_FROMPERL)
 {
-   dXSARGS;
-   Handle self;
-   Handle * list;
-   int i, count;
-
-   if ( items != 1)
-      croak ("Invalid usage of Widget.get_widgets");
-   SP -= items;
-   self = gimme_the_mate( ST( 0));
-   if ( self == nilHandle)
-      croak( "Illegal object reference passed to Widget.get_widgets");
-   count = var-> widgets. count;
-   list  = var-> widgets. items;
-   EXTEND( sp, count);
-   for ( i = 0; i < count; i++)
-      PUSHs( sv_2mortal( newSVsv((( PAnyObject) list[ i])-> mate)));
-   PUTBACK;
-   return;
 }
 
 void Widget_get_widgets          ( Handle self) {}

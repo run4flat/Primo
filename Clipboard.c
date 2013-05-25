@@ -170,67 +170,14 @@ Clipboard_register_format( Handle self, char * format)
 
 XS( Clipboard_get_formats_FROMPERL)
 {
-   dXSARGS;
-   Handle self;
-   int i;
-   PClipboardFormatReg list;
-
-   if ( items != 1)
-      croak ("Invalid usage of Clipboard.get_formats");
-   SP -= items;
-   self = gimme_the_mate( ST( 0));
-   if ( self == nilHandle)
-      croak( "Illegal object reference passed to Clipboard.get_formats");
-   my-> open( self);
-   list = formats;
-   for ( i = 0; i < formatCount; i++) {
-      if ( !apc_clipboard_has_format( self, list[ i]. sysId)) continue;
-      XPUSHs( sv_2mortal( newSVpv( list[ i]. id, 0)));
-   }
-   my-> close( self);
-   PUTBACK;
 }
 
 XS( Clipboard_get_registered_formats_FROMPERL)
 {
-   dXSARGS;
-   Handle self;
-   int i;
-   PClipboardFormatReg list;
-
-   if ( items < 1)
-      croak ("Invalid usage of Clipboard.get_registered_formats");
-   SP -= items;
-   self = gimme_the_mate( ST( 0));
-   if ( self == nilHandle)
-      croak( "Illegal object reference passed to Clipboard.get_registered_formats");
-   list = formats;
-   EXTEND( sp, formatCount);
-   for ( i = 0; i < formatCount; i++)
-      PUSHs( sv_2mortal( newSVpv( list[ i]. id, 0)));
-   PUTBACK;
 }
 
 XS( Clipboard_get_standard_clipboards_FROMPERL)
 {
-   dXSARGS;
-   int i;
-   PList l;
-
-   (void)ax; SP -= items;
-   l = apc_get_standard_clipboards();
-   if ( l && l-> count > 0) {
-      EXTEND( sp, l-> count);
-      for ( i = 0; i < l-> count; i++) {
-         char *cc = (char *)list_at( l, i);
-         PUSHs( sv_2mortal( newSVpv(cc, 0)));
-      }
-   }
-   if (l) {
-      list_delete_all( l, true);
-      plist_destroy( l);
-   }
-   PUTBACK;
 }
 
 void Clipboard_get_formats                       ( Handle self) {}

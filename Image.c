@@ -207,78 +207,7 @@ img_perlio_error( void * f)
 
 XS( Image_load_FROMPERL) 
 {
-   dXSARGS;
-   Handle self;
-   SV * sv;
-   HV *profile;
-   char *fn;
-   PList ret;
-   Bool err = false;
-   FileStream f = NULL;
-   ImgIORequest ioreq, *pioreq;
-   char error[256];
-
-   if (( items < 2) || (( items % 2) != 0))
-      croak("Invalid usage of Prima::Image::load");
-   
-   self = gimme_the_mate( ST( 0));
-
-   sv   = ST(1);
-   if ( SvROK(sv) && SvTYPE( SvRV( sv)) == SVt_PVGV)
-      f = IoIFP(sv_2io(ST(1)));
-
-   if ( f != NULL) {
-       pioreq        = &ioreq;
-       ioreq. handle = f;
-       ioreq. read   = img_perlio_read;
-       ioreq. write  = img_perlio_write;
-       ioreq. seek   = img_perlio_seek;
-       ioreq. tell   = img_perlio_tell;
-       ioreq. flush  = img_perlio_flush;
-       ioreq. error  = img_perlio_error;
-       fn            = NULL;
-   } else {
-       fn            = ( char *) SvPV_nolen( ST( 1));
-       pioreq        = NULL;
-   }
-   
-   profile = parse_hv( ax, sp, items, mark, 2, "Image::load");
-   if ( !pexist( className)) 
-      pset_c( className, self ? my-> className : ( char*) SvPV_nolen( ST( 0)));
-   pset_i( eventMask, self ? var-> eventMask2 : 0);
-   ret = apc_img_load( self, fn, pioreq, profile, error);
-   sv_free(( SV *) profile);
-   SPAGAIN;
-   SP -= items;
-   if ( ret) {
-      int i;
-      for ( i = 0; i < ret-> count; i++) {
-         PAnyObject o = ( PAnyObject) ret-> items[i];
-         if ( o && o-> mate && o-> mate != nilSV) {
-            XPUSHs( sv_mortalcopy( o-> mate));
-            if (( Handle) o != self)
-              --SvREFCNT( SvRV( o-> mate));
-         } else {
-            XPUSHs( &PL_sv_undef);    
-            err = true;
-         }   
-      }
-      plist_destroy( ret);
-   } else {
-      XPUSHs( &PL_sv_undef);   
-      err = true;
-   }   
-
-   /* This code breaks exception propagation chain
-      since it uses $@ for its own needs  */
-   if ( err)
-      sv_setpv( GvSV( PL_errgv), error);
-   else
-      sv_setsv( GvSV( PL_errgv), nilSV);
-
-   PUTBACK;
-   return;
-}   
+}
 
 int
 Image_lineSize( Handle self, Bool set, int dummy)
@@ -301,56 +230,7 @@ Image_load( SV * who, char *filename, HV * profile)
 
 XS( Image_save_FROMPERL) 
 {
-   dXSARGS;
-   Handle self;
-   HV *profile;
-   char *fn;
-   int ret;
-   char error[256];
-   FileStream f = NULL;
-   SV * sv;
-   ImgIORequest ioreq, *pioreq;
-
-   if (( items < 2) || (( items % 2) != 0))
-      croak("Invalid usage of Prima::Image::save");
-   
-   self = gimme_the_mate( ST( 0));
-
-   sv   = ST(1);
-   if ( SvROK(sv) && SvTYPE( SvRV( sv)) == SVt_PVGV)
-      f = IoIFP(sv_2io(ST(1)));
-
-   if ( f != NULL) {
-       pioreq        = &ioreq;
-       ioreq. handle = f;
-       ioreq. read   = img_perlio_read;
-       ioreq. write  = img_perlio_write;
-       ioreq. seek   = img_perlio_seek;
-       ioreq. tell   = img_perlio_tell;
-       ioreq. flush  = img_perlio_flush;
-       ioreq. error  = img_perlio_error;
-       fn            = NULL;
-   } else {
-       fn            = ( char *) SvPV_nolen( ST( 1));
-       pioreq        = NULL;
-   }
-
-   profile = parse_hv( ax, sp, items, mark, 2, "Image::save");
-   ret = apc_img_save( self, fn, pioreq, profile, error);
-   sv_free(( SV *) profile);
-   SPAGAIN;
-   SP -= items;
-   XPUSHs( sv_2mortal( newSViv(( ret > 0) ? ret : -ret)));
-   
-   /* This code breaks exception propagation chain
-      since it uses $@ for its own needs  */
-   if ( ret <= 0)
-      sv_setpv( GvSV( PL_errgv), error);
-   else
-      sv_setsv( GvSV( PL_errgv), nilSV);
-   PUTBACK;
-   return;
-}   
+}
 
 int
 Image_save_REDEFINED( SV * who, char *filename, HV * profile)

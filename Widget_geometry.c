@@ -325,22 +325,6 @@ Widget_packInfo( Handle self, Bool set, SV * packInfo)
 
 XS( Widget_get_pack_slaves_FROMPERL)
 {
-   dXSARGS;
-   Handle self;
-
-   if ( items != 1)
-      croak ("Invalid usage of Widget.get_pack_slaves");
-   SP -= items;
-   self = gimme_the_mate( ST( 0));
-   if ( self == nilHandle)
-      croak( "Illegal object reference passed to Widget.get_pack_slaves");
-   self = var-> packSlaves;
-   while ( self) {
-      XPUSHs( sv_2mortal( newSVsv((( PAnyObject) self)-> mate)));
-      self = var-> geomInfo. next;
-   }
-   PUTBACK;
-   return;
 }
 
 
@@ -377,22 +361,6 @@ Widget_placeInfo( Handle self, Bool set, SV * placeInfo)
 
 XS( Widget_get_place_slaves_FROMPERL)
 {
-   dXSARGS;
-   int i;
-   Handle self;
-
-   if ( items != 1)
-      croak ("Invalid usage of Widget.get_pack_slaves");
-   SP -= items;
-   self = gimme_the_mate( ST( 0));
-   if ( self == nilHandle)
-      croak( "Illegal object reference passed to Widget.get_pack_slaves");
-   for ( i = 0; i < var-> widgets. count; i++) {
-      if ( PWidget( var-> widgets. items[i])-> geometry == gtPlace)
-         XPUSHs( sv_2mortal( newSVsv((( PAnyObject)(var-> widgets. items[i]))-> mate)));
-   }
-   PUTBACK;
-   return;
 }
 
 void Widget_get_place_slaves          ( Handle self) {}
