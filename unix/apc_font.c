@@ -240,34 +240,5 @@ prima_update_rotated_fonts( PCachedFont f, const char * text, int len, Bool wide
 XCharStruct * 
 prima_char_struct( XFontStruct * xs, void * c, Bool wide) 
 {
-   XCharStruct * cs;
-   int d = xs-> max_char_or_byte2 - xs-> min_char_or_byte2 + 1;
-   int index1        = wide ? (( XChar2b*) c)-> byte1 : 0;
-   int index2        = wide ? (( XChar2b*) c)-> byte2 : *((char*)c);
-   int default_char1 = wide ? ( xs-> default_char >> 8) : 0;
-   int default_char2 = xs-> default_char & 0xff;
-
-   if ( default_char1 < xs-> min_byte1 ||
-        default_char1 > xs-> max_byte1)
-      default_char1 = xs-> min_byte1;
-   if ( default_char2 < xs-> min_char_or_byte2 ||
-        default_char2 > xs-> max_char_or_byte2)
-      default_char2 = xs-> min_char_or_byte2;
-   
-   if ( index1 < xs-> min_byte1 || 
-        index1 > xs-> max_byte1) { 
-      index1 = default_char1;
-      index2 = default_char2;
-   }
-   if ( index2 < xs-> min_char_or_byte2 || 
-        index2 > xs-> max_char_or_byte2) { 
-      index1 = default_char1;
-      index2 = default_char2;
-   }
-   cs = xs-> per_char ? 
-      xs-> per_char + 
-        ( index1 - xs-> min_byte1) * d +
-        ( index2 - xs-> min_char_or_byte2) : 
-      &(xs-> min_bounds);
-   return cs;
-}   
+   XCharStruct * foo; return foo;
+}
