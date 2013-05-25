@@ -96,42 +96,14 @@ init_x11( char * error_buf )
    Bool foo; return foo;
 }
 
-Bool
-window_subsystem_init( char * error_buf)
-{
-   Bool foo; return foo;
-}
-
 int
 prima_debug( const char *format, ...)
 {
    int foo; return foo;
 }
 
-Bool
-window_subsystem_get_options( int * argc, char *** argv)
-{
-   Bool foo; return foo;
-}
-
-Bool
-window_subsystem_set_option( char * option, char * value)
-{
-   Bool foo; return foo;
-}
-
-void
-window_subsystem_cleanup( void)
-{
-}
-
 static void
 free_gc_pool( struct gc_head *head)
-{
-}
-
-void
-window_subsystem_done( void)
 {
 }
 

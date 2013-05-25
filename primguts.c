@@ -581,7 +581,7 @@ XS(Prima_options)
       {
 	 int i, argc = 0;
 	 char ** argv;
-	 window_subsystem_get_options( &argc, &argv);
+//	 window_subsystem_get_options( &argc, &argv);
          EXTEND( sp, argc);
 	 for ( i = 0; i < argc; i++) 
             PUSHs( sv_2mortal( newSVpv( argv[i], 0)));
@@ -593,7 +593,7 @@ XS(Prima_options)
       value  = (SvOK( ST(1)) ? ( char*) SvPV_nolen( ST(1)) : nil);
    case 1:
       option = ( char*) SvPV_nolen( ST(0));
-      window_subsystem_set_option( option, value);
+//      window_subsystem_set_option( option, value);
       break;
    default:
       croak("Invalid call to Prima::options");
