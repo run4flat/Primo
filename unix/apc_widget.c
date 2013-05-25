@@ -120,7 +120,7 @@ apc_widget_get_clip_owner( Handle self)
 Color
 apc_widget_get_color( Handle self, int index)
 {
-   return X(self)-> colors[ index];
+   Color foo; return foo;
 }
 
 Bool

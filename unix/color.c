@@ -76,23 +76,23 @@
 #define COLORSET_PANEL             COLORSET_PANEL_NORMAL, COLORSET_PANEL_HILITE, \
                                    COLORSET_PANEL_DISABLED, COLORSET_3D
 
-static Color standard_button_colors[]      = { COLORSET_GRAY     };
-static Color standard_checkbox_colors[]    = { COLORSET_GRAY     };
-static Color standard_combo_colors[]       = { COLORSET_GRAY     };
-static Color standard_dialog_colors[]      = { COLORSET_GRAY     };
-static Color standard_edit_colors[]        = { COLORSET_PANEL    };
-static Color standard_inputline_colors[]   = { COLORSET_PANEL    };
-static Color standard_label_colors[]       = { COLORSET_GRAY     };
-static Color standard_listbox_colors[]     = { COLORSET_PANEL    };
-static Color standard_popup_colors[]       = { COLORSET_ALT_GRAY };
-static Color standard_radio_colors[]       = { COLORSET_GRAY     };
-static Color standard_scrollbar_colors[]   = { COLORSET_ALT_GRAY };
-static Color standard_slider_colors[]      = { COLORSET_GRAY     };
-static Color standard_widget_colors[]      = { COLORSET_ALT_GRAY };
-static Color standard_window_colors[]      = { COLORSET_GRAY     };
-static Color standard_application_colors[] = { COLORSET_GRAY     };
+ static Color standard_button_colors[]      = { COLORSET_GRAY     };
+ static Color standard_checkbox_colors[]    = { COLORSET_GRAY     };
+ static Color standard_combo_colors[]       = { COLORSET_GRAY     };
+ static Color standard_dialog_colors[]      = { COLORSET_GRAY     };
+ static Color standard_edit_colors[]        = { COLORSET_PANEL    };
+ static Color standard_inputline_colors[]   = { COLORSET_PANEL    };
+ static Color standard_label_colors[]       = { COLORSET_GRAY     };
+ static Color standard_listbox_colors[]     = { COLORSET_PANEL    };
+ static Color standard_popup_colors[]       = { COLORSET_ALT_GRAY };
+ static Color standard_radio_colors[]       = { COLORSET_GRAY     };
+ static Color standard_scrollbar_colors[]   = { COLORSET_ALT_GRAY };
+ static Color standard_slider_colors[]      = { COLORSET_GRAY     };
+ static Color standard_widget_colors[]      = { COLORSET_ALT_GRAY };
+ static Color standard_window_colors[]      = { COLORSET_GRAY     };
+ static Color standard_application_colors[] = { COLORSET_GRAY     };
 
-static Color* standard_colors[] = {
+ static Color* standard_colors[] = {
    nil,
    standard_button_colors,		/* Prima.Button.* */
    standard_checkbox_colors,		/* Prima.Checkbox.* */
@@ -111,34 +111,20 @@ static Color* standard_colors[] = {
    standard_application_colors,
 };
 
-static const int MAX_COLOR_CLASS = sizeof( standard_colors) / sizeof( standard_colors[ 0]) - 1;
+ static const int MAX_COLOR_CLASS = sizeof( standard_colors) / sizeof( standard_colors[ 0]) - 1;
 
 /* maps RGB or cl-constant value to RGB value.  */
 Color 
 prima_map_color( Color clr, int * hint)
 {
-   long cls;
-   if ( hint) *hint = COLORHINT_NONE;
-   if (( clr & clSysFlag) == 0) return clr;
-   
-   cls = (clr & wcMask) >> 16;
-   if ( cls <= 0 || cls > MAX_COLOR_CLASS) cls = (wcWidget) >> 16;
-   if (( clr = ( clr & ~wcMask)) > clMaxSysColor) clr = clMaxSysColor;
-   if ( clr == clSet)   {
-      if ( hint) *hint = COLORHINT_WHITE;
-      return 0xffffff; 
-   } else if ( clr == clClear) {
-      if ( hint) *hint = COLORHINT_BLACK;
-      return 0; 
-   } else return standard_colors[cls][(clr & clSysMask) - 1];
-}   
+   Color foo; return foo;
+}
 
 Color
 apc_widget_map_color( Handle self, Color color)
 {
-   if ((( color & clSysFlag) != 0) && (( color & wcMask) == 0)) color |= PWidget(self)-> widgetClass;
-   return prima_map_color( color, nil);
-}   
+   Color foo; return foo;
+}
 
 static PHash  hatches;
 static Bool   kill_hatches( Pixmap pixmap, int keyLen, void * key, void * dummy);

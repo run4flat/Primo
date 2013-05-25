@@ -166,7 +166,7 @@ Bool apc_menu_destroy( Handle self) { Bool foo; return foo; }
 
 PFont apc_menu_default_font( PFont f) { return nil; }
 
-Color apc_menu_get_color( Handle self, int index) { Color c; return c; }
+Color apc_menu_get_color( Handle self, int index) { Color foo; return foo; }
 
 /* apc_menu_set_font is in apc_font.c */
 

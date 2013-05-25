@@ -294,109 +294,14 @@ apc_gp_flood_fill( Handle self, int x, int y, Color color, Bool singleBorder)
 Color
 apc_gp_get_pixel( Handle self, int x, int y)
 {
-   DEFXX;
-   Color c = 0;
-   XImage *im;
-   Bool pixmap;
-   uint32_t p32 = 0;
-
-   if ( !opt_InPaint) return clInvalid;
-   SHIFT( x, y);
-
-   if ( x < 0 || x >= XX-> size.x || y < 0 || y >= XX-> size.y)
-      return clInvalid;
-
-   if ( XT_IS_DBM(XX)) {
-      pixmap = XT_IS_PIXMAP(XX) ? true : false;
-   } else if ( XT_IS_BITMAP(XX)) {
-      pixmap = 0;
-   } else {
-      pixmap = guts. idepth > 1;
-   }   
-   
-   im = XGetImage( DISP, XX-> gdrawable, x, XX-> size.y - y - 1, 1, 1, 
-                   pixmap ? AllPlanes : 1,
-                   pixmap ? ZPixmap   : XYPixmap);
-   XCHECKPOINT;
-   if ( !im) return clInvalid;
-
-   if ( pixmap) {
-      if ( guts. palSize > 0) {
-         int pixel;
-         if ( guts. idepth <= 8) 
-            pixel = (*( U8*)( im-> data)) & (( 1 << guts.idepth) - 1);
-         else
-            pixel = (*( U16*)( im-> data)) & (( 1 << guts.idepth) - 1);
-         if ( guts.palette[pixel]. rank == RANK_FREE) {
-            XColor xc;
-            xc.pixel = pixel;
-            XQueryColors( DISP, guts. defaultColormap, &xc, 1);
-            c = RGB_COMPOSITE(xc.red>>8,xc.green>>8,xc.blue>>8);
-         } else 
-            c = guts.palette[pixel]. composite;
-      } else {
-         int r, g, b, rmax, gmax, bmax;
-         rmax = gmax = bmax = 0xff;
-         switch ( guts. idepth) {
-         case 16:
-            p32 = *(( uint16_t*)(im-> data));
-            if ( guts.machine_byte_order != guts.byte_order) 
-               p32 = REVERSE_BYTES_16(p32);
-            rmax = 0xff & ( 0xff << ( 8 - guts. red_range));
-            gmax = 0xff & ( 0xff << ( 8 - guts. green_range));
-            bmax = 0xff & ( 0xff << ( 8 - guts. blue_range));
-            goto COMP;
-         case 24:   
-            p32 = (im-> data[0] << 16) | (im-> data[1] << 8) | im-> data[2];
-            if ( guts.machine_byte_order != guts.byte_order) 
-               p32 = REVERSE_BYTES_24(p32);
-            goto COMP;
-         case 32:
-            p32 = *(( uint32_t*)(im-> data));
-            if ( guts.machine_byte_order != guts.byte_order) 
-               p32 = REVERSE_BYTES_32(p32);
-         COMP:   
-            r = ((((p32 & guts. visual. red_mask)   >> guts. red_shift) << 8) >> guts. red_range) & 0xff;
-            g = ((((p32 & guts. visual. green_mask) >> guts. green_shift) << 8) >> guts. green_range) & 0xff;
-            b = ((((p32 & guts. visual. blue_mask)  >> guts. blue_shift) << 8) >> guts. blue_range) & 0xff;
-            if ( r == rmax ) r = 0xff;
-            if ( g == gmax ) g = 0xff;
-            if ( b == bmax ) b = 0xff;
-            c = b | ( g << 8 ) | ( r << 16);
-            break;
-         default:
-            warn("UAG_009: get_pixel not implemented for %d depth", guts.idepth);
-         }   
-      }
-   } else {
-      c = ( im-> data[0] & ((guts.bit_order == MSBFirst) ? 0x80 : 1)) 
-         ? 0xffffff : 0;
-   }   
-
-   XDestroyImage( im);
-   return c;
+   Color foo; return foo;
 }
 
 Color
 apc_gp_get_nearest_color( Handle self, Color color)
 {
-   if ( guts. palSize > 0) 
-      return guts. palette[ prima_color_find( self, color, -1, nil, RANK_FREE)]. composite;
-   if ( guts. visualClass == TrueColor || guts. visualClass == DirectColor) {
-      XColor xc;
-      xc. red   = COLOR_R16(color);
-      xc. green = COLOR_G16(color);
-      xc. blue  = COLOR_B16(color);
-      if ( XAllocColor( DISP, guts. defaultColormap, &xc)) {
-         XFreeColors( DISP, guts. defaultColormap, &xc. pixel, 1, 0); 
-         return 
-            (( xc. red   & 0xFF00) << 8) |
-            (( xc. green & 0xFF00)) |
-            (( xc. blue  & 0xFF00) >> 8);
-      }
-   }
-   return color;
-}   
+   Color foo; return foo;
+}
 
 PRGBColor
 apc_gp_get_physical_palette( Handle self, int * colors)
@@ -554,8 +459,7 @@ apc_gp_text_out( Handle self, const char * text, int x, int y, int len, Bool utf
 Color
 apc_gp_get_back_color( Handle self)
 {
-   DEFXX;
-   return ( XF_IN_PAINT(XX)) ? XX-> back. color : prima_map_color( XX-> saved_back, nil);
+   Color foo; return foo;
 }
 
 int
@@ -567,8 +471,7 @@ apc_gp_get_bpp( Handle self)
 Color
 apc_gp_get_color( Handle self)
 {
-   DEFXX;
-   return ( XF_IN_PAINT(XX)) ? XX-> fore. color : prima_map_color(XX-> saved_fore, nil);
+   Color foo; return foo;
 }
 
 /* returns rect in X coordinates BUT without menuHeight deviation */
