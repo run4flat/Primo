@@ -360,8 +360,7 @@ Drawable_get_text_box( Handle self, SV * text)
 static PFontABC
 query_abc_range( Handle self, TextWrapRec * t, unsigned int base)
 {
-   PFontABC abc;
-   return abc;
+   return nil;
 }
 
 static Bool

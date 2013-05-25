@@ -295,13 +295,7 @@ Image_load_REDEFINED( SV * who, char *filename, HV * profile)
 PList
 Image_load( SV * who, char *filename, HV * profile)
 {
-   PList ret;
-   Handle self = gimme_the_mate( who);
-   char error[ 256];
-   if ( !pexist( className)) 
-      pset_c( className, self ? my-> className : ( char*) SvPV_nolen( who));
-   ret = apc_img_load( self, filename, NULL, profile, error);
-   return ret;
+   return nil;
 }
 
 

@@ -95,13 +95,6 @@ typedef ActionProc *PActionProc;
 static PClipboardFormatReg
 first_that( Handle self, void * actionProc, void * params)
 {
-   int i;
-   PClipboardFormatReg list = formats;
-   if ( actionProc == nil) return nil;
-   for ( i = 0; i < formatCount; i++) {
-      if ((( PActionProc) actionProc)( self, list+i, params))
-         return list+i;
-   }
    return nil;
 }
 
