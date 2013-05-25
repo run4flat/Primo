@@ -59,22 +59,11 @@ static void detail_font_info( PFontInfo f, PFont font, Bool addToCache, Bool byS
 static void
 str_lwr( char *d, const char *s)
 {
-   while ( *s) {
-      *d++ = tolower( *s++);
-   }
-   *d = '\0';
 }
 
 static void
 fill_default_font( Font * font )
 {
-   bzero( font, sizeof( Font));
-   strcpy( font-> name, "Default");
-   font-> height = C_NUMERIC_UNDEF;
-   font-> size = 12;
-   font-> width = C_NUMERIC_UNDEF;
-   font-> style = fsNormal;
-   font-> pitch = fpDefault;
 }
 
 /* Extracts font name, charset, foundry etc from X properties, if available.
@@ -86,124 +75,7 @@ fill_default_font( Font * font )
 static void
 font_query_name( XFontStruct * s, PFontInfo f)
 {
-   unsigned long v;
-   char * c;
-
-   if ( !f-> flags. encoding) {
-      c = nil;
-      if ( XGetFontProperty( s, FXA_CHARSET_REGISTRY, &v) && v) {
-         XCHECKPOINT;
-         c = XGetAtomName( DISP, (Atom)v);
-         XCHECKPOINT;
-         if ( c) {
-            f-> flags. encoding = true;
-            str_lwr( f-> font. encoding, c);
-            XFree( c);
-         } 
-      }
-
-      if ( c) {
-         c = nil;
-         if ( XGetFontProperty( s, FXA_CHARSET_ENCODING, &v) && v) {
-            XCHECKPOINT;
-            c = XGetAtomName( DISP, (Atom)v);
-            XCHECKPOINT;
-            if ( c) {
-               strcat( f-> font. encoding, "-");
-               str_lwr( f-> font. encoding + strlen( f-> font. encoding), c);
-               XFree( c);
-            } 
-         }
-      }
-      
-      if ( !c) {
-         f-> flags. encoding = false;
-         f-> font. encoding[0] = 0;
-      }
-   }
-
-   /* detailing family */   
-   if ( ! f-> flags. family && XGetFontProperty( s, FXA_FOUNDRY, &v) && v) {
-      XCHECKPOINT;
-      c = XGetAtomName( DISP, (Atom)v);
-      XCHECKPOINT;
-      if ( c) {
-         f-> flags. family = true;
-         strncpy( f-> font. family, c, 255);  f-> font. family[255] = '\0';
-         str_lwr( f-> font. family, f-> font. family);
-         XFree( c);
-      }
-   } 
-
-   /* detailing name */
-   if ( ! f-> flags. name && XGetFontProperty( s, FXA_FAMILY_NAME, &v) && v) {
-      XCHECKPOINT;
-      c = XGetAtomName( DISP, (Atom)v);
-      XCHECKPOINT;
-      if ( c) {
-         f-> flags. name = true;
-         strncpy( f-> font. name, c, 255);  f-> font. name[255] = '\0';
-         str_lwr( f-> font. name, f-> font. name);
-         XFree( c);
-      } 
-   }
-
-   if ( ! f-> flags. family && ! f-> flags. name) {
-      c = f-> xname;
-      if ( strchr( c, '-') == NULL) {
-         strcpy( f-> font. name, c);
-         strcpy( f-> font. family, c);
-      } else {
-         char * d = c;
-         int cnt = 0, lim;
-         if ( *d == '-') d++;
-         while ( *(c++)) {
-            if ( *c == '-' || *(c + 1)==0) {
-               if ( c == d ) continue;
-               if ( cnt == 0 ) {
-                  lim = ( c - d > 255 ) ? 255 : c - d;
-                  strncpy( f-> font. family, d, lim);
-                  cnt++;
-               } else if ( cnt == 1) {
-                  lim = ( c - d > 255 ) ? 255 : c - d;
-                  strncpy( f-> font. name, d, lim);
-                  break;
-               } else 
-                  break;
-               d = c + 1;
-            }
-         }
-
-         if (( strlen( f-> font. family) == 0) || (strcmp( f-> font. family, "*") == 0))
-            strcpy( f-> font. family, guts. default_font. family);
-         if (( strlen( f-> font. name) == 0) || (strcmp( f-> font. name, "*") == 0)) {
-            if ( guts. default_font_ok) {
-               strcpy( f-> font. name, guts. default_font. name);
-            } else {
-               Font fx = f-> font;
-               fill_default_font( &fx);
-               if ( f-> flags. encoding) strcpy( fx. encoding, f-> font. encoding);
-               prima_core_font_pick( application, &fx, &fx);
-               strcpy( f-> font. name, fx. name);
-            }
-         } else {
-            char c[256];
-            snprintf( c, 256, "%s %s", f-> font. family, f-> font. name);
-            strcpy( f-> font. name, c);
-         }
-      }
-      str_lwr( f-> font. family, f-> font. family);
-      str_lwr( f-> font. name, f-> font. name);
-      f-> flags. name = true;
-      f-> flags. family = true;
-   } else if ( ! f-> flags. family ) {
-      str_lwr( f-> font. family, f-> font. name);
-      f-> flags. name = true;
-   } else if ( ! f-> flags. name ) {
-      str_lwr( f-> font. name, f-> font. family);
-      f-> flags. name = true;
-   }
-}   
+}
 
 static Bool
 xlfd_parse_font( char * xlfd_name, PFontInfo info, Bool do_vector_fonts)
@@ -232,114 +104,12 @@ prima_font_subsystem_set_option( char * option, char * value)
 void
 prima_font_pp2font( char * ppFontNameSize, PFont font)
 {
-   int i, newEntry = 0, len, dash = 0;
-   FontInfo fi;
-   XFontStruct * xf;
-   Font dummy, def_dummy, *def;
-   char buf[512], *p;
-
-   if ( !font) font = &dummy;
-   
-
-   /* check if font is XLFD and ends in -*-*, so we can replace it with $LANG */
-   len = strlen( ppFontNameSize);
-   for ( i = 0, p = ppFontNameSize; i < len; i++, p++)
-      if ( *p == '-') dash++;
-   if (( dash == 14) && guts. locale[0] && (strcmp( ppFontNameSize + len - 4, "-*-*") == 0)) {
-      memcpy( buf, ppFontNameSize, len - 3);
-      buf[ len - 3] = 0;
-      strncat( buf, guts. locale, 512 - strlen(buf) - 1);
-      buf[511] = 0;
-      ppFontNameSize = buf;
-      len = strlen( ppFontNameSize);
-   }
-
-   /* check if the parsed font already present */
-   memset( font, 0, sizeof( Font));
-   for ( i = 0; i < guts. n_fonts; i++) {
-      if ( strcmp( guts. font_info[i]. xname, ppFontNameSize) == 0) {
-         *font = guts. font_info[i]. font;
-         return;
-      }
-   }
-   
-   xf = ( XFontStruct * ) hash_fetch( xfontCache, ppFontNameSize, len);
-
-   if ( !xf ) {
-      xf = XLoadQueryFont( DISP, ppFontNameSize);
-      if ( !xf) {
-         Fdebug("font: cannot load %s\n", ppFontNameSize);
-         if ( !guts. default_font_ok) {
-            fill_default_font( font);
-            apc_font_pick( application, font, font);
-            font-> pitch = fpDefault;
-         }
-#ifdef USE_XFT
-         if ( !guts. use_xft || !prima_xft_parse( ppFontNameSize, font))
-#endif         
-            if ( font != &guts. default_font)
-               *font = guts. default_font;
-         return;
-      }
-      hash_store( xfontCache, ppFontNameSize, len, xf);
-      newEntry = 1;
-   }
-  
-   bzero( &fi, sizeof( fi));
-   fi. flags. sloppy = true;
-   fi. xname = ppFontNameSize;
-   xlfd_parse_font( ppFontNameSize, &fi, false);
-   font_query_name( xf, &fi);
-   detail_font_info( &fi, font, false, false);
-   *font = fi. font;
-   if ( guts. default_font_ok) {
-      def = &guts. default_font;
-   } else {
-      fill_default_font( def = &def_dummy);
-      apc_font_pick( application, def, def);
-   }
-   if ( font-> height == 0) font-> height = def-> height;
-   if ( font-> size   == 0) font-> size   = def-> size;
-   if ( strlen( font-> name) == 0) strcpy( font-> name, def-> name);
-   if ( strlen( font-> family) == 0) strcpy( font-> family, def-> family);
-   apc_font_pick( application, font, font);
-   if (
-       ( stricmp( font-> family, fi. font. family) == 0) &&
-       ( stricmp( font-> name, fi. font. name) == 0)
-      ) newEntry = 0;
-   
-   if ( newEntry ) {
-      PFontInfo n = realloc( guts. font_info, sizeof( FontInfo) * (guts. n_fonts + 1));
-      if ( n) {
-         guts. font_info = n;
-         fi. font = *font;
-         guts. font_info[ guts. n_fonts++] = fi;
-      }
-   }
-   Fdebug("font: %s%s parsed to: %d.[w=%d,s=%d].%s.%s\n", 
-	  newEntry ? "new " : "", ppFontNameSize, DEBUG_FONT((*font)));
 }
 
 void
 prima_free_rotated_entry( PCachedFont f)
 {
-   while ( f-> rotated) {
-      PRotatedFont r = f-> rotated;
-      while ( r-> length--) {
-          if ( r-> map[ r-> length]) {
-             prima_free_ximage( r-> map[ r-> length]);
-             r-> map[ r-> length] = nil;
-          }      
-      }   
-      f-> rotated = ( PRotatedFont) r-> next;
-      XFreeGC( DISP, r-> arena_gc);
-      if ( r-> arena) 
-         XFreePixmap( DISP, r-> arena);
-      if ( r-> arena_bits)
-         free( r-> arena_bits);
-      free( r);
-   }
-}   
+}
 
 static Bool
 free_rotated_entries( PCachedFont f, int keyLen, void * key, void * dummy)
@@ -350,37 +120,6 @@ free_rotated_entries( PCachedFont f, int keyLen, void * key, void * dummy)
 void
 prima_cleanup_font_subsystem( void)
 {
-   int i;
-
-   if ( guts. font_names)
-      XFreeFontNames( guts. font_names);
-   if ( guts. font_info) {
-      for ( i = 0; i < guts. n_fonts; i++)
-	 if ( guts. font_info[i]. vecname)
-	    free( guts. font_info[i]. vecname);
-      free( guts. font_info);
-   }
-   guts. font_names = nil;
-   guts. n_fonts = 0;
-   guts. font_info = nil;
-   
-   free(ignore_encodings);
-   free(s_ignore_encodings);
-
-   if ( guts. font_hash) {
-      hash_first_that( guts. font_hash, (void*)free_rotated_entries, nil, nil, nil); 
-      hash_destroy( guts. font_hash, false);
-      guts. font_hash = nil;
-   }
-
-   hash_destroy( xfontCache, false);
-   xfontCache = nil;
-   hash_destroy( encodings, false);
-   encodings = nil;
-#ifdef USE_XFT
-   prima_xft_done();
-#endif
-   
 }
 
 PFont
@@ -399,31 +138,11 @@ apc_font_load( const char* filename)
 static void
 dump_font( PFont f)
 {
-   if ( !DISP) return;
-   fprintf( stderr, "*** BEGIN FONT DUMP ***\n");
-   fprintf( stderr, "height: %d\n", f-> height);
-   fprintf( stderr, "width: %d\n", f-> width);
-   fprintf( stderr, "style: %d\n", f-> style);
-   fprintf( stderr, "pitch: %d\n", f-> pitch);
-   fprintf( stderr, "direction: %g\n", f-> direction);
-   fprintf( stderr, "name: %s\n", f-> name);
-   fprintf( stderr, "family: %s\n", f-> family);
-   fprintf( stderr, "size: %d\n", f-> size);
-   fprintf( stderr, "*** END FONT DUMP ***\n");
 }
 
 void
 prima_build_font_key( PFontKey key, PFont f, Bool bySize)
 {
-   bzero( key, sizeof( FontKey));
-   key-> height = bySize ? -f-> size : f-> height;
-   key-> width = f-> width;
-   key-> style = f-> style & ~(fsUnderlined|fsOutline|fsStruckOut);
-   key-> pitch = f-> pitch;
-   key-> direction = 0;
-   strcpy( key-> name, f-> name);
-   strcat( key-> name, "\1");
-   strcat( key-> name, f-> encoding);
 }
 
 PCachedFont
@@ -449,10 +168,6 @@ add_font_to_cache( PFontKey key, PFontInfo f, const char *name, XFontStruct *s, 
 void
 prima_init_try_height( HeightGuessStack * p, int target, int firstMove )
 {
-   p-> locked = 0;
-   p-> sp     = 1;
-   p-> target = target;
-   p-> xlfd[0] = firstMove;
 }
 
 int
@@ -464,249 +179,6 @@ prima_try_height( HeightGuessStack * p, int height)
 static void
 detail_font_info( PFontInfo f, PFont font, Bool addToCache, Bool bySize)
 {
-   XFontStruct *s = nil;
-   unsigned long v;
-   char name[ 1024];
-   FontInfo fi;
-   PFontInfo of = f;
-   int height = 0, size = 0;
-   FontKey key;
-   Bool askedDefaultPitch;
-   HeightGuessStack hgs;
-
-   if ( f-> vecname) {
-      if ( bySize)
-         size = font-> size * 10;
-      else {
-         height = font-> height * 10;
-         prima_init_try_height( &hgs, height, f-> flags. heights_cache ? f-> heights_cache[0] : height);
-         if ( f-> flags. heights_cache)
-            height = prima_try_height( &hgs, f-> heights_cache[1]);
-      }
-   }
-
-AGAIN:
-   if ( f-> vecname) {
-      memcpy( &fi, f, sizeof( fi));
-      fi. flags. size = fi. flags. height = fi. flags. width = fi. flags. ascent =
-         fi. flags. descent = fi. flags. internalLeading = fi. flags. externalLeading = 0;
-      f = &fi;
-
-      if ( f-> flags. bad_vector) {
-         /* three fields */
-         sprintf( name, f-> vecname, height / 10, size, font-> width * 10);
-      } else {
-         /* five fields */
-         sprintf( name, f-> vecname, height / 10, size, 0, 0, font-> width * 10);
-      }
-      Fdebug("font: construct h=%g, s=%d\n", (float)height/10, size);
-   } else {
-      strcpy( name, f-> xname);
-   }
-   
-   Fdebug( "font: loading %s\n", name);
-   s = hash_fetch( xfontCache, name, strlen( name));
-   
-   if ( !s) {
-      s = XLoadQueryFont( DISP, name);
-      XCHECKPOINT;
-      if ( !s) {
-         if ( !font) 
-            warn( "UAF_004: font %s load error", name);
-         if ( of-> flags. disabled) 
-            warn( "UAF_005: font %s pick-up error", name);
-         of-> flags. disabled = true;
-              
-         Fdebug( "font: kill %s\n", name);
-         if ( font) apc_font_pick( nilHandle, font, font);
-         of-> flags. disabled = false;
-         return;
-      } else {
-         hash_store( xfontCache, name, strlen( name), s);
-      }   
-   }
-
-   if ( f-> flags. sloppy || f-> vecname) {
-      /* check first if height is o.k. */
-      f-> font. height = s-> max_bounds. ascent + s-> max_bounds. descent;
-      f-> flags. height = true;
-      if ( f-> vecname && !bySize && f-> font. height != font-> height) {
-         int h = prima_try_height( &hgs, f-> font. height * 10);
-         Fdebug("font height pick: %d::%d => %d, advised %d\n", hgs.sp-1, font-> height, f-> font. height, h);
-         if ( h > 9) {
-            if ( !of-> flags. heights_cache) {
-               of-> heights_cache[0] = font-> height * 10;
-               of-> heights_cache[1] = f-> font. height;
-            }
-            height = h;
-            goto AGAIN;
-         } 
-      }
-      
-      /* detailing y-resolution */
-      if ( !f-> flags. yDeviceRes) {
-         if ( XGetFontProperty( s, FXA_RESOLUTION_Y, &v) && v) {
-            XCHECKPOINT;
-            f-> font. yDeviceRes = v;
-         } else {
-            f-> font. yDeviceRes = 72;
-         }
-         f-> flags. yDeviceRes = true;
-      }
-      
-      /* detailing x-resolution */
-      if ( !f-> flags. xDeviceRes) {
-         if ( XGetFontProperty( s, FXA_RESOLUTION_X, &v) && v) {
-            XCHECKPOINT;
-            f-> font. xDeviceRes = v;
-         } else {
-            f-> font. xDeviceRes = 72;
-         }
-         f-> flags. xDeviceRes = true;
-      }
-
-      /* detailing internal leading */
-      if ( !f-> flags. internalLeading) {
-         if ( XGetFontProperty( s, FXA_CAP_HEIGHT, &v) && v) {
-            XCHECKPOINT;
-            f-> font. internalLeading = s-> max_bounds. ascent - v;
-         } else {
-            if ( f-> flags. height) { 
-               f-> font. internalLeading = s-> max_bounds. ascent + s-> max_bounds. descent - f-> font. height;
-            } else if ( f-> flags. size) {
-               f-> font. internalLeading = s-> max_bounds. ascent + s-> max_bounds. descent - 
-                  ( f-> font. size * f-> font. yDeviceRes) / 72.27 + 0.5;
-            } else {
-               f-> font. internalLeading = 0;
-            }
-         }
-         f-> flags. internalLeading = true;
-      }
-
-      /* detailing point size and height */
-      if ( bySize) {
-         if ( f-> vecname)
-            f-> font. size = size / 10;
-         else if ( !f-> flags. size)
-            f-> font. size = font-> size;
-      } else {
-
-         if ( f-> vecname && f-> font. height < font-> height) { /* adjust anyway */
-            f-> font. internalLeading += font-> height - f-> font. height;
-            f-> font. height = font-> height;
-         }
-
-         if ( !f-> flags. size) {
-            if ( XGetFontProperty( s, FXA_POINT_SIZE, &v) && v) {
-               XCHECKPOINT;
-               f-> font. size = ( v < 10) ? 1 : ( v / 10);
-            } else 
-               f-> font. size = ( f-> font. height - f-> font. internalLeading) * 72.27 / f-> font. height + 0.5;
-         }
-      }
-      f-> flags. size = true;
-
-      /* misc stuff */
-      f-> flags. resolution      = true;
-      f-> font. resolution       = f-> font. yDeviceRes * 0x10000 + f-> font. xDeviceRes;
-      f-> flags. ascent          = true;
-      f-> font. ascent           = f-> font. height - s-> max_bounds. descent;
-      f-> flags. descent         = true;
-      f-> font. descent          = s-> max_bounds. descent; 
-      f-> flags. defaultChar     = true;
-      f-> font. defaultChar      = s-> default_char;
-      f-> flags. firstChar       = true;
-      f-> font.  firstChar       = s-> min_byte1 * 256 + s-> min_char_or_byte2;
-      f-> flags. lastChar        = true;
-      f-> font.  lastChar        = s-> max_byte1 * 256 + s-> max_char_or_byte2;
-      f-> flags. direction       = true;
-      f-> font.  direction       = 0;
-      f-> flags. externalLeading = true;
-      f-> font.  externalLeading = abs( s-> max_bounds. ascent - s-> ascent) + 
-                                   abs( s-> max_bounds. descent - s-> descent);
-      f-> font.  utf8_flags      = 0;				  
-
-      /* detailing width */
-      if ( f-> font. width == 0 || !f-> flags. width) {
-         if ( XGetFontProperty( s, FXA_AVERAGE_WIDTH, &v) && v) {
-            XCHECKPOINT;
-            f-> font. width = v / 10;
-         } else 
-            f-> font. width = s-> max_bounds. width;
-      }
-      f-> flags. width = true;
-
-      /* detailing maximalWidth */
-      if ( !f-> flags. maximalWidth) {
-         f-> flags. maximalWidth = true;   
-         if ( s-> per_char) {
-            int kl = 0, kr = 255, k;
-            int rl = 0, rr = 255, r, d;
-            f-> font. maximalWidth = 0;
-            if ( rl < s-> min_byte1) rl = s-> min_byte1;
-            if ( rr > s-> max_byte1) rr = s-> max_byte1;
-            if ( kl < s-> min_char_or_byte2) kl = s-> min_char_or_byte2;
-            if ( kr > s-> max_char_or_byte2) kr = s-> max_char_or_byte2;
-            d = kr - kl + 1;
-            for ( r = rl; r <= rr; r++) 
-               for ( k = kl; k <= kr; k++) {
-                  int x = s-> per_char[( r - s-> min_byte1) * d + k - s-> min_char_or_byte2]. width;
-                  if ( f-> font. maximalWidth < x)
-                     f-> font. maximalWidth = x;
-               }
-         } else 
-            f-> font. width = f-> font. maximalWidth = s-> max_bounds. width;
-      }
-      of-> flags. sloppy = false;
-   } 
-
-   if ( addToCache && font) {
-      /* detailing stuff */
-      int underlinePos = 0, underlineThickness = 1;
-
-      /* trust the slant part of style */
-      font-> style = f-> font. style;
-
-      /* detailing underline things */
-      if ( XGetFontProperty( s, XA_UNDERLINE_POSITION, &v) && v) {
-         XCHECKPOINT;
-         underlinePos =  -s-> max_bounds. descent + v;
-      } else 
-         underlinePos = - s-> max_bounds. descent + 1;
-      
-      if ( XGetFontProperty( s, XA_UNDERLINE_THICKNESS, &v) && v) {
-         XCHECKPOINT;
-         underlineThickness = v;
-      } else
-         underlineThickness = 1;
-
-      underlinePos -= underlineThickness;
-      if ( -underlinePos + underlineThickness / 2 > s-> max_bounds. descent) 
-         underlinePos = -s-> max_bounds. descent + underlineThickness / 2;
-
-      prima_build_font_key( &key, font, bySize); 
-      Fdebug("font cache add to :%d.%d.{%d}.%s\n", f-> font.height, f-> font.size, f-> font. style, f-> font.name);
-      if ( !add_font_to_cache( &key, f, name, s, underlinePos, underlineThickness))
-         return;
-      askedDefaultPitch = font-> pitch == fpDefault;
-      memcpy( font, &f-> font, sizeof( Font));
-      prima_build_font_key( &key, font, false);
-      if ( !hash_fetch( guts. font_hash, &key, sizeof( FontKey))) {
-         if ( !add_font_to_cache( &key, f, name, s, underlinePos, underlineThickness))
-            return;
-      }
-      
-      if ( askedDefaultPitch && font-> pitch != fpDefault) {
-        int pitch = font-> pitch;
-        font-> pitch = fpDefault;
-        prima_build_font_key( &key, font, false);
-        if ( !hash_fetch( guts. font_hash, &key, sizeof( FontKey))) {
-           if ( !add_font_to_cache( &key, f, name, s, underlinePos, underlineThickness))
-              return;
-        }
-        font-> pitch = pitch;
-      }
-   }
 }
 
 #define QUERYDIFF_BY_SIZE        (-1)

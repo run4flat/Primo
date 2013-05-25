@@ -78,53 +78,11 @@ prima_rop_map( int rop)
 void
 prima_get_gc( PDrawableSysData selfxx)
 {
-   XGCValues gcv;
-   Bool bitmap;
-   struct gc_head *gc_pool;
-
-   if ( XX-> gc && XX-> gcl) return;
-
-   if ( XX-> gc || XX-> gcl) {
-      warn( "UAG_010: internal error");
-      return;
-   }   
-
-   bitmap = XT_IS_BITMAP(XX) ? true : false;
-   gc_pool = bitmap ? &guts.bitmap_gc_pool : &guts.screen_gc_pool;
-   XX->gcl = TAILQ_FIRST(gc_pool);
-   if (XX->gcl)
-      TAILQ_REMOVE(gc_pool, XX->gcl, gc_link);
-   if (!XX->gcl) {
-      gcv. graphics_exposures = false;
-      XX-> gc = XCreateGC( DISP, bitmap ? XX-> gdrawable : guts. root, GCGraphicsExposures, &gcv);
-      XCHECKPOINT;
-      if (( XX->gcl = alloc1z( GCList))) 
-         XX->gcl->gc = XX-> gc;
-   }
-   if ( XX-> gcl) XX->gc = XX->gcl->gc;
 }
 
 void
 prima_release_gc( PDrawableSysData selfxx)
 {
-   Bool bitmap;
-   struct gc_head *gc_pool;
-
-   if ( XX-> gc) {
-      if ( XX-> gcl == nil)
-         warn( "UAG_011: internal error");
-      bitmap = XT_IS_BITMAP(XX) ? true : false;
-      gc_pool = bitmap ? &guts.bitmap_gc_pool : &guts.screen_gc_pool;
-      if ( XX-> gcl) 
-         TAILQ_INSERT_HEAD(gc_pool, XX->gcl, gc_link);
-      XX->gcl = nil;
-      XX->gc = nil;
-   } else {
-      if ( XX-> gcl) {
-         warn( "UAG_012: internal error");
-         return;
-      }
-   }
 }
 
 /* 
@@ -156,174 +114,11 @@ prima_release_gc( PDrawableSysData selfxx)
 void
 prima_prepare_drawable_for_painting( Handle self, Bool inside_on_paint)
 {
-   DEFXX;
-   unsigned long mask = VIRGIN_GC_MASK;
-   int w, h;
-   XRectangle r;
-
-   XF_IN_PAINT(XX) = true;
-   XX-> btransform. x = XX-> btransform. y = 0;
-   XX-> gcv. ts_x_origin = XX-> gcv. ts_y_origin = 0;
-   if ( inside_on_paint && XX-> udrawable && is_opt( optBuffered) && !is_opt( optInDrawInfo) ) {
-      if ( XX-> invalid_region) {
-         XClipBox( XX-> invalid_region, &r);
-         XX-> bsize. x = w = r. width;
-         XX-> bsize. y = h = r. height;
-         XX-> btransform. x = - r. x;
-         XX-> btransform. y = r. y;
-      } else {
-	 r. x = r. y = 0;
-         XX-> bsize. x = w = XX-> size. x;
-         XX-> bsize. y = h = XX-> size. y;
-      }
-      if ( w <= 0 || h <= 0) goto Unbuffered;
-      XX-> gdrawable = XCreatePixmap( DISP, XX-> udrawable, w, h, guts.depth);
-      XCHECKPOINT;
-      if (!XX-> gdrawable) goto Unbuffered;
-      XX-> gcv. ts_x_origin = -r.x;
-      XX-> gcv. ts_y_origin = -r.y;
-   } else if ( XX-> udrawable && !XX-> gdrawable) {
-Unbuffered:
-      XX-> gdrawable = XX-> udrawable;
-   }
-
-   XX-> paint_rop = XX-> rop;
-   XX-> paint_rop2 = XX-> rop2;
-   XX-> flags. paint_base_line = XX-> flags. base_line;
-   XX-> flags. paint_opaque    = XX-> flags. opaque;
-   XX-> saved_font = PDrawable( self)-> font;
-   XX-> line_width = XX-> gcv. line_width;
-   XX-> gcv. clip_mask = None;
-   XX-> gtransform = XX-> transform;
-
-   prima_get_gc( XX);
-   XX-> gcv. subwindow_mode = (self == application ? IncludeInferiors : ClipByChildren);
-   
-   XChangeGC( DISP, XX-> gc, mask, &XX-> gcv);
-   XCHECKPOINT;
-   
-   if ( XX-> dashes) {
-      dDASH_FIX( XX-> line_width, XX-> dashes, XX-> ndashes);
-      DASH_FIX;
-      XSetDashes( DISP, XX-> gc, 0, DASHES);
-      XX-> paint_ndashes = XX-> ndashes;
-      if (( XX-> paint_dashes = malloc( XX-> ndashes)))
-         memcpy( XX-> paint_dashes, XX-> dashes, XX-> ndashes);
-      XX-> line_style = ( XX-> paint_rop2 == ropCopyPut) ? LineDoubleDash : LineOnOffDash;
-   } else {
-      XX-> paint_dashes = malloc(1);
-      if ( XX-> ndashes < 0) {
-	 XX-> paint_dashes[0] = '\0';
-	 XX-> paint_ndashes = 0;
-      } else {
-	 XX-> paint_dashes[0] = '\1';
-	 XX-> paint_ndashes = 1;
-      }
-      XX-> line_style = LineSolid;
-   }
-
-   XX-> clip_rect. x = 0;
-   XX-> clip_rect. y = 0;
-   XX-> clip_rect. width = XX-> size.x;
-   XX-> clip_rect. height = XX-> size.y;
-   if ( XX-> invalid_region && inside_on_paint && !is_opt( optInDrawInfo)) {
-      if ( XX-> flags. kill_current_region) {
-         XDestroyRegion( XX-> current_region);
-         XX-> flags. kill_current_region = 0;
-      }
-      if ( XX-> btransform. x != 0 || XX-> btransform. y != 0) {
-         Region r = XCreateRegion();
-         XUnionRegion( r, XX-> invalid_region, r);
-         XOffsetRegion( r, XX-> btransform. x, -XX-> btransform. y);
-         XSetRegion( DISP, XX-> gc, r);
-         XX-> current_region = r;
-         XX-> flags. kill_current_region = 1;
-      } else {
-         XSetRegion( DISP, XX-> gc, XX-> invalid_region);
-         XX-> current_region = XX-> invalid_region;
-         XX-> flags. kill_current_region = 0;
-      }
-      XX-> paint_region = XX-> invalid_region;
-      XX-> invalid_region = nil;
-   }
-   XX-> clip_mask_extent. x = XX-> clip_mask_extent. y = 0;
-   XX-> flags. xft_clip = 0;
-
-   apc_gp_set_color( self, XX-> saved_fore);
-   apc_gp_set_back_color( self, XX-> saved_back);
-   memcpy( XX-> saved_fill_pattern, XX-> fill_pattern, sizeof( FillPattern));
-   XX-> fill_pattern[0]++; /* force  */
-   apc_gp_set_fill_pattern( self, XX-> saved_fill_pattern);
-
-   if ( !XX-> flags. reload_font && XX-> font && XX-> font-> id) {
-      XSetFont( DISP, XX-> gc, XX-> font-> id);
-      XCHECKPOINT;
-   } else {
-      apc_gp_set_font( self, &PDrawable( self)-> font);
-      XX-> flags. reload_font = false;
-   }
 }
 
 void
 prima_cleanup_drawable_after_painting( Handle self)
 {
-   DEFXX;
-#ifdef USE_XFT
-   if ( XX-> xft_drawable) {
-      XftDrawDestroy( XX-> xft_drawable);
-      XX-> xft_drawable = nil;
-   }
-#endif
-   if ( XX-> flags. kill_current_region) {
-      XDestroyRegion( XX-> current_region);
-      XX-> flags. kill_current_region = 0;
-   }
-   XX-> current_region = 0;
-   XX-> flags. xft_clip = 0;
-   if ( XX-> udrawable && XX-> udrawable != XX-> gdrawable && XX-> gdrawable && !is_opt( optInDrawInfo)) {
-      if ( XX-> paint_region) {
-         XSetRegion( DISP, XX-> gc, XX-> paint_region);
-      } else {
-         Region region = XCreateRegion();
-         XRectangle r;
-         r. x = -XX-> btransform. x;
-         r. y = XX-> btransform. y;
-         r. width = XX->bsize.x;
-         r. height = XX->bsize.y;
-         XUnionRectWithRegion( &r, region, region);
-         XSetRegion( DISP, XX-> gc, region);
-         XDestroyRegion( region);
-      }
-      XCHECKPOINT;
-      XSetFunction( DISP, XX-> gc, GXcopy);
-      XCopyArea( DISP, XX-> gdrawable, XX-> udrawable, XX-> gc,
-                 0, 0,
-                 XX-> bsize.x, XX-> bsize.y,
-                 -XX-> btransform. x, XX-> btransform. y);
-      XCHECKPOINT;
-      XFreePixmap( DISP, XX-> gdrawable);
-      XCHECKPOINT;
-      XX-> gdrawable = XX-> udrawable;
-      XX-> btransform. x = XX-> btransform. y = 0;
-   }
-   prima_release_gc(XX);
-   memcpy( XX-> fill_pattern, XX-> saved_fill_pattern, sizeof( FillPattern));
-   if ( XX-> font && ( --XX-> font-> refCnt <= 0)) {
-      prima_free_rotated_entry( XX-> font);
-      XX-> font-> refCnt = 0;
-   }
-   if ( XX-> paint_dashes) {
-      free(XX->paint_dashes);
-      XX-> paint_dashes = nil;
-   }
-   XX-> paint_ndashes = 0;
-   XF_IN_PAINT(XX) = false;
-   PDrawable( self)-> font = XX-> saved_font;
-   if ( XX-> paint_region) {
-      XDestroyRegion( XX-> paint_region);
-      XX-> paint_region = nil;
-   }
-   XFlush(DISP);
 }
 
 #define PURE_FOREGROUND if (!XX->flags.brush_fore) {\
@@ -359,34 +154,6 @@ arc_completion( double * angleStart, double * angleEnd, int * needFigure)
 static void
 calculate_ellipse_divergence(void)
 {
-   static Bool init = false;
-   if ( !init) {
-      XGCValues gcv;
-      Pixmap px = XCreatePixmap( DISP, guts.root, 4, 4, 1);
-      GC gc = XCreateGC( DISP, px, 0, &gcv);
-      XImage *xi;
-      XSetForeground( DISP, gc, 0);
-      XFillRectangle( DISP, px, gc, 0, 0, 5, 5);
-      XSetForeground( DISP, gc, 1);
-      XDrawArc( DISP, px, gc, 0, 0, 4, 4, 0, 360 * 64);
-      if (( xi = XGetImage( DISP, px, 0, 0, 4, 4, 1, XYPixmap))) {
-         int i;
-         Byte *data[4];
-         if ( xi-> bitmap_bit_order == LSBFirst) 
-            prima_mirror_bytes(( Byte*) xi-> data, xi-> bytes_per_line * 4);
-         for ( i = 0; i < 4; i++) data[i] = (Byte*)xi-> data + i * xi-> bytes_per_line;
-#define PIX(x,y) ((data[y][0] & (0x80>>(x)))!=0)
-         if (  PIX(2,1) && !PIX(3,1)) guts. ellipseDivergence.x = -1; else
-         if ( !PIX(2,1) && !PIX(3,1)) guts. ellipseDivergence.x = 1; 
-         if (  PIX(1,2) && !PIX(1,3)) guts. ellipseDivergence.y = -1; else
-         if ( !PIX(1,2) && !PIX(1,3)) guts. ellipseDivergence.y = 1; 
-#undef PIX                          
-         XDestroyImage( xi);
-      }
-      XFreeGC( DISP, gc);
-      XFreePixmap( DISP, px);
-      init = true;
-   }
 }
 
 #define ELLIPSE_RECT x - ( dX + 1) / 2 + 1, y - dY / 2, dX-guts.ellipseDivergence.x, dY-guts.ellipseDivergence.y
@@ -543,20 +310,7 @@ fs_get_pixel( FillSession * fs, int x, int y)
 static void
 hline( FillSession * fs, int x1, int y, int x2)
 {
-   XFillRectangle( DISP, fs-> drawable, fs-> gc, x1, y, x2 - x1 + 1, 1);
-   
-   if ( y == fs-> y && fs-> i) {
-      XDestroyImage( fs-> i);
-      fs-> i = nil;
-   }   
-   
-   y -= fs-> first;
-   
-   if ( fs-> lists[y] == nil)
-      fs-> lists[y] = plist_create( 32, 128);
-   list_add( fs-> lists[y], ( Handle) x1);
-   list_add( fs-> lists[y], ( Handle) x2);
-}   
+}
 
 static int
 fill( FillSession * fs, int sx, int sy, int d, int pxl, int pxr)
@@ -888,28 +642,6 @@ apc_gp_get_color( Handle self)
 void
 prima_gp_get_clip_rect( Handle self, XRectangle *cr, Bool for_internal_paints)
 {
-   DEFXX;
-   XRectangle r;
-
-   cr-> x = 0;
-   cr-> y = 0;
-   cr-> width = XX-> size.x;
-   cr-> height = XX-> size.y;
-   if ( XF_IN_PAINT(XX) && XX-> paint_region) {
-      XClipBox( XX-> paint_region, &r);
-      prima_rect_intersect( cr, &r);
-   }
-   if ( XX-> clip_rect. x != 0
-        || XX-> clip_rect. y != 0
-        || XX-> clip_rect. width != XX-> size.x
-        || XX-> clip_rect. height != XX-> size.y) {
-      prima_rect_intersect( cr, &XX-> clip_rect);
-   }
-
-   if ( for_internal_paints) {
-      cr-> x += XX-> btransform. x;
-      cr-> y -= XX-> btransform. y;
-   }
 }
 
 Rect
@@ -1211,7 +943,6 @@ apc_gp_set_font( Handle self, PFont font)
 Bool
 apc_gp_set_line_end( Handle self, int lineEnd)
 {
-   Bool foo; return foo;
 }
 
 Bool

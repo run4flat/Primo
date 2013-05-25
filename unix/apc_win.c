@@ -46,87 +46,6 @@
 static void
 set_net_hints( XWindow window, int task_listed, int modal, int zoom, int on_top)
 {
-   long data[40], * prop;
-   Atom type;
-   int count = 0, format;
-   XClientMessageEvent ev;
-   unsigned long i, n, left;
-   
-   if ( guts. icccm_only) return;
-
-   /* read and preserve all state properties we don't know about */
-   if ( XGetWindowProperty( DISP, window, NET_WM_STATE, 0, 32, false, XA_ATOM,
-          &type, &format, &n, &left, (unsigned char**)&prop) == Success) {
-     if ( prop) {
-         if ( n > 32) n = 32;
-         for ( i = 0; i < n; i++) {
-            if (( prop[i] != NET_WM_STATE_SKIP_TASKBAR || task_listed < 0) && 
-                ( prop[i] != NET_WM_STATE_MODAL || modal < 0) && 
-                ( prop[i] != NET_WM_STATE_STAYS_ON_TOP || on_top < 0) && 
-                ( prop[i] != NET_WM_STATE_ABOVE || on_top < 0) && 
-                (( prop[i] != NET_WM_STATE_MAXIMIZED_VERT && 
-                   prop[i] != NET_WM_STATE_MAXIMIZED_HORZ) || ( zoom < 0)))
-               data[ count++] = prop[i];
-         }
-         XFree(( unsigned char *) prop);
-      }
-   }
-
-   /* Send change message to root window, it's responsible for
-      on-the-fly changes. Otherwise, the properties are not re-read
-      until next XMapWindow() */
-   bzero( &ev, sizeof(ev));
-   ev. type = ClientMessage;
-   ev. display = DISP;
-   ev. window = window;
-   ev. message_type = NET_WM_STATE;
-   ev. format = 32;
-   /*
-      _NET_WM_STATE_REMOVE        0    // remove/unset property 
-      _NET_WM_STATE_ADD           1    // add/set property 
-      _NET_WM_STATE_TOGGLE        2    // toggle property  
-    */
-
-   if ( task_listed >= 0) {
-      ev. data. l[0] = ( task_listed > 0) ? 0 : 1;
-      ev. data. l[1] = ( long) NET_WM_STATE_SKIP_TASKBAR;
-      ev. data. l[2] = 0;
-      XSendEvent( DISP, guts. root, false, 0, (XEvent*)&ev);
-   }
-
-   if ( modal >= 0) {
-      ev. data. l[0] = ( modal > 0) ? 1 : 0;
-      ev. data. l[1] = ( long) NET_WM_STATE_MODAL;
-      XSendEvent( DISP, guts. root, false, 0, (XEvent*)&ev);
-   }
-
-   if ( zoom >= 0) {
-      ev. data. l[0] = ( zoom > 0) ? 1 : 0;
-      ev. data. l[1] = ( long) NET_WM_STATE_MAXIMIZED_VERT;
-      ev. data. l[2] = ( long) NET_WM_STATE_MAXIMIZED_HORZ;
-      XSendEvent( DISP, guts. root, false, 0, (XEvent*)&ev);
-   }
-   
-   if ( on_top >= 0) {
-      ev. data. l[0] = ( on_top > 0) ? 1 : 0;
-      ev. data. l[1] = ( long) NET_WM_STATE_STAYS_ON_TOP;
-      ev. data. l[1] = ( long) NET_WM_STATE_ABOVE;
-      XSendEvent( DISP, guts. root, false, 0, (XEvent*)&ev);
-   }
-
-   /* finally reset the list of properties */
-   if ( task_listed == 0) data[ count++] = NET_WM_STATE_SKIP_TASKBAR;
-   if ( modal > 0) data[ count++] = NET_WM_STATE_MODAL;
-   if ( zoom > 0)  {
-      data[ count++] = NET_WM_STATE_MAXIMIZED_VERT;
-      data[ count++] = NET_WM_STATE_MAXIMIZED_HORZ;
-   }
-   if ( on_top > 0) {
-      data[ count++] = NET_WM_STATE_STAYS_ON_TOP;
-      data[ count++] = NET_WM_STATE_ABOVE;
-   }
-   XChangeProperty( DISP, window, NET_WM_STATE, XA_ATOM, 32,
-       PropModeReplace, ( unsigned char *) data, count);
 }
 
 unsigned char * 
@@ -209,10 +128,7 @@ net_supports_maximization(void)
 static void
 apc_window_task_listed( Handle self, Bool task_list)
 {
-   DEFXX;
-   XX-> flags. task_listed = ( task_list ? 1 : 0);
-   set_net_hints( X_WINDOW, XX-> flags.task_listed, -1, -1, -1);
-} 
+}
 
 /* Motif window hints */
 #define MWM_HINTS_FUNCTIONS           (1L << 0)
@@ -238,42 +154,6 @@ apc_window_task_listed( Handle self, Bool task_list)
 static void
 set_motif_hints( XWindow window, int border_style, int border_icons)
 {
-   struct {
-     unsigned long flags, functions, decorations;
-     long  input_mode;
-     unsigned long status;
-   } mwmhints;
-
-
-#define MWMHINT_OR(field,value) mwmhints.field |= (value)
-
-   if ( guts. icccm_only) return;
-
-   bzero( &mwmhints, sizeof(mwmhints));
-   MWMHINT_OR( flags, MWM_HINTS_DECORATIONS);
-   MWMHINT_OR( flags, MWM_HINTS_FUNCTIONS);
-   if ( border_style == bsSizeable) {
-      MWMHINT_OR( decorations, MWM_DECOR_BORDER);
-      MWMHINT_OR( decorations, MWM_DECOR_RESIZEH);
-      MWMHINT_OR( functions, MWM_FUNC_RESIZE);
-   }
-   MWMHINT_OR( functions, MWM_FUNC_MOVE);
-   MWMHINT_OR( functions, MWM_FUNC_CLOSE);
-   if ( border_icons & biTitleBar)
-      MWMHINT_OR( decorations, MWM_DECOR_TITLE);
-   if ( border_icons & biSystemMenu)
-      MWMHINT_OR( decorations, MWM_DECOR_MENU);
-   if ( border_icons & biMinimize) {
-      MWMHINT_OR( decorations, MWM_DECOR_MINIMIZE);
-      MWMHINT_OR( functions, MWM_FUNC_MINIMIZE);
-   }
-   if (( border_icons & biMaximize) && ( border_style == bsSizeable)) {
-      MWMHINT_OR( decorations, MWM_DECOR_MAXIMIZE);
-      MWMHINT_OR( functions, MWM_FUNC_MAXIMIZE);
-   }
-
-   XChangeProperty(DISP, window, XA_MOTIF_WM_HINTS, XA_MOTIF_WM_HINTS, 32,
-       PropModeReplace, (unsigned char *) &mwmhints, 5);
 }
 
 Bool
@@ -393,35 +273,7 @@ prima_get_frame_info( Handle self, PRect r)
 void
 apc_SetWMNormalHints( Handle self, XSizeHints * hints)
 {
-   DEFXX;
-   hints-> flags |= PMinSize | PMaxSize;
-   if ( XX-> flags. sizeable) {
-      int h = PWidget(self)-> sizeMin.y;
-      if ( h == 0) h = 1;
-      hints-> min_width  = PWidget(self)-> sizeMin.x;
-      hints-> min_height = h + XX-> menuHeight;
-      hints-> max_width  = PWidget(self)-> sizeMax.x;
-      hints-> max_height = PWidget(self)-> sizeMax.y + XX-> menuHeight;
-      if ( !XX-> flags. sizemax_set && 
-         PWidget(self)-> sizeMax.x == 16384 &&
-         PWidget(self)-> sizeMax.y == 16384) {
-         hints-> flags &= ~ PMaxSize;
-      }
-      else 
-         XX-> flags. sizemax_set = 1;
-   } else {   
-      Point who; 
-      who. x = ( hints-> flags & USSize) ? hints-> width  : XX-> size. x;
-      who. y = ( hints-> flags & USSize) ? hints-> height : XX-> size. y + XX-> menuHeight;
-      hints-> min_width  = who. x;
-      hints-> min_height = who. y;
-      hints-> max_width  = who. x;
-      hints-> max_height = who. y;
-      XX-> flags. sizemax_set = 1;
-   }
-   XSetWMNormalHints( DISP, X_WINDOW, hints);
-   XCHECKPOINT;
-}   
+}
 
 
 Bool
@@ -433,34 +285,7 @@ apc_window_set_client_pos( Handle self, int x, int y)
 static void
 apc_window_set_rect( Handle self, int x, int y, int szx, int szy)
 {
-    DEFXX;
-    XSizeHints hints;
-    Point psize = XX-> size;
-    ConfigureEventPair *cep;
-
-    bzero( &hints, sizeof( XSizeHints));
-    hints. flags = USPosition | USSize;
-    hints. x = x - XX-> decorationSize. x;
-    hints. y = guts. displaySize. y - szy - XX-> menuHeight - y - XX-> decorationSize. y;
-    hints. width  = szx;
-    hints. height = szy + XX-> menuHeight;
-    XX-> flags. position_determined = 1;
-    XX-> size. x = szx;
-    XX-> size. y = szy;
-    XMoveResizeWindow( DISP, XX-> client, 0, XX-> menuHeight, hints. width, hints. height - XX-> menuHeight);
-    XMoveResizeWindow( DISP, X_WINDOW, hints. x, hints. y, hints. width, hints. height);
-    if (( cep = malloc( sizeof( ConfigureEventPair)))) {
-       bzero( cep, sizeof( ConfigureEventPair));
-       cep-> w = hints. width;
-       cep-> h = hints. height;
-       TAILQ_INSERT_TAIL( &XX-> configure_pairs, cep, link);
-    }
-
-    apc_SetWMNormalHints( self, &hints);
-    prima_send_cmSize( self, psize);
-    if ( PObject( self)-> stage == csDead) return; 
-    prima_wm_sync( self, ConfigureNotify); 
-}   
+}
 
 static Bool
 window_set_client_size( Handle self, int width, int height)

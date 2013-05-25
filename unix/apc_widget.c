@@ -125,20 +125,6 @@ EXIT:
 void
 process_transparents( Handle self)
 {
-   int i;
-   Point sz = X(self)-> size;
-   for ( i = 0; i < PWidget(self)-> widgets. count; i++) {
-      Handle x = PWidget(self)-> widgets. items[ i];
-      if ( X(x)-> flags. transparent && 
-           X(x)-> flags. want_visible &&
-           !X(x)-> flags. falsely_hidden) {
-         Point pos = X(x)-> origin;
-         if ( pos. x >= sz.x || pos.y >= sz.y ||
-              pos. x + X(x)-> size.x <= 0 ||
-              pos. y + X(x)-> size.y <= 0) continue;
-         apc_widget_invalidate_rect( x, nil);
-      }
-   }
 }
 
 static int
@@ -428,47 +414,12 @@ apc_widget_set_shape( Handle self, Handle mask)
 static void
 apc_XUnmapWindow( Handle self)
 {
-   Handle z = guts. focused;
-   while ( z) {
-      if ( z == self) {
-         if (PComponent(self)-> owner) {
-            z = PComponent(self)-> owner;
-            while ( z && !X(z)-> type. window) z = PComponent(z)-> owner;
-            if ( z && z != application)
-               XSetInputFocus( DISP, PComponent(z)-> handle, RevertToNone, guts. currentFocusTime);
-         }
-         break;
-      }
-      z = PComponent(z)-> owner;
-   }
-   XUnmapWindow( DISP, X_WINDOW);
 }
 
 void
 prima_send_cmSize( Handle self, Point oldSize)
 {
-   DEFXX;
-   Event e;
-
-   bzero( &e, sizeof(e));
-   e. gen. source = self;
-   e. cmd = cmSize;
-   e. gen. R. left = oldSize. x;
-   e. gen. R. bottom = oldSize. y;
-   e. gen. P. x = e. gen. R. right = XX-> size. x;
-   e. gen. P. y = e. gen. R. top = XX-> size. y;
-   {
-      int i, y = XX-> size. y, count = PWidget( self)-> widgets. count;
-      for ( i = 0; i < count; i++) {
-	 PWidget child = PWidget( PWidget( self)-> widgets. items[i]);
-         if ((( PWidget(child)-> growMode & gmDontCare) == 0) &&
-             ( !X(child)-> flags. clip_owner || ( child-> owner == application))) {
-            XMoveWindow( DISP, child-> handle, X(child)-> origin.x, y - X(child)-> size.y - X(child)-> origin. y);
-         }
-      }
-   }
-   apc_message( self, &e, false);
-}   
+}
 
 Bool
 apc_widget_set_size( Handle self, int width, int height)

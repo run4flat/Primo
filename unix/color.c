@@ -156,16 +156,6 @@ my_XAllocColor( Display * disp, Colormap cm, XColor * xc, int line)
 static void
 my_XFreeColors( Display * disp, Colormap cm, long * ls, int count, long pal, int line)
 {
-   XSynchronize( DISP, true);
-   printf("Free at %d:%d items\n", line, count);
-   for ( pal = 0; pal < count; pal++, ls++) {
-      printf("%ld.", *ls);
-      XFreeColors( disp, cm, ls, 1, 0);
-      XSync( disp, false);
-      if ( !card[*ls]) printf("jopa!\n");
-       else card[*ls]--;
-   }
-   printf("done\n");
 }
 
 #define XAllocColor(a,b,c) my_XAllocColor(a,b,c,__LINE__)
@@ -396,13 +386,6 @@ create_std_palettes( XColor * xc, int count)
 static void
 fill_cubic( XColor * xc, int d)
 {
-   int b, g, r, d2 = d * d, frac = 65535 / ( d - 1);
-   for ( b = 0; b < d; b++) for ( g = 0; g < d; g++) for ( r = 0; r < d; r++) {
-      int idx = b + g * d + r * d2;
-      xc[idx]. blue = b * frac;
-      xc[idx]. green = g * frac;
-      xc[idx]. red = r * frac;
-   }
 }
 
 static char * do_visual = nil;
@@ -411,23 +394,11 @@ static PList color_options = nil;
 static void
 set_color_class( int class, char * option, char * value)
 {
-   if ( !value) {
-      warn("`%s' must be given a value -- skipped\n", option);
-      return;
-   }
-   if ( !color_options) color_options = plist_create( 8, 8);
-   if ( !color_options) return;
-   list_add( color_options, ( Handle) class);
-   list_add( color_options, ( Handle) duplicate_string(value));
-}   
+}
 
 static void
 apply_color_class( int c_class, Color value) 
 {
-   int i;
-   Color ** t = standard_colors + 1;
-   for ( i = 1; i < MAX_COLOR_CLASS; i++, t++) (*t)[c_class] = value;
-   Mdebug("color: class %d=%06x\n", c_class, value);
 }
 
 Bool
@@ -451,41 +422,6 @@ typedef struct
 void
 prima_done_color_subsystem( void)
 {
-   int i;
-   FreeColorsStruct fc;
-
-   if ( DISP) {
-      hash_first_that( hatches, (void*)kill_hatches, nil, nil, nil);
-      fc. count = 0;
-      
-      for ( i = 0; i < guts. palSize; i++) {
-         list_destroy( &guts. palette[i]. users);
-         if ( 
-             !guts. privateColormap &&
-             guts. palette[i]. rank > RANK_FREE && 
-             guts. palette[i]. rank <= RANK_IMMUTABLE) {
-            fc. free[ fc. count++] = i;
-            if ( fc. count == 256) {
-               XFreeColors( DISP, guts. defaultColormap, fc. free, 256, 0);
-               fc. count = 0;
-            }
-         }
-      }
-      if ( fc. count > 0)
-         XFreeColors( DISP, guts. defaultColormap, fc. free, fc. count, 0);
-      XFreeColormap( DISP, guts. defaultColormap);
-   }
-
-   hash_destroy( hatches, false);
-   guts. defaultColormap = 0;
-   free( guts. mappingPlace);
-   free( guts. ditherPatterns);
-   free( guts. palette);
-   free( guts. systemColorMap);
-   guts. palette = nil;
-   guts. systemColorMap = nil;
-   guts. ditherPatterns = nil;
-   guts. mappingPlace = nil;
 }
 
 /*
@@ -549,18 +485,6 @@ prima_palette_alloc( Handle self)
 void
 prima_palette_free( Handle self, Bool priority)
 {
-   int i, max = priority ? 2 : 1;
-   if ( !guts. dynamicColors) return;
-   for ( i = 0; i < guts. palSize; i++) {
-      int rank = wlpal_get(self,i);
-      if ( rank > RANK_FREE && max >= rank) {
-         wlpal_set( self, i, RANK_FREE);
-         list_delete( &guts. palette[i]. users, self);
-         Pdebug("color: %s free %d, %d\n", PWidget(self)-> name, i, rank);
-         guts. palette[i]. touched = true;
-      }
-   }
-   Pdebug(":%s for %s\n", priority ? "PRIO" : "", PWidget(self)-> name);
 }
 
 int
@@ -572,8 +496,6 @@ prima_lpal_get( Byte * palette, int index)
 void 
 prima_lpal_set( Byte * palette, int index, int rank )
 {
-   palette[ LPAL_ADDR( index ) ] &=~ LPAL_MASK( index);
-   palette[ LPAL_ADDR( index ) ] |=  LPAL_SET( index, rank);
 }
           
 

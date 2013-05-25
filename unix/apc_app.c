@@ -135,65 +135,16 @@ window_subsystem_set_option( char * option, char * value)
 void
 window_subsystem_cleanup( void)
 {
-   if ( !DISP) return;
-   /*XXX*/
-   prima_end_menu();
-#ifdef WITH_GTK
-   prima_gtk_done();
-#endif
 }
 
 static void
 free_gc_pool( struct gc_head *head)
 {
-   GCList *n1, *n2;
-
-   n1 = TAILQ_FIRST(head);
-   while (n1 != nil) {
-      n2 = TAILQ_NEXT(n1, gc_link);
-      XFreeGC( DISP, n1-> gc);
-      /* XXX */ free(n1);
-      n1 = n2;
-   }
-   TAILQ_INIT(head);
 }
 
 void
 window_subsystem_done( void)
 {
-   if ( !DISP) return;
-
-   if ( guts. hostname. value) {
-      XFree( guts. hostname. value);
-      guts. hostname. value = nil;
-   }
-
-   prima_end_menu();
-
-   free_gc_pool(&guts.bitmap_gc_pool);
-   free_gc_pool(&guts.screen_gc_pool);
-   prima_done_color_subsystem();
-   free( guts. clipboard_formats);
-
-   XFreeGC( DISP, guts. menugc);
-   prima_gc_ximages();          /* verrry dangerous, very quiet please */
-   if ( guts.pointer_font) {
-      XFreeFont( DISP, guts.pointer_font);
-      guts.pointer_font = nil;
-   }
-   XCloseDisplay( DISP);
-   DISP = nil;
-   
-   plist_destroy( guts. files);
-   guts. files = nil;
-
-   XrmDestroyDatabase( guts.db);
-   if (guts.ximages)            hash_destroy( guts.ximages, false);
-   if (guts.menu_windows)       hash_destroy( guts.menu_windows, false);
-   if (guts.windows)            hash_destroy( guts.windows, false);
-   if (guts.clipboards)         hash_destroy( guts.clipboards, false);
-   if (guts.clipboard_xfers)    hash_destroy( guts.clipboard_xfers, false);
-   prima_cleanup_font_subsystem();
 }
 
 Bool
@@ -343,43 +294,11 @@ purge_invalid_watchers( Handle self, void *dummy)
 static void
 perform_pending_paints( void)
 {
-   PDrawableSysData selfxx, next;
-
-   for ( XX = TAILQ_FIRST( &guts.paintq); XX != nil; ) {
-      next = TAILQ_NEXT( XX, paintq_link);
-      if ( XX-> flags. paint_pending && (guts. appLock == 0) &&
-         (PWidget( XX->self)-> stage == csNormal)) {
-         TAILQ_REMOVE( &guts.paintq, XX, paintq_link);
-         XX-> flags. paint_pending = false;
-         prima_simple_message( XX-> self, cmPaint, false);
-         /* handle the case where this widget is locked */
-         if (XX->invalid_region) {
-            XDestroyRegion(XX->invalid_region);
-            XX->invalid_region = nil;
-         }
-      } 
-      XX = next;
-   }
 }
 
 static void
 send_pending_events( void)
 {
-   PendingEvent *pe, *next;
-   int stage;
-
-   for ( pe = TAILQ_FIRST( &guts.peventq); pe != nil; ) {
-      next = TAILQ_NEXT( pe, peventq_link);
-      if (( stage = PComponent( pe->recipient)-> stage) != csConstructing) {
-         TAILQ_REMOVE( &guts.peventq, pe, peventq_link);
-      }
-      if ( stage == csNormal)
-         apc_message( pe-> recipient, &pe-> event, false);
-      if ( stage != csConstructing) {
-         free( pe);
-      }
-      pe = next;
-   }
 }
 
 Bool

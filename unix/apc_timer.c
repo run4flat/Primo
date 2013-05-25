@@ -31,32 +31,11 @@
 static void
 inactivate_timer( PTimerSysData sys)
 {
-   if ( sys-> older || sys-> younger || guts. oldest == sys) {
-      if ( sys-> older) {
-	 sys-> older-> younger = sys-> younger;
-      } else {
-	 guts. oldest = sys-> younger;
-      }
-      if ( sys-> younger)
-	 sys-> younger-> older = sys-> older;
-   }
-   sys-> older = nil;
-   sys-> younger = nil;
 }
 
 static void
 fetch_sys_timer( Handle self, PTimerSysData *s, Bool *real_timer)
 {
-   if ( self == 0) {
-      *s = nil;
-      *real_timer = false;
-   } else if ( self >= FIRST_SYS_TIMER && self <= LAST_SYS_TIMER) {
-      *s = &guts. sys_timers[ self - FIRST_SYS_TIMER];
-      *real_timer = false;
-   } else {
-      *s = ((PTimerSysData)(PComponent((self))-> sysData));
-      *real_timer = true;
-   }
 }
 
 #define ENTERTIMER \

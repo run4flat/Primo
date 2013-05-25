@@ -252,142 +252,16 @@ apc_component_fullname_changed_notify( Handle self)
 void
 prima_no_cursor( Handle self)
 {
-   if ( self && guts.focused == self && X(self)
-	&& !(XF_IN_PAINT(X(self)))
-	&& X(self)-> flags. cursor_visible
-	&& guts. cursor_save)
-   {
-      DEFXX;
-      int x, y, w, h;
-
-      h = XX-> cursor_size. y;
-      y = XX-> size. y - (h + XX-> cursor_pos. y);
-      x = XX-> cursor_pos. x;
-      w = XX-> cursor_size. x;
-
-      prima_get_gc( XX);
-      XChangeGC( DISP, XX-> gc, VIRGIN_GC_MASK, &guts. cursor_gcv);
-      XCHECKPOINT;
-      XCopyArea( DISP, guts. cursor_save, XX-> udrawable, XX-> gc,
-		 0, 0, w, h, x, y);
-      XCHECKPOINT;
-      prima_release_gc( XX);
-      guts. cursor_shown = false;
-   }
 }
 
 void
 prima_update_cursor( Handle self)
 {
-   if (
-   	guts.focused == self
-	&& !(XF_IN_PAINT(X(self)))
-   ) {
-      DEFXX;
-      int x, y, w, h;
-
-      h = XX-> cursor_size. y;
-      y = XX-> size. y - (h + XX-> cursor_pos. y);
-      x = XX-> cursor_pos. x;
-      w = XX-> cursor_size. x;
-
-      if ( !guts. cursor_save || !guts. cursor_xor
-	   || w > guts. cursor_pixmap_size. x
-	   || h > guts. cursor_pixmap_size. y)
-      {
-	 if ( !guts. cursor_save) {
-	    guts. cursor_gcv. background = 0;
-	    guts. cursor_gcv. foreground = 0xffffffff;
-	 }
-	 if ( guts. cursor_save) {
-	    XFreePixmap( DISP, guts. cursor_save);
-	    guts. cursor_save = 0;
-	 }
-	 if ( guts. cursor_xor) {
-	    XFreePixmap( DISP, guts. cursor_xor);
-	    guts. cursor_xor = 0;
-	 }
-	 if ( guts. cursor_pixmap_size. x < w)
-	    guts. cursor_pixmap_size. x = w;
-	 if ( guts. cursor_pixmap_size. y < h)
-	    guts. cursor_pixmap_size. y = h;
-	 if ( guts. cursor_pixmap_size. x < 16)
-	    guts. cursor_pixmap_size. x = 16;
-	 if ( guts. cursor_pixmap_size. y < 64)
-	    guts. cursor_pixmap_size. y = 64;
-	 guts. cursor_save = XCreatePixmap( DISP, XX-> udrawable,
-					    guts. cursor_pixmap_size. x,
-					    guts. cursor_pixmap_size. y,
-					    guts. depth);
-	 guts. cursor_xor  = XCreatePixmap( DISP, XX-> udrawable,
-					    guts. cursor_pixmap_size. x,
-					    guts. cursor_pixmap_size. y,
-					    guts. depth);
-      }
-
-      prima_get_gc( XX);
-      XChangeGC( DISP, XX-> gc, VIRGIN_GC_MASK, &guts. cursor_gcv);
-      XCHECKPOINT;
-      XCopyArea( DISP, XX-> udrawable, guts. cursor_save, XX-> gc,
-		 x, y, w, h, 0, 0);
-      XCHECKPOINT;
-      XCopyArea( DISP, guts. cursor_save, guts. cursor_xor, XX-> gc,
-		 0, 0, w, h, 0, 0);
-      XCHECKPOINT;
-      XSetFunction( DISP, XX-> gc, GXxor);
-      XCHECKPOINT;
-      XFillRectangle( DISP, guts. cursor_xor, XX-> gc, 0, 0, w, h);
-      XCHECKPOINT;
-      prima_release_gc( XX);
-
-      if ( XX-> flags. cursor_visible) {
-	 guts. cursor_shown = false;
-	 prima_cursor_tick();
-      } else {
-	 apc_timer_stop( CURSOR_TIMER);
-      }
-   }
 }
 
 void
 prima_cursor_tick( void)
 {
-   if (
-   	guts. focused && 
-	X(guts. focused)-> flags. cursor_visible &&
-	!(XF_IN_PAINT(X(guts. focused)))
-   ) {
-      PDrawableSysData selfxx = X(guts. focused);
-      Pixmap pixmap;
-      int x, y, w, h;
-
-      if ( guts. cursor_shown) {
-	 guts. cursor_shown = false;
-	 apc_timer_set_timeout( CURSOR_TIMER, guts. invisible_timeout);
-	 pixmap = guts. cursor_save;
-      } else {
-	 guts. cursor_shown = true;
-	 apc_timer_set_timeout( CURSOR_TIMER, guts. visible_timeout);
-	 pixmap = guts. cursor_xor;
-      }
-
-      h = XX-> cursor_size. y;
-      y = XX-> size. y - (h + XX-> cursor_pos. y);
-      x = XX-> cursor_pos. x;
-      w = XX-> cursor_size. x;
-
-      prima_get_gc( XX);
-      XChangeGC( DISP, XX-> gc, VIRGIN_GC_MASK, &guts. cursor_gcv);
-      XCHECKPOINT;
-      XCopyArea( DISP, pixmap, XX-> udrawable, XX-> gc, 0, 0, w, h, x, y);
-      XCHECKPOINT;
-      prima_release_gc( XX);
-      XFlush( DISP);
-      XCHECKPOINT;
-   } else {
-      apc_timer_stop( CURSOR_TIMER);
-      guts. cursor_shown = !guts. cursor_shown;
-   }
 }
 
 Bool
@@ -431,32 +305,6 @@ apc_cursor_get_visible( Handle self)
 void
 prima_rebuild_watchers( void)
 {
-   int i;
-   PFile f;
-
-   FD_ZERO( &guts.read_set);
-   FD_ZERO( &guts.write_set);
-   FD_ZERO( &guts.excpt_set);
-   FD_SET( guts.connection, &guts.read_set);
-   guts.max_fd = guts.connection;
-   for ( i = 0; i < guts.files->count; i++) {
-      f = (PFile)list_at( guts.files,i);
-      if ( f-> eventMask & feRead) {
-	 FD_SET( f->fd, &guts.read_set);
-	 if ( f->fd > guts.max_fd)
-	    guts.max_fd = f->fd;
-      }
-      if ( f-> eventMask & feWrite) {
-	 FD_SET( f->fd, &guts.write_set);
-	 if ( f->fd > guts.max_fd)
-	    guts.max_fd = f->fd;
-      }
-      if ( f-> eventMask & feException) {
-	 FD_SET( f->fd, &guts.excpt_set);
-	 if ( f->fd > guts.max_fd)
-	    guts.max_fd = f->fd;
-      }
-   }
 }
 
 Bool
@@ -506,141 +354,12 @@ apc_message( Handle self, PEvent e, Bool is_post)
 static void 
 close_msgdlg( struct MsgDlg * md)
 {
-   md-> active  = false;
-   md-> pressed = false;
-   if ( md-> grab) 
-      XUngrabPointer( DISP, CurrentTime);
-   md-> grab    = false;
-   XUnmapWindow( DISP, md-> w);
-   XFlush( DISP);
-   if ( md-> next == nil) {
-      XSetInputFocus( DISP, md-> focus, md-> focus_revertTo, CurrentTime);
-      XCHECKPOINT;
-   }   
-}   
+}
 
 void
 prima_msgdlg_event( XEvent * ev, struct MsgDlg * md)
 {
-   XWindow w = ev-> xany. window;
-   switch ( ev-> type) {
-   case ConfigureNotify:
-      md-> winSz. x = ev-> xconfigure. width;
-      md-> winSz. y = ev-> xconfigure. height;
-      break;   
-   case Expose:
-      {
-         int i, y = md-> textPos. y;
-         int d = md-> pressed ? 2 : 0;
-         XSetForeground( DISP, md-> gc, md-> bg. primary); 
-         if ( md-> bg. balance > 0) {
-            Pixmap p = prima_get_hatch( &guts. ditherPatterns[ md-> bg. balance]);
-            if ( p) {
-               XSetStipple( DISP, md-> gc, p);
-               XSetFillStyle( DISP, md-> gc, FillOpaqueStippled);
-               XSetBackground( DISP, md-> gc, md-> bg. secondary);
-            } 
-         } 
-         XFillRectangle( DISP, w, md-> gc, 0, 0, md-> winSz.x, md-> winSz.y);
-         if ( md-> bg. balance > 0) 
-            XSetFillStyle( DISP, md-> gc, FillSolid);
-         XSetForeground( DISP, md-> gc, md-> fg); 
-         for ( i = 0; i < md-> wrappedCount; i++) {
-            if ( md-> wide)
-               XDrawString16( DISP, w, md-> gc, 
-                 ( md-> winSz.x - md-> widths[i]) / 2, y, 
-                   ( XChar2b*) md-> wrapped[i], md-> lengths[i]);
-            else
-               XDrawString( DISP, w, md-> gc, 
-                 ( md-> winSz.x - md-> widths[i]) / 2, y, 
-                   md-> wrapped[i], md-> lengths[i]);
-            y += md-> font-> height + md-> font-> externalLeading;
-         }   
-         XDrawRectangle( DISP, w, md-> gc, 
-            md-> btnPos.x-1, md-> btnPos.y-1, md-> btnSz.x+2, md-> btnSz.y+2);
-         XDrawString( DISP, w, md-> gc, 
-            md-> btnPos.x + ( md-> btnSz.x - md-> OKwidth) / 2 + d,
-            md-> btnPos.y + md-> font-> height + md-> font-> externalLeading +
-              ( md-> btnSz.y - md-> font-> height - md-> font-> externalLeading) / 2 - 2 + d,
-            "OK", 2);
-         XSetForeground( DISP, md-> gc, 
-            md-> pressed ? md-> d3d : md-> l3d); 
-         XDrawLine( DISP, w, md-> gc,
-            md-> btnPos.x, md-> btnPos.y + md-> btnSz.y - 1, 
-            md-> btnPos.x, md-> btnPos. y);
-         XDrawLine( DISP, w, md-> gc,
-            md-> btnPos.x + 1, md-> btnPos. y,
-            md-> btnPos.x + md-> btnSz.x - 1, md-> btnPos. y);
-         XSetForeground( DISP, md-> gc, 
-            md-> pressed ? md-> l3d : md-> d3d); 
-         XDrawLine( DISP, w, md-> gc,
-            md-> btnPos.x, md-> btnPos.y + md-> btnSz.y, 
-            md-> btnPos.x + md-> btnSz.x, md-> btnPos.y + md-> btnSz.y);
-         XDrawLine( DISP, w, md-> gc,
-            md-> btnPos.x + md-> btnSz.x, md-> btnPos.y + md-> btnSz.y - 1,
-            md-> btnPos.x + md-> btnSz.x, md-> btnPos.y + 1);
-      }
-      break;
-   case ButtonPress:
-      if ( !md-> grab && 
-         ( ev-> xbutton. button == Button1) &&
-         ( ev-> xbutton. x >= md-> btnPos. x ) &&
-         ( ev-> xbutton. x < md-> btnPos. x + md-> btnSz.x) &&
-         ( ev-> xbutton. y >= md-> btnPos. y ) &&
-         ( ev-> xbutton. y < md-> btnPos. y + md-> btnSz.y)) {
-         md-> pressed = true;
-         md-> grab = true;
-         XClearArea( DISP, w, md-> btnPos.x, md-> btnPos.y,
-             md-> btnSz.x, md-> btnSz.y, true); 
-         XGrabPointer( DISP, w, false, 
-             ButtonReleaseMask | PointerMotionMask | ButtonMotionMask,
-	     GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
-      }   
-      break;   
-   case MotionNotify:
-      if ( md-> grab) {
-         Bool np = 
-           (( ev-> xmotion. x >= md-> btnPos. x ) &&
-            ( ev-> xmotion. x < md-> btnPos. x + md-> btnSz.x) &&
-            ( ev-> xmotion. y >= md-> btnPos. y ) &&
-            ( ev-> xmotion. y < md-> btnPos. y + md-> btnSz.y));
-         if ( np != md-> pressed) {
-            md-> pressed = np;
-            XClearArea( DISP, w, md-> btnPos.x, md-> btnPos.y,
-                md-> btnSz.x, md-> btnSz.y, true); 
-         }
-      }      
-      break;
-   case KeyPress:
-      {
-         char str_buf[256];
-         KeySym keysym;
-         int str_len = XLookupString( &ev-> xkey, str_buf, 256, &keysym, nil);
-         if (
-              ( keysym == XK_Return) ||
-              ( keysym == XK_Escape) ||
-              ( keysym == XK_KP_Enter) ||
-              ( keysym == XK_KP_Space) ||
-              (( str_len == 1) && ( str_buf[0] == ' '))
-            ) 
-            close_msgdlg( md);
-      }   
-      break;   
-   case ButtonRelease:
-      if ( md-> grab && 
-         ( ev-> xbutton. button == Button1)) {
-         md-> grab = false;
-         XUngrabPointer( DISP, CurrentTime);
-         if ( md-> pressed) close_msgdlg( md);
-      }   
-      break;
-   case ClientMessage:
-      if (( ev-> xclient. message_type == WM_PROTOCOLS) &&
-         (( Atom) ev-> xclient. data. l[0] == WM_DELETE_WINDOW)) 
-         close_msgdlg( md);
-      break;   
-   }
-}   
+}
      
 extern char ** Drawable_do_text_wrap( Handle, TextWrapRec *);
 
@@ -882,68 +601,17 @@ apc_getdir( const char *dirname)
 void
 prima_rect_union( XRectangle *t, const XRectangle *s)
 {
-   XRectangle r;
-
-   if ( t-> x < s-> x) r. x = t-> x; else r. x = s-> x;
-   if ( t-> y < s-> y) r. y = t-> y; else r. y = s-> y;
-   if ( t-> x + t-> width > s-> x + s-> width)
-      r. width = t-> x + t-> width - r. x;
-   else
-      r. width = s-> x + s-> width - r. x;
-   if ( t-> y + t-> height > s-> y + s-> height)
-      r. height = t-> y + t-> height - r. y;
-   else
-      r. height = s-> y + s-> height - r. y;
-   *t = r;
 }
 
 void
 prima_rect_intersect( XRectangle *t, const XRectangle *s)
 {
-   XRectangle r;
-   int w, h;
-
-   if ( t-> x > s-> x) r. x = t-> x; else r. x = s-> x;
-   if ( t-> y > s-> y) r. y = t-> y; else r. y = s-> y;
-   if ( t-> x + t-> width < s-> x + s-> width)
-      w = t-> x + (int)t-> width - r. x;
-   else
-      w = s-> x + (int)s-> width - r. x;
-   if ( t-> y + t-> height < s-> y + s-> height)
-      h = t-> y + (int)t-> height - r. y;
-   else
-      h = s-> y + (int)s-> height - r. y;
-   if ( w < 0 || h < 0) {
-      r. x = 0; r. y = 0; r. width = 0; r. height = 0;
-   } else {
-      r. width = w; r. height = h;
-   }
-   *t = r;
 }
 
 
 void
 prima_utf8_to_wchar( const char * utf8, XChar2b * u16, int src_len_bytes, int target_len_xchars )
 {
-   STRLEN charlen;
-   while ( target_len_xchars--) {
-      register UV u = (
-#if PERL_PATCHLEVEL >= 16
-         utf8_to_uvchr_buf(( U8*) utf8, ( U8*)(utf8 + src_len_bytes), &charlen)
-#else
-         utf8_to_uvchr(( U8*) utf8, &charlen)
-#endif
-      );
-      if ( u < 0x10000) {
-         u16-> byte1 = u >> 8;
-         u16-> byte2 = u & 0xff;
-      } else 
-         u16-> byte1 = u16-> byte2 = 0xff;
-      u16++;
-      utf8 += charlen;
-      src_len_bytes -= charlen;
-      if ( src_len_bytes <= 0 || charlen == 0) break;
-   }
 }
 
 XChar2b *
@@ -959,27 +627,11 @@ prima_alloc_utf8_to_wchar( const char * utf8, int length_chars)
 void 
 prima_wchar2char( char * dest, XChar2b * src, int lim)
 {
-   if ( lim < 1) return;
-   while ( lim-- && src-> byte1 && src-> byte2) *(dest++) = (src++)-> byte2;
-   if ( lim < 0) dest--;
-   *dest = 0;
 }
 
 void 
 prima_char2wchar( XChar2b * dest, char * src, int lim)
 {
-   int l = strlen( src) + 1;
-   if ( lim < 1) return;
-   if ( lim > l) lim = l;
-   src  += lim - 2;
-   dest += lim - 1;
-   dest-> byte1 = dest-> byte2 = 0;
-   dest--;
-   while ( lim--) {
-      dest-> byte2 = *(src--);
-      dest-> byte1 = 0;
-      dest--;
-   }
 }
 
 char *

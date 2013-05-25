@@ -149,116 +149,11 @@ XRenderFindDisplay (Display *dpy);
 void
 prima_xft_init(void)
 {
-   CharSetInfo *csi;
-   int i;
-   FcCharSet * fcs_ascii;
-#ifdef HAVE_ICONV_H
-   iconv_t ii;
-   unsigned char in[128], *iptr;
-   char ucs4[12];
-   size_t ibl, obl;
-   uint32_t *optr;
-   int j;
-#endif  
-
-#ifdef NEED_X11_EXTENSIONS_XRENDER_H
-   { /* snatch error code from xrender guts */
-      XExtDisplayInfo *info = XRenderFindDisplay( DISP);
-      if ( info && info-> codes)
-         guts. xft_xrender_major_opcode = info-> codes-> major_opcode;
-   }
-#endif   
-
-   if ( !apc_fetch_resource( "Prima", "", "UseXFT", "usexft", 
-                              nilHandle, frUnix_int, &guts. use_xft))
-      guts. use_xft = 1;
-   if ( guts. use_xft) {
-      if ( !XftInit(0)) guts. use_xft = 0;
-   }
-   /* After this point guts.use_xft must never be altered */
-   if ( !guts. use_xft) return;
-   Fdebug("XFT ok\n");
-
-   csi = std_charsets;
-   fcs_ascii = FcCharSetCreate();
-   for ( i = 32; i < 127; i++)  FcCharSetAddChar( fcs_ascii, i);
-
-
-   std_charsets[0]. fcs = FcCharSetUnion( fcs_ascii, fcs_ascii);
-   for ( i = 161; i < 255; i++) FcCharSetAddChar( std_charsets[0]. fcs, i);
-   for ( i = 128; i < 255; i++) std_charsets[0]. map[i - 128] = i;
-   std_charsets[0]. glyphs = ( 127 - 32) + ( 255 - 161);
-      
-#ifdef HAVE_ICONV_H
-   sprintf( ucs4, "UCS-4%cE", (guts.machine_byte_order == LSBFirst) ? 'L' : 'B');
-   for ( i = 1; i < MAX_CHARSET; i++) {
-      memset( std_charsets[i]. map, 0, sizeof(std_charsets[i]. map));
-
-      ii = iconv_open(ucs4, std_charsets[i]. name);
-      if ( ii == (iconv_t)(-1)) continue;
-
-      std_charsets[i]. fcs = FcCharSetUnion( fcs_ascii, fcs_ascii);
-      for ( j = 0; j < 128; j++) in[j] = j + 128;
-      iptr = in;
-      optr = std_charsets[i]. map;
-      ibl = 128;
-      obl = 128 * sizeof( uint32_t);
-      while ( 1 ) {
-         int ret = iconv( ii, ( char **) &iptr, &ibl, ( char **) &optr, &obl);
-         if ( ret < 0 && errno == EILSEQ) {
-            iptr++;
-            optr++;
-            ibl--;
-            obl -= sizeof(uint32_t);
-            continue;
-         }
-         break;
-      }
-      iconv_close(ii);
-
-      optr = std_charsets[i]. map - 128;
-      std_charsets[i]. glyphs = 127 - 32;
-      for ( j = (( i == KOI8_INDEX) ? 191 : 161); j < 256; j++) 
-         /* koi8 hack - 161-190 are pseudo-graphic symbols, not really characters,
-            so don't use them for font matching by a charset */
-         if ( optr[j]) {
-            FcCharSetAddChar( std_charsets[i]. fcs, optr[j]);
-            std_charsets[i]. glyphs++;
-         }
-      if ( std_charsets[i]. glyphs > 127 - 32) 
-         std_charsets[i]. enabled = true;
-   }
-#endif
-
-   mismatch     = hash_create();
-   encodings    = hash_create();
-   for ( i = 0; i < MAX_CHARSET; i++) {
-      int length = 0;
-      char upcase[256], *dest = upcase, *src = std_charsets[i].name;
-      if ( !std_charsets[i]. enabled) continue;
-      while ( *src) {
-         *dest++ = toupper(*src++);
-         length++;
-      }
-      hash_store( encodings, upcase, length, (void*) (std_charsets + i));
-      hash_store( encodings, std_charsets[i]. name, length, (void*) (std_charsets + i));
-   }
- 
-   locale = hash_fetch( encodings, guts. locale, strlen( guts.locale));
-   if ( !locale) locale = std_charsets;
-   FcCharSetDestroy( fcs_ascii);
 }
 
 void
 prima_xft_done(void)
 {
-   int i;
-   if ( !guts. use_xft) return;
-   for ( i = 0; i < MAX_CHARSET; i++)
-      if ( std_charsets[i]. fcs)
-         FcCharSetDestroy( std_charsets[i]. fcs);
-   hash_destroy( encodings, false);
-   hash_destroy( mismatch, false);
 }
 
 static unsigned short
@@ -277,104 +172,11 @@ utf8_flag_strncpy( char * dst, const char * src, unsigned int maxlen, unsigned s
 static void
 fcpattern2font( FcPattern * pattern, PFont font)
 {
-   FcChar8 * s;
-   int i, j;
-   double d = 1.0;
-   FcCharSet *c = nil;
-
-   /* FcPatternPrint( pattern); */
-   if ( FcPatternGetString( pattern, FC_FAMILY, 0, &s) == FcResultMatch)
-      font-> utf8_flags |= utf8_flag_strncpy( font-> name, (char*)s, 255, FONT_UTF8_NAME);
-   if ( FcPatternGetString( pattern, FC_FOUNDRY, 0, &s) == FcResultMatch)
-      font-> utf8_flags |= utf8_flag_strncpy( font-> family, (char*)s, 255, FONT_UTF8_FAMILY);
-   font-> style = 0;
-   if ( FcPatternGetInteger( pattern, FC_SLANT, 0, &i) == FcResultMatch) 
-      if ( i == FC_SLANT_ITALIC || i == FC_SLANT_OBLIQUE)
-         font-> style |= fsItalic;
-   if ( FcPatternGetInteger( pattern, FC_WEIGHT, 0, &i) == FcResultMatch) {
-      if ( i <= FC_WEIGHT_LIGHT)
-         font-> style |= fsThin;
-      else if ( i >= FC_WEIGHT_BOLD)
-         font-> style |= fsBold;
-   }
-   if ( FcPatternGetInteger( pattern, FC_SPACING, 0, &i) == FcResultMatch)
-      font-> pitch = (( i == FC_PROPORTIONAL) ? fpVariable : fpFixed);
-
-   if ( FcPatternGetInteger( pattern, FC_PIXEL_SIZE, 0, &font-> height) == FcResultMatch) {
-       Fdebug("xft:height factor read:%d\n", font-> height);
-   }
-   font-> width = 100; /* warning, FC_WIDTH does not reflect FC_MATRIX scale changes */
-   if ( FcPatternGetInteger( pattern, FC_WIDTH, 0, &font-> width) == FcResultMatch) {
-       Fdebug("xft:width factor read:%d\n", font-> width);
-   }
-   font-> width = ( font-> width * font-> height) / 100.0 + .5;
-   font-> yDeviceRes = guts. resolution. y;
-   FcPatternGetInteger( pattern, FC_DPI, 0, &font-> yDeviceRes);
-   if ( font-> yDeviceRes <= 0)
-      font-> yDeviceRes = guts. resolution. y;
-   FcPatternGetBool( pattern, FC_SCALABLE, 0, &font-> vector);
-   FcPatternGetDouble( pattern, FC_ASPECT, 0, &d);
-   font-> xDeviceRes = font-> yDeviceRes * d;
-   if ( 
-         (FcPatternGetInteger( pattern, FC_SIZE, 0, &font-> size) != FcResultMatch) &&
-         (font-> height != C_NUMERIC_UNDEF)
-      ) {
-      font-> size = font-> height * 72.27 / font-> yDeviceRes + .5;
-      Fdebug("xft:size calculated:%d\n", font-> size);
-   }
-
-   font-> firstChar = 32; font-> lastChar = 255;
-   font-> breakChar = 32; font-> defaultChar = 32;
-   if (( FcPatternGetCharSet( pattern, FC_CHARSET, 0, &c) == FcResultMatch) && c) {
-      FcChar32 ucs4, next, map[FC_CHARSET_MAP_SIZE];
-      if (( ucs4 = FcCharSetFirstPage( c, map, &next)) != FC_CHARSET_DONE) {
-         for (i = 0; i < FC_CHARSET_MAP_SIZE; i++) 
-            if ( map[i] ) {
-               for (j = 0; j < 32; j++)
-                  if (map[i] & (1 << j)) {
-                      FcChar32 u = ucs4 + i * 32 + j;
-                      font-> firstChar = u;
-                      if ( font-> breakChar   < u) font-> breakChar   = u;
-                      if ( font-> defaultChar < u) font-> defaultChar = u;
-                      goto STOP_1;
-                  }
-            }
-STOP_1:;
-         while ( next != FC_CHARSET_DONE)
-            ucs4 = FcCharSetNextPage (c, map, &next);
-         for (i = FC_CHARSET_MAP_SIZE - 1; i >= 0; i--) 
-            if ( map[i] ) {
-               for (j = 31; j >= 0; j--)
-                  if (map[i] & (1 << j)) {
-                      FcChar32 u = ucs4 + i * 32 + j;
-                      font-> lastChar = u;
-                      if ( font-> breakChar   > u) font-> breakChar   = u;
-                      if ( font-> defaultChar > u) font-> defaultChar = u;
-                      goto STOP_2;
-                  }
-            }
-STOP_2:;
-      }
-   }
-   
-   /* XXX other details? */
-   font-> descent = font-> height / 4;
-   font-> ascent  = font-> height - font-> descent;
-   font-> maximalWidth = font-> width;
-   font-> internalLeading = 0;
-   font-> externalLeading = 0;
 }
 
 static void
 xft_build_font_key( PFontKey key, PFont f, Bool bySize)
 {
-   bzero( key, sizeof( FontKey));
-   key-> height = bySize ? -f-> size : f-> height;
-   key-> width = f-> width;
-   key-> style = f-> style & ~(fsUnderlined|fsOutline|fsStruckOut);
-   key-> pitch = f-> pitch;
-   key-> direction = f-> direction;
-   strcpy( key-> name, f-> name);
 }
 
 static PCachedFont
@@ -535,11 +337,6 @@ prima_xft_fonts( PFont array, const char *facename, const char * encoding, int *
 void
 prima_xft_font_encodings( PHash hash)
 {
-   int i;
-   for ( i = 0; i < MAX_CHARSET; i++) {
-      if ( !std_charsets[i]. enabled) continue;
-      hash_store( hash, std_charsets[i]. name, strlen(std_charsets[i]. name), (void*) (std_charsets + i));
-   }
 }
    
 static FcChar32 *
@@ -646,39 +443,6 @@ my_XftDrawString32( PDrawableSysData selfxx,
 	_Xconst XftColor *color, int x, int y,
 	_Xconst FcChar32 *string, int len)
 {
-	int i, lastchar, lx, ly, ox, oy, shift;
-	if ( XX-> font-> font. direction == 0) {
-		XftDrawString32( XX-> xft_drawable, color, XX-> font-> xft, x, y, string, len);
-		return;
-	}
-	lx = ox = x;
-	ly = oy = y;
-	lastchar = 0;
-	shift = 0;
-	for ( i = 0; i < len; i++) {
-		int cx, cy;
-		FT_UInt ft_index;
-		XGlyphInfo glyph;
-		ft_index = XftCharIndex( DISP, XX-> font-> xft, string[i]);
-		XftGlyphExtents( DISP, XX-> font-> xft, &ft_index, 1, &glyph);
-		lx += glyph. xOff;
-		ly += glyph. yOff;
-		XftGlyphExtents( DISP, XX-> font-> xft_base, &ft_index, 1, &glyph);
-		shift += glyph. xOff;
-		cx = ox + (int)(shift * XX-> xft_font_cos + 0.5);
-		cy = oy - (int)(shift * XX-> xft_font_sin + 0.5);
-		if ( cx == lx && cy == ly) continue;
-
-		XftDrawString32( XX-> xft_drawable, color, XX-> font-> xft, 
-			x, y, string + lastchar, i - lastchar + 1);
-		lastchar = i + 1;
-		x = lx = cx;
-		y = ly = cy;
-	}
-
-	if ( lastchar < len)
-		XftDrawString32( XX-> xft_drawable, color, XX-> font-> xft, 
-			x, y, string + lastchar, len - lastchar);
 }
 
 Bool
@@ -790,11 +554,6 @@ prima_xft_parse( char * ppFontNameSize, Font * font)
 void
 prima_xft_update_region( Handle self)
 {
-   DEFXX;
-   if ( XX-> xft_drawable) {
-      XftDrawSetClip( XX-> xft_drawable, XX-> current_region);
-      XX-> flags. xft_clip = 1;
-   }
 }
 
 #else

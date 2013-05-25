@@ -189,13 +189,6 @@ normal_way:
 void
 prima_XDestroyImage( XImage * i)
 {
-   if ( i) {
-      if ( i-> data) {
-         free( i-> data);
-         i-> data = nil;
-      }
-      ((*((i)->f.destroy_image))((i)));
-   }
 }
 
 Bool
@@ -219,29 +212,11 @@ destroy_one_ximage( PrimaXImage *i, int nothing1, void *nothing2, void *nothing3
 void
 prima_gc_ximages( void )
 {
-   if ( !guts.ximages) return;
-   hash_first_that( guts.ximages, (void*)destroy_one_ximage, nil, nil, nil);
 }
 
 void
 prima_ximage_event( XEvent *eve) /* to be called from apc_event's handle_event */
 {
-#ifdef USE_MITSHM
-   XShmCompletionEvent *ev = (XShmCompletionEvent*)eve;
-   PrimaXImage *i;
-
-   if ( eve && eve-> type == guts. shared_image_completion_event) {
-      i = hash_fetch( guts.ximages, (void*)&ev->shmseg, sizeof(ev->shmseg));
-      if ( i) {
-         i-> ref_cnt--;
-         if ( i-> ref_cnt <= 0) {
-            hash_delete( guts.ximages, (void*)&ev->shmseg, sizeof(ev->shmseg), false);
-            if ( i-> can_free)
-               prima_free_ximage( i);
-         }
-      }
-   }
-#endif
 }
 
 void
@@ -249,28 +224,6 @@ prima_put_ximage(
 	XDrawable win, GC gc, PrimaXImage *i, 
 	int src_x, int src_y, int dst_x, int dst_y, int width, int height
 ) {
-   if ( src_x < 0) {
-      width += src_x;
-      dst_x -= src_x;
-      src_x = 0;
-      if ( width <= 0) return;
-   }
-#ifdef USE_MITSHM
-   if ( i-> shm) {
-      if ( src_y + height > i-> image-> height)
-         height = i-> image-> height - src_y;
-      if ( i-> ref_cnt < 0)
-         i-> ref_cnt = 0;
-      i-> ref_cnt++;
-      if ( i-> ref_cnt == 1)
-         hash_store( guts.ximages, &i->xmem.shmseg, sizeof(i->xmem.shmseg), i);
-      XShmPutImage( DISP, win, gc, i-> image, src_x, src_y, dst_x, dst_y, width, height, true);
-      XFlush(DISP);
-      return;
-   }
-#endif
-   XPutImage( DISP, win, gc, i-> image, src_x, src_y, dst_x, dst_y, width, height);
-   XCHECKPOINT;
 }
 
 
@@ -284,13 +237,6 @@ apc_image_create( Handle self)
 static void
 clear_caches( Handle self)
 {
-   DEFXX;
-
-   prima_palette_free( self, false);
-   destroy_ximage( XX-> image_cache. icon);
-   destroy_ximage( XX-> image_cache. image);
-   XX-> image_cache. icon      = nil;
-   XX-> image_cache. image     = nil;
 }
 
 Bool
@@ -369,36 +315,11 @@ mirror_bits( void)
 void
 prima_copy_xybitmap( unsigned char *data, const unsigned char *idata, int w, int h, int ls, int ils)
 {
-   int y;
-   register int x;
-   Byte *mirrored_bits;
-
-   /* XXX: MSB/LSB */
-   if ( guts.bit_order == MSBFirst) {
-      for ( y = h-1; y >= 0; y--) {
-	 memcpy( ls*(h-y-1)+data, idata+y*ils, ls);
-      }
-   } else {
-      mirrored_bits = mirror_bits();
-      w = ( w + 7) / 8;
-      for ( y = h-1; y >= 0; y--) {
-	 register const unsigned char *s = idata+y*ils;
-	 register unsigned char *t = ls*(h-y-1)+data;
-	 for ( x = 0; x < w; x++) {
-	    *t++ = mirrored_bits[*s++];
-	 }
-      }
-   }
 }
 
 void
 prima_mirror_bytes( unsigned char *data, int dataSize)
 {
-   Byte *mirrored_bits = mirror_bits();
-   while ( dataSize--) {
-      *data = mirrored_bits[*data];
-      data++;
-   }
 }
 
 static Bool
@@ -410,26 +331,11 @@ create_cache1_1( Image *img, ImageCache *cache, Bool for_icon)
 static void
 create_rgb_to_8_lut( int ncolors, const PRGBColor pal, Pixel8 *lut)
 {
-   int i;
-   for ( i = 0; i < ncolors; i++) 
-      lut[i] = 
-            (((pal[i].r << guts. red_range  ) >> 8) << guts.   red_shift) |
-            (((pal[i].g << guts. green_range) >> 8) << guts. green_shift) |
-            (((pal[i].b << guts. blue_range ) >> 8) << guts.  blue_shift);
 }
 
 static void
 create_rgb_to_16_lut( int ncolors, const PRGBColor pal, Pixel16 *lut)
 {
-   int i;
-   for ( i = 0; i < ncolors; i++) 
-      lut[i] = 
-            (((pal[i].r << guts. red_range  ) >> 8) << guts.   red_shift) |
-            (((pal[i].g << guts. green_range) >> 8) << guts. green_shift) |
-            (((pal[i].b << guts. blue_range ) >> 8) << guts.  blue_shift);
-   if ( guts.machine_byte_order != guts.byte_order) 
-      for ( i = 0; i < ncolors; i++) 
-         lut[i] = REVERSE_BYTES_16(lut[i]);
 }
 
 static int *
@@ -441,15 +347,6 @@ rank_rgb_shifts( void)
 static void
 create_rgb_to_xpixel_lut( int ncolors, const PRGBColor pal, XPixel *lut)
 {
-   int i;
-   for ( i = 0; i < ncolors; i++) 
-      lut[i] = 
-            (((pal[i].r << guts. red_range  ) >> 8) << guts.   red_shift) |
-            (((pal[i].g << guts. green_range) >> 8) << guts. green_shift) |
-            (((pal[i].b << guts. blue_range ) >> 8) << guts.  blue_shift);
-   if ( guts.machine_byte_order != guts.byte_order) 
-      for ( i = 0; i < ncolors; i++) 
-         lut[i] = REVERSE_BYTES_32(lut[i]);
 }
 
 static Bool
@@ -546,39 +443,16 @@ create_cache24( Image* img, ImageCache *cache, int bpp)
 static void
 cache_remap_8( Image*img, ImageCache* cache)
 {
-   int sz = img-> h * cache-> image-> bytes_per_line_alias;
-   Byte * p = cache-> image-> data_alias;
-   while ( sz--) {
-      *p = guts. mappingPlace[ *p];
-      p++;
-   }
 }
 
 static void
 cache_remap_4( Image*img, ImageCache* cache)
 {
-   int sz = img-> h * cache-> image-> bytes_per_line_alias;
-   Byte * p = cache-> image-> data_alias;
-   while ( sz--) {
-      *p = 
-         guts. mappingPlace[(*p) & 0xf] |
-        (guts. mappingPlace[((*p) & 0xf0) >> 4] << 4);
-      p++;
-   }
 }
 
 static void
 cache_remap_1( Image*img, ImageCache* cache)
 {
-   int sz = img-> h * cache-> image-> bytes_per_line_alias;
-   Byte * p = cache-> image-> data_alias;
-   if ( guts. mappingPlace[0] == guts. mappingPlace[1]) 
-      memset( p, (guts. mappingPlace[0] == 0) ? 0 : 0xff, sz);
-   else if ( guts. mappingPlace[0] != 0)  
-      while ( sz--) {
-         *p = ~(*p);
-         p++;
-      }
 }
 
 
@@ -750,126 +624,16 @@ apc_image_begin_paint( Handle self)
 static void
 convert_16_to_24( XImage *i, PImage img)
 {
-   int y, x, h, w;
-   Pixel16 *d;
-   register Pixel24 *line;
-
-   /*
-      Compensate less than 8-bit true-color memory layout depth converted into
-      real 8 bit, a bit slower but more error-prone in general sense. Although
-      Prima::gp-problems advises not to check against 0xffffff as white, since
-      white is 0xf8f8f8 on 15-bit displays for example, it is not practical to
-      use this check fro example when a RGB image is to be converted into a
-      low-palette image with RGB(0xff,0xff,0xff) expected and desirable palette
-      slot value.
-    */
-
-   int rmax = 0xff & ( 0xff << ( 8 - guts. red_range));
-   int gmax = 0xff & ( 0xff << ( 8 - guts. green_range));
-   int bmax = 0xff & ( 0xff << ( 8 - guts. blue_range));
-   if ( rmax == 0 ) rmax = 0xff;
-   if ( gmax == 0 ) gmax = 0xff;
-   if ( bmax == 0 ) bmax = 0xff;
-
-   h = img-> h; w = img-> w;
-   for ( y = 0; y < h; y++) {
-      d = (Pixel16 *)(i-> data + (h-y-1)*i-> bytes_per_line);
-      line = (Pixel24*)(img-> data + y*img-> lineSize);
-      if ( guts.machine_byte_order != guts.byte_order) {
-         for ( x = 0; x < w; x++) {
-            register Pixel16 dd = REVERSE_BYTES_16(*d);
-            line-> a0 = (((dd & guts. visual. blue_mask)  >> guts. blue_shift) << 8) >> guts. blue_range; 
-            line-> a1 = (((dd & guts. visual. green_mask) >> guts. green_shift) << 8) >> guts. green_range;
-            line-> a2 = (((dd & guts. visual. red_mask)   >> guts. red_shift) << 8) >> guts. red_range;
-            if ( line-> a0 == bmax) line-> a0 = 0xff;
-            if ( line-> a1 == gmax) line-> a1 = 0xff;
-            if ( line-> a2 == rmax) line-> a2 = 0xff;
-            line++; d++;
-         }
-      } else {
-         for ( x = 0; x < w; x++) {
-            line-> a0 = (((*d & guts. visual. blue_mask)  >> guts. blue_shift) << 8) >> guts. blue_range; 
-            line-> a1 = (((*d & guts. visual. green_mask) >> guts. green_shift) << 8) >> guts. green_range;
-            line-> a2 = (((*d & guts. visual. red_mask)   >> guts. red_shift) << 8) >> guts. red_range;
-            if ( line-> a0 == bmax) line-> a0 = 0xff;
-            if ( line-> a1 == gmax) line-> a1 = 0xff;
-            if ( line-> a2 == rmax) line-> a2 = 0xff;
-            line++; d++;
-         }
-      }
-   }
 }
 
 static void
 convert_32_to_24( XImage *i, PImage img)
 {
-   int y, x, h, w;
-   Pixel32 *d, dd;
-   Pixel24 *line;
-
-   h = img-> h; w = img-> w;
-   if ( guts.machine_byte_order != guts.byte_order) {
-      for ( y = 0; y < h; y++) {
-         d = (Pixel32 *)(i-> data + (h-y-1)*i-> bytes_per_line);
-         line = (Pixel24*)(img-> data + y*img-> lineSize);
-         for ( x = 0; x < w; x++) {
-            dd = REVERSE_BYTES_32(*d);
-            line-> a0 = (((dd & guts. visual. blue_mask)  >> guts. blue_shift) << 8) >> guts. blue_range; 
-            line-> a1 = (((dd & guts. visual. green_mask) >> guts. green_shift) << 8) >> guts. green_range;
-            line-> a2 = (((dd & guts. visual. red_mask)   >> guts. red_shift) << 8) >> guts. red_range;
-            d++; line++;
-         }
-      }
-   } else {
-      for ( y = 0; y < h; y++) {
-         d = (Pixel32 *)(i-> data + (h-y-1)*i-> bytes_per_line);
-         line = (Pixel24*)(img-> data + y*img-> lineSize);
-         for ( x = 0; x < w; x++) {
-            line-> a0 = (((*d & guts. visual. blue_mask)  >> guts. blue_shift) << 8) >> guts. blue_range; 
-            line-> a1 = (((*d & guts. visual. green_mask) >> guts. green_shift) << 8) >> guts. green_range;
-            line-> a2 = (((*d & guts. visual. red_mask)   >> guts. red_shift) << 8) >> guts. red_range;
-            d++; line++;
-         }
-      }
-   }
 }
 
 static void
 convert_equal_paletted( XImage *i, PImage img)
 {
-   int y, w, h;
-   Pixel8 *d, *line;
-   XColor xc[256];
-   
-   h = img-> h;
-   w = ( img-> lineSize < i-> bytes_per_line) ? img-> lineSize : i-> bytes_per_line;
-   d = ( Pixel8*)(i-> data + (h-1) * i-> bytes_per_line);
-   line = (Pixel8*)img-> data;
-   bzero( line, img-> dataSize);
-   for ( y = 0; y < h; y++) {
-      memcpy( line, d, img-> w);
-      d -= i-> bytes_per_line;
-      line += img-> lineSize;
-   }
-   for ( y = 0; y < 256; y++) guts. mappingPlace[y] = -1;
-   for ( y = 0; y < img-> dataSize; y++)
-      guts. mappingPlace[ img-> data[y]] = 0;
-   for ( y = 0; y < guts. palSize; y++) xc[y]. pixel = y;
-   XQueryColors( DISP, guts. defaultColormap, xc, guts. palSize);
-   
-/* XXX if ( guts. bit_order != MSBFirst) prima_mirror_bytes( img-> data, img-> dataSize); */
-
-   img-> palSize = 0;
-   for ( y = 0; y < 256; y++) 
-      if ( guts. mappingPlace[y] == 0) {
-         img-> palette[img-> palSize]. r = xc[y].red/256;
-         img-> palette[img-> palSize]. g = xc[y].green/256;
-         img-> palette[img-> palSize]. b = xc[y].blue/256;
-         guts. mappingPlace[y] = img-> palSize++;
-      }
-
-   for ( y = 0; y < img-> dataSize; y++)
-      img-> data[y] = guts. mappingPlace[ img-> data[y]]; 
 }
 
 Bool
@@ -965,112 +729,32 @@ static Byte clear_bits[ByteValues];
 
 static void mbs_init_bits(void)
 {
-   if ( !mbsInitialized) {
-      int i;
-      if ( guts.bit_order == MSBFirst) {
-         Byte * mirrored_bits = mirror_bits();
-         for ( i = 0; i < ByteValues; i++) {
-            set_bits[i]   = mirrored_bits[1 << (i%ByteBits)];
-            clear_bits[i] = ~mirrored_bits[(1 << (i%ByteBits))];
-         }
-      } else {
-         for ( i = 0; i < ByteValues; i++) {
-            set_bits[i]   = 1 << (i%ByteBits);
-            clear_bits[i] = ~(1 << (i%ByteBits));
-         }
-      }
-      mbsInitialized = true;
-   }   
-} 
+}
 
 static void 
 mbs_mono_in( Byte * srcData, Byte * dstData, Bool xreverse, 
     int targetwidth, Fixed step, Fixed count,int first, int last, int targetLineSize )
 {
-    int x   = xreverse ? targetwidth - 1 : 0;
-    int inc = xreverse ? -1 : 1;
-    if ( srcData[first/ByteBits] & set_bits[LOWER_BYTE(first)])
-       dstData[x/ByteBits] |= set_bits[LOWER_BYTE(x)];
-    else
-       dstData[x/ByteBits] &= clear_bits[LOWER_BYTE(x)];
-    
-    x += inc;
-    targetwidth--;
-    while ( targetwidth) {
-       if ( count.i.i > last) {
-           if ( srcData[first/ByteBits] & set_bits[LOWER_BYTE(first)])
-              dstData[x/ByteBits] |= set_bits[LOWER_BYTE(x)];
-           else
-              dstData[x/ByteBits] &= clear_bits[LOWER_BYTE(x)];
-           x += inc;
-           last = count.i.i;
-           targetwidth--;
-       }
-       count.l += step.l;
-       first++;
-    }
-}   
+}
 
 static void 
 mbs_mono_out( Byte * srcData, Byte * dstData, Bool xreverse,   
     int targetwidth, Fixed step, Fixed count,int first, int last, int targetLineSize)
 {                                                                       
-   int x   = xreverse ? ( targetwidth - 1) : 0;
-   int inc = xreverse ? -1 : 1;
-   while ( targetwidth) {
-      if ( count.i.i > last) {
-         first++;
-         last = count.i.i;
-      }
-      count.l += step.l;
-      if ( srcData[first/ByteBits] & set_bits[LOWER_BYTE(first)])
-         dstData[x/ByteBits] |= set_bits[LOWER_BYTE(x)];
-      else
-         dstData[x/ByteBits] &= clear_bits[LOWER_BYTE(x)];
-      x += inc;
-      targetwidth--;
-   }   
-}   
+}
 
 
 #define BS_BYTEEXPAND( type)                                                        \
 static void mbs_##type##_out( type * srcData, type * dstData, Bool xreverse,    \
     int targetwidth, Fixed step, Fixed count,int first, int last, int targetLineSize)\
 {                                                                       \
-   int x   = xreverse ? ( targetwidth - 1) : 0;                         \
-   int inc = xreverse ? -1 : 1;                                         \
-   while ( targetwidth) {                                               \
-      if ( count.i.i > last) {                                          \
-         first++;                                                       \
-         last = count.i.i;                                              \
-      }                                                                 \
-      count.l += step.l;                                                \
-      dstData[x] = srcData[first];                                      \
-      x += inc;                                                         \
-      targetwidth--;                                                    \
-   }                                                                    \
-}   
+}
 
 #define BS_BYTEIMPACT( type)                                                        \
 static void mbs_##type##_in( type * srcData, type * dstData, Bool xreverse,    \
     int targetwidth, Fixed step, Fixed count, int first, int last, int targetLineSize)    \
 {                                                                       \
-    int x   = xreverse ? targetwidth - 1 : 0;                           \
-    int inc = xreverse ? -1 : 1;                                        \
-    dstData[x] = srcData[first];                                        \
-    x += inc;                                                           \
-    targetwidth--;                                                      \
-    while ( targetwidth) {                                              \
-       if ( count.i.i > last) {                                         \
-           dstData[x] = srcData[first];                                 \
-           x += inc;                                                    \
-           last = count.i.i;                                            \
-           targetwidth--;                                               \
-       }                                                                \
-       count.l += step.l;                                               \
-       first++;                                                         \
-    }                                                                   \
-}   
+}
 
 BS_BYTEEXPAND( Pixel8)
 BS_BYTEEXPAND( Pixel16)
@@ -1086,8 +770,7 @@ BS_BYTEIMPACT( Pixel32)
 static void mbs_copy( Byte * srcData, Byte * dstData, Bool xreverse,  
     int targetwidth, Fixed step, Fixed count, int first, int last, int targetLineSize)
 {
-   memcpy( dstData, srcData, targetLineSize);
-}   
+}
 
 
 static void
@@ -1108,63 +791,6 @@ stretch_calculate_seed( int ssize, int tsize,
                         modification to the actual stretch routine
  */
 {
-   Fixed count;
-   Fixed step;
-   int last;
-   int asize;
-   int cstart;
-   int cend;
-   int s;
-   int t;
-   int dt;
-
-   count. l = 0;
-   s = 0;
-   asize  =  ABS(tsize);
-   cstart = *clipstart;
-   cend   =  cstart + *clipsize;
-   t      =  0;
-   dt     =  1;
-   if ( cstart < 0)          cstart = 0;
-   if ( cend > asize)        cend = asize;
-   
-   if ( asize < ssize) {
-      step. l = (double) asize / ssize * UINT16_PRECISION;
-      last    = -1;
-      while ( t != cend) {
-         if ( count.i.i > last) {
-            last = count.i.i;
-            if ( t == cstart) {
-               seed-> count  = count;
-               seed-> step   = step;
-               seed-> source = s;
-               seed-> last   = last;
-            }
-            t += dt;
-         }
-         count.l += step.l;
-         s++;
-      }
-   } else {
-      step. l = (double) ssize / asize * UINT16_PRECISION;
-      last    = 0;
-      while ( t != cend) {
-         if ( count.i.i > last) {
-            s++;
-            last = count.i.i;
-         }
-         if ( t == cstart) {
-            seed-> count  = count;
-            seed-> step   = step;
-            seed-> source = s;
-            seed-> last   = last;
-         }
-         count.l += step.l;
-         t += dt;
-      }
-   }
-   *clipstart = cstart;
-   *clipsize  = cend - cstart;
 }
 
 typedef void mStretchProc( void * srcData, void * dstData, Bool xreverse, 
