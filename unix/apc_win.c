@@ -193,19 +193,7 @@ apc_window_set_caption( Handle self, const char *caption, Bool utf8)
 XWindow
 prima_find_frame_window( XWindow w)
 {
-   XWindow r, p, *c;
-   unsigned int nc;
-
-   if ( w == None)
-      return None;
-   while ( XQueryTree( DISP, w, &r, &p, &c, &nc)) {
-      if (c)
-         XFree(c);
-      if ( p == r)
-         return w;
-      w = p;
-   }
-   return None;
+   XWindow foo; return foo;
 }
 
 Bool
