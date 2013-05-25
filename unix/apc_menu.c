@@ -47,11 +47,7 @@
 static PMenuWindow
 get_menu_window( Handle self, XWindow xw)
 {
-   DEFMM;
-   PMenuWindow w = XX-> w;
-   while (w && w->w != xw)
-      w = w->  next;
-   return w;
+   return nil;
 }
 
 extern Cursor predefined_cursors[];
@@ -59,64 +55,7 @@ extern Cursor predefined_cursors[];
 static PMenuWindow
 get_window( Handle self, PMenuItemReg m)
 {
-   DEFMM;
-   PMenuWindow w, wx;
-   XSetWindowAttributes attrs;
-   
-   if ( !( w = malloc( sizeof( MenuWindow)))) return nil;
-   bzero(w, sizeof( MenuWindow));
-   w-> self = self;
-   w-> m = m;
-   w-> sz.x = -1;
-   w-> sz.y = -1;
-   attrs. event_mask = 0
-      | KeyPressMask
-      | KeyReleaseMask
-      | ButtonPressMask
-      | ButtonReleaseMask
-      | EnterWindowMask
-      | LeaveWindowMask
-      | PointerMotionMask
-      | ButtonMotionMask
-      | KeymapStateMask
-      | ExposureMask
-      | VisibilityChangeMask
-      | StructureNotifyMask
-      | FocusChangeMask
-      | PropertyChangeMask
-      | ColormapChangeMask
-      | OwnerGrabButtonMask;
-   attrs. override_redirect = true;
-   attrs. save_under = true;
-   attrs. do_not_propagate_mask = attrs. event_mask;
-   w->w = XCreateWindow( DISP, guts. root,
-                         0, 0, 1, 1, 0, CopyFromParent,
-                         InputOutput, CopyFromParent,
-                         0
-                         | CWOverrideRedirect
-                         | CWEventMask
-                         | CWSaveUnder
-                         , &attrs);
-   if (!w->w) {
-      free(w);
-      return nil;
-   }
-   XCHECKPOINT;
-   XSetTransientForHint( DISP, w->w, None);
-   hash_store( guts.menu_windows, &w->w, sizeof(w->w), (void*)self);
-   wx = XX-> w;
-   if ( predefined_cursors[crArrow] == None) {
-      XCreateFontCursor( DISP, XC_left_ptr);
-      XCHECKPOINT;
-   }
-   XDefineCursor( DISP, w-> w, predefined_cursors[crArrow]);
-   if ( wx) {
-      while ( wx-> next ) wx = wx-> next;
-      w-> prev = wx;
-      wx-> next = w;
-   } else
-      XX-> w = w;
-   return w;
+   return nil;
 }
 
 static int
@@ -225,7 +164,7 @@ Bool apc_menu_create( Handle self, Handle owner) { Bool foo; return foo; }
 
 Bool apc_menu_destroy( Handle self) { Bool foo; return foo; }
 
-PFont apc_menu_default_font( PFont f) { return f; }
+PFont apc_menu_default_font( PFont f) { return nil; }
 
 Color apc_menu_get_color( Handle self, int index) { Color c; return c; }
 

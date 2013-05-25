@@ -434,30 +434,7 @@ apc_gp_get_nearest_color( Handle self, Color color)
 PRGBColor
 apc_gp_get_physical_palette( Handle self, int * colors)
 {
-   int i;
-   PRGBColor p;
-   XColor * xc;
-   
-   *colors = 0;
-   
-   if ( guts. palSize == 0) return nil;
-   if ( !( p = malloc( guts. palSize * sizeof( RGBColor))))
-      return nil;
-   if ( !( xc = malloc( guts. palSize * sizeof( XColor)))) {
-      free( p);
-      return nil;
-   }
-   for ( i = 0; i < guts. palSize; i++) xc[i]. pixel = i;
-   XQueryColors( DISP, guts. defaultColormap, xc, guts. palSize);
-   XCHECKPOINT;
-   for ( i = 0; i < guts. palSize; i++) {
-      p[i]. r = xc[i]. red   >> 8;
-      p[i]. g = xc[i]. green >> 8;
-      p[i]. b = xc[i]. blue  >> 8;
-   }
-   free( xc);
-   *colors = guts. palSize;
-   return p;
+   return nil;
 }
 
 Bool
@@ -651,59 +628,13 @@ apc_gp_get_clip_rect( Handle self)
 PFontABC
 prima_xfont2abc( XFontStruct * fs, int firstChar, int lastChar)
 {
-   PFontABC abc = malloc( sizeof( FontABC) * (lastChar - firstChar + 1));
-   XCharStruct *cs;
-   int k, l, d = fs-> max_char_or_byte2 - fs-> min_char_or_byte2 + 1;
-   int default_char1 = fs-> default_char >> 8;
-   int default_char2 = fs-> default_char & 0xff;
-   if ( !abc) return nil;
-   
-   if ( default_char2 < fs-> min_char_or_byte2 || default_char2 > fs-> max_char_or_byte2 ||
-        default_char1 < fs-> min_byte1 || default_char1 > fs-> max_byte1) {
-        default_char1 = fs-> min_byte1;
-        default_char2 = fs-> min_char_or_byte2;
-   }
-   for ( k = firstChar, l = 0; k <= lastChar; k++, l++) {
-      int i1 = k >> 8;
-      int i2 = k & 0xff;
-      if ( !fs-> per_char)
-	 cs = &fs-> min_bounds;
-      else if ( i2 < fs-> min_char_or_byte2 || i2 > fs-> max_char_or_byte2 ||
-                i1 < fs-> min_byte1 || i1 > fs-> max_byte1)
-	 cs = fs-> per_char + 
-              (default_char1 - fs-> min_byte1) * d +
-               default_char2 - fs-> min_char_or_byte2;
-      else
-	 cs = fs-> per_char + 
-              (i1 - fs-> min_byte1) * d +
-               i2 - fs-> min_char_or_byte2;
-      abc[l]. a = cs-> lbearing;
-      abc[l]. b = cs-> rbearing - cs-> lbearing;
-      abc[l]. c = cs-> width - cs-> rbearing;
-   }
-   return abc;
-}   
+   return nil;
+}
 
 PFontABC
 apc_gp_get_font_abc( Handle self, int firstChar, int lastChar, Bool unicode)
 {
-   PFontABC abc;
-
-   if ( self) {
-      DEFXX;
-      /*
-      if (!XX-> font) apc_gp_set_font( self, &PDrawable( self)-> font);
-      if (!XX-> font) return nil;
-      */
-#ifdef USE_XFT
-      if ( XX-> font-> xft)
-         return prima_xft_get_font_abc( self, firstChar, lastChar, unicode);
-#endif   
-
-      abc = prima_xfont2abc( XX-> font-> fs, firstChar, lastChar);
-   } else
-      abc = prima_xfont2abc( guts. font_abc_nil_hack, firstChar, lastChar);
-   return abc;
+   return nil;
 }
 
 unsigned long *

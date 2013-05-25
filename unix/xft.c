@@ -182,14 +182,7 @@ xft_build_font_key( PFontKey key, PFont f, Bool bySize)
 static PCachedFont
 try_size( Handle self, Font f, double size)
 {
-   FontKey key;
-   f. size = size;
-   f. height = f. width = C_NUMERIC_UNDEF;
-   f. direction = 0;
-   if ( !prima_xft_font_pick( self, &f, &f, &size)) return nil;
-   f. width = 0;
-   xft_build_font_key( &key, &f, true);
-   return ( PCachedFont) hash_fetch( guts. font_hash, &key, sizeof( FontKey));
+   return nil;
 }
 
 
@@ -208,12 +201,7 @@ prima_xft_set_font( Handle self, PFont font)
 PCachedFont
 prima_xft_get_cache( PFont font)
 {
-   FontKey key;
-   PCachedFont kf;
-   xft_build_font_key( &key, font, false);
-   kf = ( PCachedFont) hash_fetch( guts. font_hash, &key, sizeof( FontKey));
-   if ( !kf || !kf-> xft) return nil;
-   return kf;
+   return nil;
 }
 
 /*
@@ -230,108 +218,7 @@ prima_xft_get_cache( PFont font)
 PFont
 prima_xft_fonts( PFont array, const char *facename, const char * encoding, int *retCount)
 {
-   FcFontSet * s;
-   FcPattern   *pat, **ppat;
-   FcObjectSet *os;
-   PFont newarray, f;
-   PHash names = nil;
-   CharSetInfo * csi = nil;
-   int i;
-
-   if ( encoding) {
-      if ( !( csi = ( CharSetInfo*) hash_fetch( encodings, encoding, strlen( encoding))))
-         return array;
-   }
-
-   pat = FcPatternCreate();
-   if ( facename) FcPatternAddString( pat, FC_FAMILY, ( FcChar8*) facename);
-   FcPatternAddBool( pat, FC_SCALABLE, 1);
-   os = FcObjectSetBuild( FC_FAMILY, FC_CHARSET, FC_ASPECT, 
-        FC_SLANT, FC_WEIGHT, FC_SIZE, FC_PIXEL_SIZE, FC_SPACING,
-        FC_FOUNDRY, FC_SCALABLE, FC_DPI,
-        (void*) 0);
-   s = FcFontList( 0, pat, os);
-   FcObjectSetDestroy( os);
-   FcPatternDestroy( pat);
-   if ( !s) return array;
-
-   /* XXX make dynamic */
-   if ( !( newarray = realloc( array, sizeof(Font) * (*retCount + s-> nfont * MAX_CHARSET)))) {
-      FcFontSetDestroy(s);
-      return array;
-   }
-   ppat = s-> fonts; 
-   f = newarray + *retCount;
-   bzero( f, sizeof( Font) * s-> nfont * MAX_CHARSET);
-
-   names = hash_create();
-   
-   for ( i = 0; i < s->nfont; i++, ppat++) {
-      FcCharSet *c = nil;
-      fcpattern2font( *ppat, f);
-      FcPatternGetCharSet( *ppat, FC_CHARSET, 0, &c);
-      if ( c && FcCharSetCount(c) == 0) continue;
-      if ( encoding) {
-         /* case 1 - encoding is set, filter only given encoding */
-         if ( c && ( FcCharSetIntersectCount( csi-> fcs, c) >= csi-> glyphs - 1)) {
-            if ( !facename) {
-               /* and, if no facename set, each facename is reported only once */
-               if ( hash_fetch( names, f-> name, strlen( f-> name))) continue;
-               hash_store( names, f-> name, strlen( f-> name), ( void*)1);
-            }
-            strncpy( f-> encoding, encoding, 255);
-            f++;
-         } 
-      } else if ( facename) {
-         /* case 2 - facename only is set, report each facename with every encoding */
-         int j;
-         Font * tmpl = f;
-         for ( j = 0; j < MAX_CHARSET; j++) {
-            if ( !std_charsets[j]. enabled) continue;
-            if ( FcCharSetIntersectCount( c, std_charsets[j]. fcs) >= std_charsets[j]. glyphs - 1) {
-               *f = *tmpl;
-               strncpy( f-> encoding, std_charsets[j]. name, 255);
-               f++;
-            }
-         }
-         if ( f == tmpl) {/* no encodings found */
-            strcpy( f-> encoding, fontspecific);
-            f++;
-         }
-      } else if ( !facename && !encoding) { 
-         /* case 3 - report unique facenames and store list of encodings
-            into the hack array */
-         if ( hash_fetch( names, f-> name, strlen( f-> name)) == (void*)1) continue;
-         hash_store( names, f-> name, strlen( f-> name), (void*)1);
-         if ( c) {
-            int j, found = 0;
-            char ** enc = (char**) f-> encoding;
-            unsigned char * shift = (unsigned char*)enc + sizeof(char *) - 1;
-            for ( j = 0; j < MAX_CHARSET; j++) {
-               if ( !std_charsets[j]. enabled) continue;
-               if ( *shift + 2 >= 256 / sizeof(char*)) break;
-               if ( FcCharSetIntersectCount( c, std_charsets[j]. fcs) >= std_charsets[j]. glyphs - 1) {
-                  char buf[ 512];
-                  int len = snprintf( buf, 511, "%s-charset-%s", f-> name, std_charsets[j]. name);
-                  if ( hash_fetch( names, buf, len) == (void*)2) continue;
-                  hash_store( names, buf, len, (void*)2);
-                  *(enc + ++(*shift)) = std_charsets[j]. name;
-                  found = 1;
-               }
-            }
-            if ( !found)
-               *(enc + ++(*shift)) = fontspecific;
-         }
-         f++;
-      }
-   }
-
-   *retCount = f - newarray;
-   
-   hash_destroy( names, false);
-   
-   FcFontSetDestroy(s);
-   return newarray;
+   return nil;
 }
 
 void
@@ -479,28 +366,7 @@ prima_xft_get_font_ranges( Handle self, int * count)
 PFontABC
 prima_xft_get_font_abc( Handle self, int firstChar, int lastChar, Bool unicode)
 {
-   PFontABC abc;
-   int i, len = lastChar - firstChar + 1;
-   XftFont *font = X(self)-> font-> xft_base;
-
-   if ( !( abc = malloc( sizeof( FontABC) * len))) 
-      return nil;
-
-   for ( i = 0; i < len; i++) {
-      FcChar32 c = i + firstChar;
-      FT_UInt ft_index;
-      XGlyphInfo glyph;
-      if ( !unicode && c > 128) {
-         c = X(self)-> xft_map8[ c - 128];
-      }
-      ft_index = XftCharIndex( DISP, font, c);
-      XftGlyphExtents( DISP, font, &ft_index, 1, &glyph);
-      abc[i]. a = -glyph. x;
-      abc[i]. b = glyph. width;
-      abc[i]. c = glyph. xOff - glyph. width + glyph. x;
-   }
-
-   return abc;
+   return nil;
 }
 
 uint32_t *

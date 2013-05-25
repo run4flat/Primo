@@ -125,8 +125,7 @@ prima_cleanup_font_subsystem( void)
 PFont
 apc_font_default( PFont f)
 {
-   memcpy( f, &guts. default_font, sizeof( Font));
-   return f;
+   return nil;
 }
 
 int
@@ -148,15 +147,7 @@ prima_build_font_key( PFontKey key, PFont f, Bool bySize)
 PCachedFont
 prima_find_known_font( PFont font, Bool refill, Bool bySize)
 {
-   FontKey key;
-   PCachedFont kf;
-
-   prima_build_font_key( &key, font, bySize);
-   kf = hash_fetch( guts. font_hash, &key, sizeof( FontKey));
-   if ( kf && refill) {
-      memcpy( font, &kf-> font, sizeof( Font));
-   }
-   return kf;
+   return nil;
 }
 
 static Bool
@@ -324,200 +315,19 @@ apc_font_pick( Handle self, PFont source, PFont dest)
 static PFont
 spec_fonts( int *retCount)
 {
-   int i, count = guts. n_fonts;
-   PFontInfo info = guts. font_info;
-   PFont fmtx = nil;
-   Font defaultFont;
-   List list;
-   PHash hash = nil;
-
-   list_create( &list, 256, 256);
-
-   *retCount = 0;
-   defaultFont. width  = 0;
-   defaultFont. height = 0;
-   defaultFont. size   = 10;
-   
-  
-   if ( !( hash = hash_create())) {
-      list_destroy( &list);
-      return nil;
-   }
-
-   /* collect font info */
-   for ( i = 0; i < count; i++) {
-      int len;
-      PFont fm;
-      if ( info[ i]. flags. disabled) continue;
-      
-      len = strlen( info[ i].font.name);
-
-      fm = hash_fetch( hash, info[ i].font.name, len);
-      if ( fm) {
-         char ** enc = (char**) fm-> encoding;
-         unsigned char * shift = (unsigned char*)enc + sizeof(char *) - 1;
-         if ( *shift + 2 < 256 / sizeof(char*)) {
-            int j, exists = 0;
-            for ( j = 1; j <= *shift; j++) {
-               if ( strcmp( enc[j], info[i].xname + info[i].info_offset) == 0) {
-                  exists = 1;
-                  break;
-               }
-            }
-            if ( exists) continue;
-            *(enc + ++(*shift)) = info[i].xname + info[i].info_offset;
-         }
-         continue;
-      }
-
-      if ( !( fm = ( PFont) malloc( sizeof( Font)))) {
-         if ( hash) hash_destroy( hash, false);
-         list_delete_all( &list, true);
-         list_destroy( &list);
-         return nil;
-      }
-
-      /*
-      if ( info[i]. flags. sloppy) 
-         detail_font_info( info + i, &defaultFont, false, true);
-       */
-      *fm = info[i]. font;
-     
-      { /* multi-encoding format */
-         char ** enc = (char**) fm-> encoding;
-         unsigned char * shift = (unsigned char*)enc + sizeof(char *) - 1;      
-         memset( fm-> encoding, 0, 256);
-         *(enc + ++(*shift)) = info[i].xname + info[i].info_offset;
-         hash_store( hash, info[ i].font.name, strlen( info[ i].font.name), fm); 
-      }
-
-      list_add( &list, ( Handle) fm);
-   }
-
-   if ( hash) hash_destroy( hash, false);      
-
-   if ( list. count == 0) goto Nothing;
-   fmtx = ( PFont) malloc( list. count * sizeof( Font));
-   if ( !fmtx) {
-      list_delete_all( &list, true);   
-      list_destroy( &list);
-      return nil;
-   }
-   
-   *retCount = list. count;
-      for ( i = 0; i < list. count; i++)
-         memcpy( fmtx + i, ( void *) list. items[ i], sizeof( Font));
-   list_delete_all( &list, true);
-
-Nothing:
-   list_destroy( &list);
-   
-#ifdef USE_XFT
-   if ( guts. use_xft)
-      fmtx = prima_xft_fonts( fmtx, nil, nil, retCount);
-#endif
-
-   return fmtx;
-}   
+   return nil;
+}
 
 PFont
 apc_fonts( Handle self, const char *facename, const char * encoding, int *retCount)
 {
-   int i, count = guts. n_fonts;
-   PFontInfo info = guts. font_info;
-   PFontInfo * table; 
-   int n_table;
-   PFont fmtx;
-   Font defaultFont;
-
-   if ( !facename && !encoding) return spec_fonts( retCount);
-   
-   *retCount = 0;
-   n_table = 0;
-   
-   /* stage 1 - browse through names and validate records */
-   table = malloc( count * sizeof( PFontInfo));
-   if ( !table && count > 0) return nil;
-   
-   if ( facename == nil) {
-      PHash hash = hash_create();
-      for ( i = 0; i < count; i++) {
-         int len;
-         if ( info[ i]. flags. disabled) continue;
-         len = strlen( info[ i].font.name);
-         if ( hash_fetch( hash, info[ i].font.name, len) || 
-            strcmp( info[ i].xname + info[ i].info_offset, encoding) != 0)
-              continue;
-         hash_store( hash, info[ i].font.name, len, (void*)1);
-         table[ n_table++] = info + i;
-      }
-      hash_destroy( hash, false);
-      *retCount = n_table;
-   } else {
-      for ( i = 0; i < count; i++) {
-         if ( info[ i]. flags. disabled) continue;
-         if (
-               ( stricmp( info[ i].font.name, facename) == 0) &&
-               ( 
-                   !encoding || 
-                   ( strcmp( info[ i].xname + info[ i].info_offset, encoding) == 0)
-               )
-            )
-         {
-            table[ n_table++] = info + i;
-         }
-      }   
-      *retCount = n_table;
-   }   
-
-   fmtx = malloc( n_table * sizeof( Font)); 
-   bzero( fmtx, n_table * sizeof( Font)); 
-   if ( !fmtx && n_table > 0) {
-      *retCount = 0;
-      free( table);
-      return nil;
-   }
-   
-   defaultFont. width  = 0;
-   defaultFont. height = 0;
-   defaultFont. size   = 10;
-      
-   for ( i = 0; i < n_table; i++) {
-      /*
-      if ( table[i]-> flags. sloppy)
-         detail_font_info( table[i], &defaultFont, false, true);
-       */
-      fmtx[i] = table[i]-> font;
-   }   
-   free( table);
-
-#ifdef USE_XFT
-   if ( guts. use_xft)
-      fmtx = prima_xft_fonts( fmtx, facename, encoding, retCount);
-#endif
-
-   return fmtx;
+   return nil;
 }
 
 PHash
 apc_font_encodings( Handle self )
 {
-   HE *he;
-   PHash hash = hash_create();
-   if ( !hash) return nil;
-
-#ifdef USE_XFT
-   if ( guts. use_xft)
-      prima_xft_font_encodings( hash);
-#endif
-
-   hv_iterinit(( HV*) encodings);
-   for (;;) {
-      if (( he = hv_iternext( encodings)) == nil)
-         break;
-      hash_store( hash, HeKEY( he), HeKLEN( he), (void*)1);
-   }
-   return hash;
+   return nil;
 }
 
 Bool

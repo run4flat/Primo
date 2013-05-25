@@ -48,12 +48,7 @@ prima_init_clipboard_subsystem(char * error_buf)
 PList
 apc_get_standard_clipboards( void)
 {
-   PList l = plist_create( 3, 1);
-   if (!l) return nil;
-   list_add( l, (Handle)duplicate_string( "Primary"));
-   list_add( l, (Handle)duplicate_string( "Secondary"));
-   list_add( l, (Handle)duplicate_string( "Clipboard"));
-   return l;
+   return nil;
 }
 
 Bool

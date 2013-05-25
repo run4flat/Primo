@@ -380,15 +380,13 @@ apc_sys_get_insert_mode( void)
 PFont
 apc_sys_get_msg_font( PFont f)
 {
-   memcpy( f, &guts. default_msg_font, sizeof( Font));
-   return f;
+   return nil;
 }
 
 PFont
 apc_sys_get_caption_font( PFont f)
 {
-   memcpy( f, &guts. default_caption_font, sizeof( Font));
-   return f;
+   return nil;
 }
 
 int
@@ -547,55 +545,7 @@ apc_dl_export(char *path)
 PList
 apc_getdir( const char *dirname)
 {
-   DIR *dh;
-   struct dirent *de;
-   PList dirlist = nil;
-   char *type;
-   char path[ 2048];
-   struct stat s;
-
-   if (( dh = opendir( dirname)) && (dirlist = plist_create( 50, 50))) {
-      while (( de = readdir( dh))) {
-	 list_add( dirlist, (Handle)duplicate_string( de-> d_name));
-#if defined(DT_REG) && defined(DT_DIR)
-	 switch ( de-> d_type) {
-	 case DT_FIFO:	type = "fifo";	break;
-	 case DT_CHR:	type = "chr";	break;
-	 case DT_DIR:	type = "dir";	break;
-	 case DT_BLK:	type = "blk";	break;
-	 case DT_REG:	type = "reg";	break;
-	 case DT_LNK:	type = "lnk";	break;
-	 case DT_SOCK:	type = "sock";	break;
-#ifdef DT_WHT
-	 case DT_WHT:	type = "wht";	break;
-#endif
-	 default:
-#endif 
-                        snprintf( path, 2047, "%s/%s", dirname, de-> d_name);
-                        type = nil;
-                        if ( stat( path, &s) == 0) {
-                           switch ( s. st_mode & S_IFMT) {
-                           case S_IFIFO:        type = "fifo";  break;
-                           case S_IFCHR:        type = "chr";   break;
-                           case S_IFDIR:        type = "dir";   break;
-                           case S_IFBLK:        type = "blk";   break;
-                           case S_IFREG:        type = "reg";   break;
-                           case S_IFLNK:        type = "lnk";   break;
-                           case S_IFSOCK:       type = "sock";  break;
-#ifdef S_IFWHT
-                           case S_IFWHT:        type = "wht";   break;
-#endif
-                           }
-                        }
-                        if ( !type)     type = "unknown";
-#if defined(DT_REG) && defined(DT_DIR)
-	 }
-#endif
-	 list_add( dirlist, (Handle)duplicate_string( type));
-      }
-      closedir( dh);
-   }
-   return dirlist;
+   return nil;
 }
 
 void

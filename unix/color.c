@@ -507,22 +507,5 @@ static Bool kill_hatches( Pixmap pixmap, int keyLen, void * key, void * dummy)
 Pixmap 
 prima_get_hatch( FillPattern * fp)
 {
-   int i;
-   Pixmap p;
-   FillPattern fprev;
-   if ( memcmp( fp, fillPatterns[fpSolid], sizeof( FillPattern)) == 0)
-      return nilHandle;
-   if (( p = ( Pixmap) hash_fetch( hatches, fp, sizeof( FillPattern))))
-      return p;
-   for ( i = 0; i < sizeof( FillPattern); i++)
-      fprev[i] = (*fp)[ sizeof(FillPattern) - i - 1];
-   if (( p = XCreateBitmapFromData( DISP, guts. root, (char*)fprev, 8, 8)) == None) {
-      hash_first_that( hatches, (void*)kill_hatches, nil, nil, nil);
-      hash_destroy( hatches, false);
-      hatches = hash_create();
-      if (( p = XCreateBitmapFromData( DISP, guts. root, (char*)fprev, 8, 8)) == None) 
-         return nilHandle;
-   }
-   hash_store( hatches, fp, sizeof( FillPattern), ( void*) p);
-   return p;
+   return nil;
 }
