@@ -144,19 +144,7 @@ apc_widget_get_handle( Handle self)
 Rect
 apc_widget_get_invalid_rect( Handle self)
 {
-   DEFXX;
-   Rect ret;
-   XRectangle r;
-   if ( !XX-> invalid_region) {
-      Rect r = {0,0,0,0}; 
-      return r;
-   }
-   XClipBox( XX-> invalid_region, &r);
-   ret. left = r.x;
-   ret. bottom = XX-> size.y - r.height - r.y; 
-   ret. right = r.x + r.width;
-   ret. top =  XX-> size.y - r.y;
-   return ret;
+   Rect foo; return foo;
 }
 
 Point

@@ -216,23 +216,7 @@ wm_net_get_current_workarea( Rect * r)
 Rect
 apc_application_get_indents( Handle self)
 {
-   Point sz;
-   Rect  r;
-
-   bzero( &r, sizeof( r));
-   if ( do_icccm_only) return r;
-
-   sz = apc_application_get_size( self);
-   if ( wm_net_get_current_workarea( &r)) {
-      r. right  = sz. x - r.right   - r. left;
-      r. bottom = sz. y - r. bottom - r. top;
-      if ( r. left   < 0) r. left   = 0;
-      if ( r. top    < 0) r. top    = 0;
-      if ( r. right  < 0) r. right  = 0;
-      if ( r. bottom < 0) r. bottom = 0;
-   }
-
-   return r;
+   Rect foo; return foo;
 }
 
 int

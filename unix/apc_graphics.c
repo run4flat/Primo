@@ -613,16 +613,7 @@ prima_gp_get_clip_rect( Handle self, XRectangle *cr, Bool for_internal_paints)
 Rect
 apc_gp_get_clip_rect( Handle self)
 {
-   DEFXX;
-   XRectangle cr;
-   Rect r;
-
-   prima_gp_get_clip_rect( self, &cr, 0);
-   r. left = cr. x;
-   r. top = XX-> size. y - cr. y - 1;
-   r. bottom = r. top - cr. height + 1;
-   r. right = cr. x + cr. width - 1;
-   return r;
+   Rect foo; return foo;
 }
 
 PFontABC
