@@ -170,11 +170,6 @@ prima_color_subsystem_set_option( char * option, char * value)
    Bool foo; return foo;
 }
 
-typedef struct 
-{
-   int count;
-   unsigned long free[256];
-} FreeColorsStruct;
 
 void
 prima_done_color_subsystem( void)

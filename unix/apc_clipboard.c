@@ -100,10 +100,6 @@ apc_clipboard_clear( Handle self)
    Bool foo; return foo;
 }
 
-typedef struct {
-   Atom selection;
-   long mask;
-} SelectionProcData;
 
 #define SELECTION_NOTIFY_MASK 1
 #define PROPERTY_NOTIFY_MASK  2

@@ -93,13 +93,6 @@
 #define FC_WIDTH "width"
 #endif
 
-typedef struct {
-   char      *name;
-   FcCharSet *fcs;
-   int        glyphs;
-   Bool       enabled;
-   uint32_t   map[128];   /* maps characters 128-255 into unicode */
-} CharSetInfo;
 
 
 #define KOI8_INDEX 12
@@ -109,12 +102,6 @@ typedef struct {
 
 #ifdef NEED_X11_EXTENSIONS_XRENDER_H
 /* piece of Xrender guts */
-typedef struct _XExtDisplayInfo {
-    struct _XExtDisplayInfo *next;      
-    Display *display;                   
-    XExtCodes *codes;                   
-    XPointer data;                      
-} XExtDisplayInfo;
 
 extern XExtDisplayInfo *
 XRenderFindDisplay (Display *dpy);

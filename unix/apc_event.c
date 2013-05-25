@@ -352,14 +352,6 @@ prima_no_input( PDrawableSysData XX, Bool ignore_horizon, Bool beep)
 }
 
 
-typedef struct _WMSyncData
-{
-   Point   origin;
-   Point   size;
-   XWindow above;
-   Bool    mapped;
-   Bool    allow_cmSize;
-} WMSyncData;
 
 
 

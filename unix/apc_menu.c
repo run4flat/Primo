@@ -55,14 +55,6 @@ extern Cursor predefined_cursors[];
 #define MENU_CHECK_XOFFSET 10
 
 
-typedef struct {
-   void        * xft_drawable;
-   uint32_t    * xft_map8;
-   Color         rgb;
-   unsigned long pixel;
-   XWindow       win;
-   GC            gc;
-} MenuDrawRec;
 
 
 

@@ -236,18 +236,6 @@ apc_gp_fill_sector( Handle self, int x, int y, int dX, int dY, double angleStart
    
 
 
-typedef struct {
-   XImage *  i;
-   Rect      clip;
-   uint32_t  color;
-   int       depth;
-   int       y;
-   Bool      singleBorder;
-   XDrawable drawable;
-   GC        gc;
-   int       first;
-   PList  *  lists;
-} FillSession;
 
 
 

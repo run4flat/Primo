@@ -154,28 +154,12 @@ apc_application_get_size( Handle self)
    Point foo; return foo;
 }
 
-typedef struct {
-   int no;
-   void *sub;
-   void *glob;
-} FileList, *PFileList;
 
 Bool
 apc_watch_filehandle( int no, void *sub, void *glob)
 {
    Bool foo; return foo;
 }
-
-#ifdef PerlIO
-typedef PerlIO *FileStream;
-#else
-#define PERLIO_IS_STDIO 1
-typedef FILE *FileStream;
-#define PerlIO_fileno(f) fileno(f)
-#endif
-
-
-
 
 Bool
 prima_one_loop_round( Bool wait, Bool careOfApplication)
