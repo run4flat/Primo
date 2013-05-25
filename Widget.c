@@ -165,34 +165,13 @@ Widget_fetch_resource( char *className, char *name, char *classRes, char *res, H
 Handle
 Widget_first( Handle self)
 {
-   return apc_widget_get_z_order( self, zoFirst);
+   return nilHandle;
 }
 
 Handle
 Widget_first_that( Handle self, void * actionProc, void * params)
 {
-   Handle child  = nilHandle;
-   int i, count  = var-> widgets. count;
-   Handle * list;
-   if ( actionProc == nil || count == 0) return nilHandle;
-   if (!(list = allocn( Handle, count + 2))) return nilHandle;
-
-   list[0] = (Handle)( var-> enum_lists);
-   list[1] = (Handle)( count);
-   var-> enum_lists = list;
-   memcpy( list + 2, var-> widgets. items, sizeof( Handle) * count);
-
-   for ( i = 2; i < count + 2; i++)
-   {
-      if ( list[i] && (( PActionProc) actionProc)( self, list[ i], params))
-      {
-         child = list[ i];
-         break;
-      }
-   }
-   var-> enum_lists = (Handle*)(*list);
-   free( list);
-   return child;
+   return nilHandle;
 }
 
 /*::g */
@@ -242,7 +221,7 @@ Widget_key_event( Handle self, int command, int code, int key, int mod, int repe
 Handle
 Widget_last( Handle self)
 {
-   return apc_widget_get_z_order( self, zoLast);
+   return nilHandle;
 }
 
 Bool
@@ -261,7 +240,7 @@ Widget_mouse_event( Handle self, int command, int button, int mod, int x, int y,
 Handle
 Widget_next( Handle self)
 {
-   return apc_widget_get_z_order( self, zoNext);
+   return nilHandle;
 }
 
 static void 
@@ -272,93 +251,7 @@ fill_tab_candidates( PList list, Handle level)
 Handle 
 Widget_next_positional( Handle self, int dx, int dy)
 {
-   Handle horizon = self;
-   
-   int i, maxDiff = INT_MAX;
-   Handle max = nilHandle;
-   List candidates;
-   Point p[2];
-   
-   int minor[2], major[2], axis, extraDiff, ir[4];
-
-   /*
-      In order to compute positional difference, using four penalties.
-      To simplify algorithm, Rect will be translated to int[4] and
-      minor, major and extraDiff assigned to array indices for those 
-      steps - minor for first and third, major for second and extraDiff for last one.
-    */
-   
-   axis = ( dx == 0) ? dy : dx;
-   minor[0] = ( dx == 0) ? 0 : 1;
-   minor[1] = minor[0] + 2;
-   extraDiff = major[(axis < 0) ? 0 : 1] = ( dx == 0) ? 1 : 0;
-   major[(axis < 0) ? 1 : 0] = extraDiff + 2;
-   extraDiff = ( dx == 0) ? (( axis < 0) ? 0 : 2) : (( axis < 0) ? 1 : 3);
-   
-   while ( PWidget( horizon)-> owner) {
-      if (
-          ( PWidget( horizon)-> options. optSystemSelectable) || /* fast check for CWindow */
-          ( PWidget( horizon)-> options. optModalHorizon) 
-         ) break; 
-      horizon = PWidget( horizon)-> owner;
-   }
-
-   if ( !CWidget( horizon)-> get_visible( horizon) ||
-        !CWidget( horizon)-> get_enabled( horizon)) return nilHandle;
-
-   list_create( &candidates, 64, 64);
-   fill_tab_candidates( &candidates, horizon);
-   
-   p[0].x = p[0].y = 0;
-   p[1] = CWidget( self)-> get_size( self);
-   apc_widget_map_points( self, true, 2, p);
-   apc_widget_map_points( horizon, false, 2, p);
-   ir[0] = p[0].x; ir[1] = p[0].y; ir[2] = p[1].x; ir[3] = p[1].y;
-
-   for ( i = 0; i < candidates. count; i++) {
-      int    diff, ix[4];
-      Handle x = candidates. items[i];
-
-      if ( x == self) continue;
-      
-      p[0].x = p[0].y = 0;
-      p[1] = CWidget( x)-> get_size( x);
-      apc_widget_map_points( x, true, 2, p);
-      apc_widget_map_points( horizon, false, 2, p);
-      ix[0] = p[0].x; ix[1] = p[0].y; ix[2] = p[1].x; ix[3] = p[1].y;
-
-      /* First step - checking if the widget is subject to comparison. It is not,
-         if it's minor axis is not contiguous with self's */
-
-      if ( ix[ minor[0]] > ir[ minor[1]] || ix[ minor[1]] < ir[ minor[0]]) 
-         continue;
-
-      /* Using x100 penalty for distance in major axis - and discarding those that 
-         of different sign */
-      diff = ( ix[ major[ 1]] - ir[ major[0]]) * 100 * axis;
-      if ( diff < 0) 
-         continue;
-
-      /* Adding x10 penalty for incomplete minor axis congruence. Addition goes in tenths,
-         in a way to not allow congruence overweight major axis distance */
-      if ( ix[ minor[0]] > ir[ minor[0]])
-         diff += ( ix[ minor[0]] - ir[ minor[0]]) * 100 / ( ir[ minor[1]] - ir[ minor[0]]);
-      if ( ix[ minor[1]] < ir[ minor[1]])
-         diff += ( ir[ minor[1]] - ix[ minor[1]]) * 100 / ( ir[ minor[1]] - ir[ minor[0]]);
-
-      /* Adding 'distance from level' x1 penalty */
-      if (( ix[ extraDiff] - ir[ extraDiff]) * axis < 0) 
-         diff += abs( ix[ extraDiff] - ir[ extraDiff]);
-
-      if ( diff < maxDiff) {
-         max = x;
-         maxDiff = diff;
-      }   
-   }   
-   
-   list_destroy( &candidates);
-
-   return max;
+   return nilHandle;
 }
 
 static int compare_taborders_forward( const void *a, const void *b)
@@ -443,25 +336,7 @@ do_taborder_candidates( Handle level, Handle who,
 Handle 
 Widget_next_tab( Handle self, Bool forward)
 {
-   Handle horizon = self, result = nilHandle;
-   int stage = 0;
-
-   while ( PWidget( horizon)-> owner) {
-      if (
-          ( PWidget( horizon)-> options. optSystemSelectable) || /* fast check for CWindow */
-          ( PWidget( horizon)-> options. optModalHorizon) 
-         ) break; 
-      horizon = PWidget( horizon)-> owner;
-   }
-
-   if ( !CWidget( horizon)-> get_visible( horizon) ||
-        !CWidget( horizon)-> get_enabled( horizon)) return nilHandle;
-   
-   do_taborder_candidates( horizon, self, 
-      forward ? compare_taborders_forward : compare_taborders_backward, 
-      &stage, &result);
-   if ( result == self) result = nilHandle;
-   return result;
+   return nilHandle;
 }
 
 /*::o */
@@ -476,7 +351,7 @@ Widget_post_message( Handle self, SV * info1, SV * info2)
 Handle
 Widget_prev( Handle self)
 {
-   return apc_widget_get_z_order( self, zoPrev);
+   return nilHandle;
 }
 
 Bool
@@ -690,8 +565,7 @@ Widget_get_locked( Handle self)
 Handle
 Widget_get_parent( Handle self)
 {
-   enter_method;
-   return my-> get_clipOwner( self) ? var-> owner : application;
+   return nilHandle;
 }
 
 Point
@@ -709,19 +583,7 @@ Widget_get_popup_font( Handle self)
 Handle
 Widget_get_selectee( Handle self)
 {
-   if ( var-> stage > csFrozen) return nilHandle;
-   if ( is_opt( optSelectable))
-      return self;
-   else if ( var-> currentWidget) {
-      PWidget w = ( PWidget) var-> currentWidget;
-      if ( w-> options. optSystemSelectable && !w-> self-> get_clipOwner(( Handle) w))
-         return ( Handle) w;
-      else
-         return w-> self-> get_selectee(( Handle) w);
-   } else if ( is_opt( optSystemSelectable))
-      return self;
-   else
-      return find_tabfoc( self);
+   return nilHandle;
 }
 
 Point
@@ -823,19 +685,6 @@ find_accel( Handle self, Handle item, int * key)
 static Handle
 find_tabfoc( Handle self)
 {
-   int i;
-   Handle toRet;
-   for ( i = 0; i < var-> widgets. count; i++) {
-      PWidget w = ( PWidget)( var-> widgets. items[ i]);
-      if (
-           w-> self-> get_selectable(( Handle) w) &&
-           w-> self-> get_enabled(( Handle) w)
-         )
-         return ( Handle) w;
-   }
-   for ( i = 0; i < var-> widgets. count; i++)
-      if (( toRet = find_tabfoc( var-> widgets. items[ i])))
-         return toRet;
    return nilHandle;
 }
 
@@ -900,16 +749,7 @@ Widget_accelItems( Handle self, Bool set, SV * accelItems)
 Handle
 Widget_accelTable( Handle self, Bool set, Handle accelTable)
 {
-   enter_method;
-   if ( var-> stage > csFrozen) return nilHandle;
-   if ( !set)
-      return var-> accelTable;
-   if ( accelTable && !kind_of( accelTable, CAbstractMenu)) return nilHandle;
-   if ( accelTable && (( PAbstractMenu) accelTable)-> owner != self)
-      my-> set_accelItems( self, CAbstractMenu( accelTable)-> get_items( accelTable, ""));
-   else
-      var-> accelTable = accelTable;
-   return accelTable;
+   return nilHandle;
 }
 
 Color
@@ -1026,21 +866,6 @@ Widget_current( Handle self, Bool set, Bool current)
 Handle
 Widget_currentWidget( Handle self, Bool set, Handle widget)
 {
-   enter_method;
-   if ( var-> stage > csFrozen) return nilHandle;
-   if ( !set)
-      return var-> currentWidget;
-   if ( widget) {
-      if ( !widget || ( PWidget( widget)-> stage > csFrozen) ||
-             ( PWidget( widget)-> owner != self)
-           ) return nilHandle;
-      var-> currentWidget = widget;
-   } else
-      var-> currentWidget = nilHandle;
-
-   /* adjust selection if we're in currently selected chain */
-   if ( my-> get_selected( self))
-      my-> set_selectedWidget( self, widget);
    return nilHandle;
 }
 
@@ -1164,27 +989,6 @@ Widget_palette( Handle self, Bool set, SV * palette)
 Handle
 Widget_pointerIcon( Handle self, Bool set, Handle icon)
 {
-   enter_method;
-   Point hotSpot;
-
-   if ( var-> stage > csFrozen) return nilHandle;
-
-   if ( !set) {
-      HV * profile = newHV();
-      Handle icon = Object_create( "Prima::Icon", profile);
-      sv_free(( SV *) profile);
-      apc_pointer_get_bitmap( self, icon);
-      --SvREFCNT( SvRV((( PAnyObject) icon)-> mate));
-      return icon;
-   }
-
-   if ( icon != nilHandle && !kind_of( icon, CIcon)) {
-      warn("RTC083: Illegal object reference passed to Widget::pointerIcon");
-      return nilHandle;
-   }
-   hotSpot = my-> get_pointerHotSpot( self);
-   apc_pointer_set_user( self, icon, hotSpot);
-   if ( var-> pointerType == crUser) my-> first_that( self, (void*)sptr, nil);
    return nilHandle;
 }
 
@@ -1231,16 +1035,6 @@ Widget_pointerPos( Handle self, Bool set, Point p)
 Handle
 Widget_popup( Handle self, Bool set, Handle popup)
 {
-   enter_method;
-   if ( var-> stage > csFrozen) return nilHandle;
-   if ( !set)
-      return var-> popupMenu;
-
-   if ( popup && !kind_of( popup, CPopup)) return nilHandle;
-   if ( popup && PAbstractMenu( popup)-> owner != self)
-      my-> set_popupItems( self, CAbstractMenu( popup)-> get_items( popup, ""));
-   else
-      var-> popupMenu = popup;
    return nilHandle;
 }
 
@@ -1313,40 +1107,6 @@ Widget_selected( Handle self, Bool set, Bool selected)
 Handle
 Widget_selectedWidget( Handle self, Bool set, Handle widget)
 {
-   if ( var-> stage > csFrozen) return nilHandle;
-
-   if ( !set) {
-      if ( var-> stage <= csNormal) {
-         Handle foc = apc_widget_get_focused();
-         PWidget  f = ( PWidget) foc;
-         while( f) {
-            if (( Handle) f == self) return foc;
-            f = ( PWidget) f-> owner;
-         }
-      }
-      return nilHandle;
-
-      /* classic solution should be recursive and inheritant call */
-      /* of get_selected() here, when Widget would return state of */
-      /* child-group selected state until Widget::selected() called; */
-      /* thus, each of them would call apc_widget_get_focused - that's expensive, */
-      /* so that's the reason not to use classic object model here. */
-   }
-
-   if ( widget) {
-      if ( PWidget( widget)-> owner == self)
-         CWidget( widget)-> set_selected( widget, true);
-   } else {
-      /* give selection up to hierarchy chain */
-      Handle s = self;
-      while ( s) {
-         if ( CWidget( s)-> get_selectable( s)) {
-            CWidget( s)-> set_selected( s, true);
-            break;
-         }
-         s = PWidget( s)-> owner;
-      }
-   }
    return nilHandle;
 }
 
@@ -1361,36 +1121,6 @@ Widget_selectingButtons( Handle self, Bool set, int sb)
 Handle
 Widget_shape( Handle self, Bool set, Handle mask)
 {
-   if ( var-> stage > csFrozen) return nilHandle;
-
-   if ( !set) {
-      if ( apc_widget_get_shape( self, nilHandle)) {
-         HV * profile = newHV();
-         Handle i = Object_create( "Prima::Image", profile);
-         sv_free(( SV *) profile);
-         apc_widget_get_shape( self, i);
-         --SvREFCNT( SvRV((( PAnyObject) i)-> mate));
-         return i;
-      } else
-         return nilHandle;
-   }
-
-   if ( mask && !kind_of( mask, CImage)) {
-      warn("RTC008A: Illegal object reference passed to Widget::shape");
-      return nilHandle;
-   }
-
-   if ( mask && (( PImage( mask)-> type & imBPP) != imbpp1)) {
-      Handle i = CImage( mask)-> dup( mask);
-      ++SvREFCNT( SvRV( PImage( i)-> mate));
-      CImage( i)-> set_conversion( i, ictNone);
-      CImage( i)-> set_type( i, imBW);
-      apc_widget_set_shape( self, i);
-      --SvREFCNT( SvRV( PImage( i)-> mate));
-      Object_destroy( i);
-   } else
-      apc_widget_set_shape( self, mask);
-
    return nilHandle;
 }
 

@@ -569,117 +569,20 @@ Image_pixel( Handle self, Bool set, int x, int y, SV * pixel)
 Handle
 Image_bitmap( Handle self)
 {
-   Handle h;
-   Point s;
-   HV * profile = newHV();
-
-   pset_H( owner,        var->owner);
-   pset_i( width,        var->w);
-   pset_i( height,       var->h);
-   pset_sv_noinc( palette,     my->get_palette( self));
-   pset_i( monochrome,   (var-> type & imBPP) == 1);
-   h = Object_create( "Prima::DeviceBitmap", profile);
-   sv_free(( SV *) profile);
-   s = CDrawable( h)-> get_size( h);
-   CDrawable( h)-> put_image_indirect( h, self, 0, 0, 0, 0, s.x, s.y, s.x, s.y, ropCopyPut);
-   --SvREFCNT( SvRV( PDrawable( h)-> mate));
-   return h;
+   return nilHandle;
 }
 
 
 Handle
 Image_dup( Handle self)
 {
-   Handle h;
-   PImage i;
-   HV * profile = newHV();
-
-   pset_H( owner,        var->owner);
-   pset_i( width,        var->w);
-   pset_i( height,       var->h);
-   pset_i( type,         var->type);
-   pset_i( conversion,   var->conversion);
-   pset_i( hScaling,     is_opt( optHScaling));
-   pset_i( vScaling,     is_opt( optVScaling));
-   pset_i( preserveType, is_opt( optPreserveType));
-
-   h = Object_create( var->self-> className, profile);
-   sv_free(( SV *) profile);
-   i = ( PImage) h;
-   memcpy( i-> palette, var->palette, 768);
-   i-> palSize = var-> palSize;
-   if ( i-> type != var->type)
-      croak("RTC0108: Image::dup consistency failed");
-   else
-      memcpy( i-> data, var->data, var->dataSize);
-   memcpy( i-> stats, var->stats, sizeof( var->stats));
-   i-> statsCache = var->statsCache;
-
-   if ( hv_exists(( HV*)SvRV( var-> mate), "extras", 6)) {
-      SV ** sv = hv_fetch(( HV*)SvRV( var-> mate), "extras", 6, 0);
-      if ( sv && SvOK( *sv) && SvROK( *sv) && SvTYPE( SvRV( *sv)) == SVt_PVHV)
-         (void) hv_store(( HV*)SvRV( i-> mate), "extras", 6, newSVsv( *sv), 0);
-   }
-   
-   --SvREFCNT( SvRV( i-> mate));
-   return h;
+   return nilHandle;
 }
 
 Handle
 Image_extract( Handle self, int x, int y, int width, int height)
 {
-   Handle h;
-   PImage i;
-   HV * profile;
-   unsigned char * data = var->data;
-   int ls = var->lineSize;
-
-   if ( var->w == 0 || var->h == 0) return my->dup( self);
-   if ( x < 0) x = 0;
-   if ( y < 0) y = 0;
-   if ( x >= var->w) x = var->w - 1;
-   if ( y >= var->h) y = var->h - 1;
-   if ( width  + x > var->w) width  = var->w - x;
-   if ( height + y > var->h) height = var->h - y;
-   if ( width <= 0 || height <= 0) return my->dup( self);
-
-   profile = newHV();
-   pset_H( owner,        var->owner);
-   pset_i( width,        width);
-   pset_i( height,       height);
-   pset_i( type,         var->type);
-   pset_i( conversion,   var->conversion);
-   pset_i( hScaling,     is_opt( optHScaling));
-   pset_i( vScaling,     is_opt( optVScaling));
-   pset_i( preserveType, is_opt( optPreserveType));
-
-   h = Object_create( var->self-> className, profile);
-   sv_free(( SV *) profile);
-
-   i = ( PImage) h;
-   memcpy( i-> palette, var->palette, 768);
-   i-> palSize = var-> palSize;
-   if (( var->type & imBPP) >= 8) {
-      int pixelSize = ( var->type & imBPP) / 8;
-      while ( height > 0) {
-         height--;
-         memcpy( i-> data + height * i-> lineSize,
-                 data + ( y + height) * ls + pixelSize * x,
-                 pixelSize * width);
-      }
-   } else if (( var->type & imBPP) == 4) {
-      while ( height > 0) {
-         height--;
-         bc_nibble_copy( data + ( y + height) * ls, i-> data + height * i-> lineSize, x, width);
-      }
-   } else if (( var->type & imBPP) == 1) {
-      while ( height > 0) {
-         height--;
-         bc_mono_copy( data + ( y + height) * ls, i-> data + height * i-> lineSize, x, width);
-      }
-   }
-   --SvREFCNT( SvRV( i-> mate));
-   return h;
+   return nilHandle;
 }
 
 /*

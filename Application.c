@@ -215,18 +215,13 @@ Application_get_system_info( char * dummy)
 Handle
 Application_get_widget_from_handle( Handle self, SV * handle)
 {
-   ApiHandle apiHandle;
-   if ( SvIOK( handle))
-           apiHandle = SvUVX( handle);
-   else
-      apiHandle = sv_2uv( handle);
-   return apc_application_get_handle( self, apiHandle);
+   return nilHandle;
 }
 
 Handle
 Application_get_hint_widget( Handle self)
 {
-   return var->  hintWidget;
+   return nilHandle;
 }
 
 static Bool
@@ -238,38 +233,19 @@ icon_notify ( Handle self, Handle child, Handle icon)
 Handle
 Application_icon( Handle self, Bool set, Handle icon)
 {
-   if ( var-> stage > csFrozen) return nilHandle;
-
-   if ( !set)
-      return var-> icon;
-
-   if ( icon && !kind_of( icon, CImage)) {
-       warn("RTC0013: Illegal object reference passed to Application::icon");
-       return nilHandle;
-   }
-   if ( icon) {
-      icon = ((( PImage) icon)-> self)-> dup( icon);
-      ++SvREFCNT( SvRV((( PAnyObject) icon)-> mate));
-   }
-   my-> first_that( self, (void*)icon_notify, (void*)icon);
-   if ( var-> icon)
-      my-> detach( self, var-> icon, true);
-   var-> icon = icon;
-   if ( icon && ( list_index_of( var-> components, icon) < 0))
-      my-> attach( self, icon);
    return nilHandle;
 }
 
 Handle
 Application_get_focused_widget( Handle self)
 {
-   return apc_widget_get_focused();
+   return nilHandle;
 }
 
 Handle
 Application_get_active_window( Handle self)
 {
-   return apc_window_get_active();
+   return nilHandle;
 }
 
 Bool
@@ -347,11 +323,6 @@ Application_insertMode( Handle self, Bool set, Bool insMode)
 Handle 
 Application_get_modal_window( Handle self, int modalFlag, Bool topMost)
 {
-   if ( modalFlag == mtExclusive) {
-      return topMost ? var-> topExclModal   : var-> exclModal;
-   } else if ( modalFlag == mtShared) {
-      return topMost ? var-> topSharedModal : var-> sharedModal;
-   } 
    return nilHandle;
 }
 
@@ -426,8 +397,8 @@ Application_showHint( Handle self, Bool set, Bool showHint)
    return false;
 }
 
-Handle Application_next( Handle self) { return self;}
-Handle Application_prev( Handle self) { return self;}
+Handle Application_next( Handle self) { return nilHandle; }
+Handle Application_prev( Handle self) { return nilHandle; }
 
 SV *
 Application_palette( Handle self, Bool set, SV * palette)
@@ -438,36 +409,13 @@ Application_palette( Handle self, Bool set, SV * palette)
 Handle
 Application_top_frame( Handle self, Handle from)
 {
-   while ( from) {
-      if ( kind_of( from, CWindow) &&
-             (( PWidget( from)-> owner == application) || !CWidget( from)-> get_clipOwner(from))
-         )
-         return from;
-      from = PWidget( from)-> owner;
-   }
-   return application;
+   return nilHandle;
 }
 
 Handle
 Application_get_image( Handle self, int x, int y, int xLen, int yLen)
 {
-   HV * profile;
-   Handle i;
-   Bool ret;
-   Point sz;
-   if ( var->  stage > csFrozen) return nilHandle;
-   if ( x < 0 || y < 0 || xLen <= 0 || yLen <= 0) return nilHandle;
-   sz = apc_application_get_size( self);
-   if ( x + xLen > sz. x) xLen = sz. x - x;
-   if ( y + yLen > sz. y) yLen = sz. y - y;
-   if ( x >= sz. x || y >= sz. y || xLen <= 0 || yLen <= 0) return nilHandle;
-
-   profile = newHV();
-   i = Object_create( "Prima::Image", profile);
-   sv_free(( SV *) profile);
-   ret = apc_application_get_bitmap( self, i, x, y, xLen, yLen);
-   --SvREFCNT( SvRV((( PAnyObject) i)-> mate));
-   return ret ? i : nilHandle;
+   return nilHandle;
 }
 
 /*
@@ -476,80 +424,18 @@ Application_get_image( Handle self, int x, int y, int xLen, int yLen)
 Handle
 Application_map_focus( Handle self, Handle from)
 {
-   Handle topFrame = my-> top_frame( self, from);
-   Handle topShared;
-
-   if ( var->  topExclModal)
-      return ( topFrame == var->  topExclModal) ? from : var->  topExclModal;
-
-   if ( !var->  topSharedModal && var->  modalHorizons. count == 0)
-      return from; /* return from if no shared modals active */
-
-  if ( topFrame == self) {
-      if ( !var->  topSharedModal) return from;
-      topShared = var->  topSharedModal;
-   } else {
-      Handle horizon =
-         ( !CWindow( topFrame)-> get_modalHorizon( topFrame)) ?
-         CWindow( topFrame)-> get_horizon( topFrame) : topFrame;
-      if ( horizon == self)
-         topShared = var->  topSharedModal;
-      else
-         topShared = PWindow( horizon)-> topSharedModal;
-   }
-
-   return ( !topShared || ( topShared == topFrame)) ? from : topShared;
+   return nilHandle;
 }
 
 static Handle
 popup_win( Handle xTop)
 {
-   PWindow_vmt top = CWindow( xTop);
-   if ( !top-> get_visible( xTop))
-      top-> set_visible( xTop, 1);
-   if ( top-> get_windowState( xTop) == wsMinimized)
-      top-> set_windowState( xTop, wsNormal);
-   top-> set_selected( xTop, 1);
-   return xTop;
+   return nilHandle;
 }
 
 Handle
 Application_popup_modal( Handle self)
 {
-   Handle ha = apc_window_get_active();
-   Handle xTop;
-
-   if ( var->  topExclModal) {
-   /* checking exclusive modal chain */
-      xTop = ( !ha || ( PWindow(ha)->modal == 0)) ? var->  exclModal : ha;
-      while ( xTop) {
-         if ( PWindow(xTop)-> nextExclModal) {
-            CWindow(xTop)-> bring_to_front( xTop);
-            xTop = PWindow(xTop)-> nextExclModal;
-         } else {
-            return popup_win( xTop);
-         }
-      }
-   } else {
-      if ( !var->  topSharedModal && var->  modalHorizons. count == 0)
-         return nilHandle; /* return from if no shared modals active */
-      /* checking shared modal chains */
-      if ( ha) {
-         xTop = ( PWindow(ha)->modal == 0) ? CWindow(ha)->get_horizon(ha) : ha;
-         if ( xTop == application) xTop = var->  sharedModal;
-      } else
-         xTop = var->  sharedModal ? var->  sharedModal : var->  modalHorizons. items[ 0];
-
-      while ( xTop) {
-         if ( PWindow(xTop)-> nextSharedModal) {
-            CWindow(xTop)-> bring_to_front( xTop);
-            xTop = PWindow(xTop)-> nextSharedModal;
-         } else {
-            return popup_win( xTop);
-         }
-      }
-   }
-
    return nilHandle;
 }
 

@@ -171,53 +171,7 @@ Widget_reset_children_geometry( Handle self)
 static Handle
 Widget_check_in( Handle self, Handle in, Bool barf)
 {
-   Handle h = in;
-
-   /* check overall validity */
-   if ( !in || !kind_of( in, CWidget)) {
-      if ( barf)
-         croak("%s: invalid 'in': not a widget", "RTC008F: Prima::Widget::pack");
-      else
-         return nilHandle;
-   }
-
-   /* check direct inheritance */
-   while ( h) {
-      if ( h == self) {
-         if ( barf)
-            croak("%s: invalid 'in': is already a child", "RTC008F: Prima::Widget::pack");
-         else
-            return nilHandle;
-      }
-      h = PWidget( h)-> owner;
-   }
-
-   /* check slaves chain */
-   h = PWidget( in)-> packSlaves;
-   while ( h) {
-      if ( h == in) {
-         if ( barf)
-            croak("%s: invalid 'in': already a pack slave", "RTC008F: Prima::Widget::pack");
-         else
-            return nilHandle;
-      }
-      h = PWidget( h)-> geomInfo. next;
-   }
-   
-   h = PWidget( in)-> placeSlaves;
-   while ( h) {
-      if ( h == in) {
-         if ( barf)
-            croak("%s: invalid 'in': already a place slave", "RTC008F: Prima::Widget::pack");
-         else
-            return nilHandle;
-      }
-      h = PWidget( h)-> geomInfo. next;
-   }
-
-   /* place to check other chains if needed */
-
-   return in;
+   return nilHandle;
 }
 
 Point

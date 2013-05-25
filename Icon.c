@@ -113,13 +113,7 @@ Icon_create_empty( Handle self, int width, int height, int type)
 Handle
 Icon_dup( Handle self)
 {
-   Handle h = inherited dup( self);
-   PIcon  i = ( PIcon) h;
-   memcpy( i-> mask, var-> mask, var-> maskSize);
-   i-> autoMasking = var-> autoMasking;
-   i-> maskColor   = var-> maskColor;
-   i-> maskIndex   = var-> maskIndex;
-   return h;
+   return nilHandle;
 }
 
 IconHandle

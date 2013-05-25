@@ -62,7 +62,7 @@ static Bool bring_by_name( Handle self, PComponent item, char * name)
 Handle
 Component_bring( Handle self, char * componentName)
 {
-   return my-> first_that_component( self, (void*)bring_by_name, componentName);
+   return nilHandle;
 }
 
 static Bool
@@ -118,13 +118,6 @@ Component_name( Handle self, Bool set, SV * name)
 Handle
 Component_owner( Handle self, Bool set, Handle owner)
 {
-   HV * profile;
-   if ( !set)
-       return var-> owner;
-   profile = newHV();
-   pset_H( owner, owner);
-   my-> set( self, profile);
-   sv_free(( SV *) profile);
    return nilHandle;
 }
 
@@ -228,27 +221,7 @@ Component_recreate( Handle self)
 Handle
 Component_first_that_component( Handle self, void * actionProc, void * params)
 {
-   Handle child = nilHandle;
-   int i, count;
-   Handle * list = nil;
-
-   if ( actionProc == nil || var-> components == nil)
-      return nilHandle;
-   count = var-> components-> count;
-   if ( count == 0) return nilHandle;
-   if ( !( list = allocn( Handle, count))) return nilHandle;
-   memcpy( list, var-> components-> items, sizeof( Handle) * count);
-
-   for ( i = 0; i < count; i++)
-   {
-      if ((( PActionProc) actionProc)( self, list[ i], params))
-      {
-         child = list[ i];
-         break;
-      }
-   }
-   free( list);
-   return child;
+   return nilHandle;
 }
 
 void

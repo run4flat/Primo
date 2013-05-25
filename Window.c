@@ -92,23 +92,13 @@ Window_get_client_handle( Handle self)
 Handle
 Window_get_modal_window( Handle self, int modalFlag, Bool next)
 {
-   if ( modalFlag == mtExclusive) {
-      return next ? var-> nextExclModal   : var-> prevExclModal;
-   } else if ( modalFlag == mtShared) {
-      return next ? var-> nextSharedModal : var-> prevSharedModal;
-   } 
    return nilHandle;
 }
 
 Handle
 Window_get_horizon( Handle self)
 {
-   /* self trick is appropriate here;
-      don't bump into it accidentally */
-   self = var-> owner;
-   while ( self != application && !my-> get_modalHorizon( self))
-      self = var-> owner;
-   return self;
+   return nilHandle;
 }
 
 
@@ -191,27 +181,6 @@ icon_notify ( Handle self, Handle child, Handle icon)
 Handle
 Window_icon( Handle self, Bool set, Handle icon)
 {
-   if ( var-> stage > csFrozen) return nilHandle;
-
-   if ( !set) {
-      if ( apc_window_get_icon( self, nilHandle)) {
-         HV * profile = newHV();
-         Handle i = Object_create( "Prima::Icon", profile);
-         sv_free(( SV *) profile);
-         apc_window_get_icon( self, i);
-         --SvREFCNT( SvRV((( PAnyObject) i)-> mate));
-         return i;
-      } else
-         return nilHandle;
-   }
-
-   if ( icon && !kind_of( icon, CImage)) {
-       warn("RTC0091: Illegal object reference passed to Window::icon");
-       return nilHandle;
-   }
-   my-> first_that( self, (void*)icon_notify, (void*)icon);
-   apc_window_set_icon( self, icon);
-   opt_clear( optOwnerIcon);
    return nilHandle;
 }
 

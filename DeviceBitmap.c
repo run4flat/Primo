@@ -62,29 +62,11 @@ DeviceBitmap_monochrome( Handle self, Bool set, Bool monochrome)
 
 static Handle xdup( Handle self, char * className)
 {
-   Handle h;
-   PDrawable i;
-   HV * profile = newHV();
-   Point s;
-
-   pset_H( owner,        var-> owner);
-   pset_i( width,        var-> w);
-   pset_i( height,       var-> h);
-   pset_i( type,         var-> monochrome ? imMono : imRGB);
-
-   h = Object_create( className, profile);
-   sv_free(( SV *) profile);
-   i = ( PDrawable) h;
-   s = i-> self-> get_size( h);
-   i-> self-> begin_paint( h);
-   i-> self-> put_image_indirect( h, self, 0, 0, 0, 0, s.x, s.y, s.x, s.y, ropCopyPut);
-   i-> self-> end_paint( h);
-   --SvREFCNT( SvRV( i-> mate));
-   return h;
+   return nilHandle;
 }
 
-Handle DeviceBitmap_image( Handle self) { return xdup( self, "Prima::Image"); }
-Handle DeviceBitmap_icon( Handle self) { return xdup( self, "Prima::Icon"); }
+Handle DeviceBitmap_image( Handle self) { return nilHandle; }
+Handle DeviceBitmap_icon( Handle self) { return nilHandle; }
 
 SV *
 DeviceBitmap_get_handle( Handle self)
