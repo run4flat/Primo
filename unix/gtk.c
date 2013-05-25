@@ -67,8 +67,7 @@ prima_gtk_done(void)
 
 static gboolean do_events(gpointer data)
 {
-	prima_one_loop_round( false, true);
-	return gtk_dialog != NULL;
+	return false;
 }
 
 static char *

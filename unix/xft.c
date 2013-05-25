@@ -159,14 +159,7 @@ prima_xft_done(void)
 static unsigned short
 utf8_flag_strncpy( char * dst, const char * src, unsigned int maxlen, unsigned short is_utf8_flag)
 {
-	int is_utf8 = 0;
-	while ( maxlen-- && *src) {
-		if ( *((unsigned char*)src) > 0x7f) 
-			is_utf8 = 1;
-		*(dst++) = *(src++);
-	}
-	*dst = 0;
-	return is_utf8 ? is_utf8_flag : 0;
+   return 0;
 }
 
 static void
@@ -229,31 +222,7 @@ prima_xft_font_encodings( PHash hash)
 static FcChar32 *
 xft_text2ucs4( const unsigned char * text, int len, Bool utf8, uint32_t * map8)
 {
-   FcChar32 *ret, *r;
-   if ( utf8) {
-      STRLEN charlen, bytelen = strlen(text);
-      (void)bytelen;
-
-      if ( len < 0) len = prima_utf8_length(( char*) text);
-      if ( !( r = ret = malloc( len * sizeof( FcChar32)))) return nil;
-      while ( len--) {
-         *(r++) = 
-#if PERL_PATCHLEVEL >= 16
-         utf8_to_uvchr_buf(( U8*) text, ( U8*) + bytelen, &charlen)
-#else
-         utf8_to_uvchr(( U8*) text, &charlen)
-#endif
-         ;
-         text += charlen;
-	 if ( charlen == 0 ) break;
-      }
-   } else {
-      int i;
-      if ( len < 0) len = strlen(( char*) text);
-      if ( !( ret = malloc( len * sizeof( FcChar32)))) return nil;
-      for ( i = 0; i < len; i++) 
-         ret[i] = ( text[i] < 128) ? text[i] : map8[ text[i] - 128];
-   }
+   FcChar32 *ret;
    return ret;
 }
 
@@ -274,9 +243,6 @@ static XftFont *
 create_no_aa_font( XftFont * font)
 {
    FcPattern * request;
-   if (!( request = FcPatternDuplicate( font-> pattern))) return nil;
-   FcPatternDel( request, FC_ANTIALIAS);
-   FcPatternAddBool( request, FC_ANTIALIAS, 0);
    return XftFontOpenPattern( DISP, request);
 }
 
