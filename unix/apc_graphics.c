@@ -252,41 +252,8 @@ get_pixel_depth( int depth)
 static uint32_t
 color_to_pixel( Handle self, Color color, int depth)
 {
-   uint32_t pv;
-
-   if ( depth == 1) {
-      pv = color ? 1 : 0;
-   } else if ( guts.palSize > 0 ) {
-      pv = prima_color_find( self, color, -1, nil, RANK_FREE);
-   } else {
-      switch ( depth) {
-      case 16:   
-      case 24:   
-      case 32:   
-         pv = 
-            (((COLOR_R(color) << guts. red_range  ) >> 8) << guts.   red_shift) |
-            (((COLOR_G(color) << guts. green_range) >> 8) << guts. green_shift) |
-            (((COLOR_B(color) << guts. blue_range ) >> 8) << guts.  blue_shift);
-         if ( guts.machine_byte_order != guts.byte_order)  
-            switch( depth) {
-            case 16:
-               pv = REVERSE_BYTES_16( pv);
-               break;   
-            case 24:
-               pv = REVERSE_BYTES_24( pv);
-               break;   
-            case 32:
-               pv = REVERSE_BYTES_32( pv);
-               break;            
-            }   
-          break;
-      default:
-         warn("UAG_005: Not supported pixel depth");
-         return 0;
-      }
-   }
-   return pv;
-}  
+   uint32_t foo; return foo;
+}
 
 typedef struct {
    XImage *  i;

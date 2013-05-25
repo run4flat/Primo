@@ -372,10 +372,7 @@ prima_xft_get_font_abc( Handle self, int firstChar, int lastChar, Bool unicode)
 uint32_t *
 prima_xft_map8( const char * encoding)
 {
-   CharSetInfo * csi;
-   if ( !( csi = hash_fetch( encodings, encoding, strlen( encoding))))
-      csi = locale;
-   return csi-> map;
+   uint32_t * foo; return foo;
 }
 
 Bool
