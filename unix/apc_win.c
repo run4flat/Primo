@@ -52,59 +52,7 @@ unsigned char *
 prima_get_window_property( XWindow window, Atom property, Atom req_type, Atom * actual_type,
                            int * actual_format, unsigned long * nitems)
 {
-   Atom a_actual_type;
-   unsigned char * ret, * ptr;
-   unsigned long left, n, a_nitems;
-   int a_actual_format, curr_size, new_size, malloc_size, offset;
-
-   ret = NULL;
-   offset = 0;
-   new_size = curr_size = malloc_size = 0;
-   if ( actual_type   == NULL) actual_type   = &a_actual_type;
-   if ( actual_format == NULL) actual_format = &a_actual_format;
-   if ( nitems        == NULL) nitems        = &a_nitems;
-
-   *nitems = 0;
-
-   while ( XGetWindowProperty( DISP, window, property, offset, 2048, false, req_type,
-          actual_type, actual_format, &n, &left, &ptr) == Success) {
-     if ( ptr) {
-         if ( n > 0) {
-	     if ( *actual_format == 32) *actual_format = sizeof(long) * 8; /* MUAHAHA!! That's even documented now */
-	     curr_size = n * *actual_format / 8;
-	     new_size += curr_size;
-             offset += curr_size / 4;
-	     *nitems += n;
-
-	     if ( ret == NULL) {
-	         malloc_size = new_size;
-		 ret = malloc( malloc_size);
-		 if ( ret == NULL) {
-                    warn("Not enough memory: %d bytes\n", malloc_size);
-		    return NULL;
-		 }
-	     } else {
-                 if ( new_size > malloc_size) {
-		     unsigned char * p;
-		     malloc_size = new_size * 2;
-		     p = realloc( ret, malloc_size);
-		     if ( p) {
-		        ret = p;
-		     } else {
-		        free( ret);
-                        warn("Not enough memory: %d bytes\n", malloc_size);
-			return NULL;
-		     }
-		 }
-	     }
-	     memcpy( ret + new_size - curr_size, ptr, curr_size);
-         }
-         XFree( ptr);
-      }
-      if ( left <= 0) break;
-   }
-
-   return ret;
+   unsigned char * foo; return foo;
 }
 
 Bool
