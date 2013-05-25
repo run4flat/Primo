@@ -69,17 +69,7 @@ predefined_cursors[] = {
    None
 };
 
-static int
-get_cursor( Handle self, Pixmap *source, Pixmap *mask, Point *hot_spot, Cursor *cursor)
-{
-   int foo; return foo;
-}
 
-static Bool
-load_pointer_font( void)
-{
-   Bool foo; return foo;
-}
 
 Point
 apc_pointer_get_hot_spot( Handle self)

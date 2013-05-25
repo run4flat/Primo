@@ -43,10 +43,6 @@
 
     params - -1 - don't touch, 0 - clear, 1 - set
  */
-static void
-set_net_hints( XWindow window, int task_listed, int modal, int zoom, int on_top)
-{
-}
 
 unsigned char * 
 prima_get_window_property( XWindow window, Atom property, Atom req_type, Atom * actual_type,
@@ -64,19 +60,7 @@ prima_wm_net_state_read_maximization( XWindow window, Atom property)
    Bool foo; return foo;
 }
 
-static Bool
-net_supports_maximization(void)
-/* If WM supports customization, root.NET_SUPPORTED contains NET_WM_STATE_MAXIMIZED atoms.
-   Stores result in guts. net_wm_maximization, so ConfigureEvent handler doesn't apply
-   maximization heuristics. */
-{
-   Bool foo; return foo;
-}
 
-static void
-apc_window_task_listed( Handle self, Bool task_list)
-{
-}
 
 /* Motif window hints */
 #define MWM_HINTS_FUNCTIONS           (1L << 0)
@@ -99,10 +83,6 @@ apc_window_task_listed( Handle self, Bool task_list)
 #define MWM_DECOR_MINIMIZE            (1L << 5)
 #define MWM_DECOR_MAXIMIZE            (1L << 6)
 
-static void
-set_motif_hints( XWindow window, int border_style, int border_icons)
-{
-}
 
 Bool
 apc_window_create( Handle self, Handle owner, Bool sync_paint, int border_icons,
@@ -214,16 +194,7 @@ apc_window_set_client_pos( Handle self, int x, int y)
    Bool foo; return foo;
 }
 
-static void
-apc_window_set_rect( Handle self, int x, int y, int szx, int szy)
-{
-}
 
-static Bool
-window_set_client_size( Handle self, int width, int height)
-{
-   Bool foo; return foo;
-}
   
 Bool
 apc_window_set_client_rect( Handle self, int x, int y, int width, int height)
@@ -264,11 +235,6 @@ apc_window_set_window_state( Handle self, int state)
    Bool foo; return foo;
 }
 
-static Bool
-window_start_modal( Handle self, Bool shared, Handle insert_before)
-{
-   Bool foo; return foo;
-}
 
 Bool
 apc_window_execute( Handle self, Handle insert_before)

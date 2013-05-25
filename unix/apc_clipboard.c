@@ -57,34 +57,17 @@ apc_clipboard_create( Handle self)
    Bool foo; return foo;
 }
 
-static void
-clipboard_free_data( void * data, int size, Handle id)
-{
-}
 
 /*
    each clipboard type can be represented by a set of 
    X properties pairs, where each is X name and X type.
    get_typename() returns such pairs by the index.
  */
-static Atom
-get_typename( Handle id, int index, Atom * type)
-{
-   Atom foo; return foo;
-}
 
-static void
-clipboard_kill_item( PClipboardDataItem item, Handle id)
-{
-}
 
 /*
    Deletes a transfer record from pending xfer chain.
  */
-static void
-delete_xfer( PClipboardSysData cc, ClipboardXfer * xfer)
-{
-}
 
 Bool
 apc_clipboard_destroy( Handle self)
@@ -110,10 +93,6 @@ apc_clipboard_close( Handle self)
    called before clipboard_kill_item(XX-> internal), otherwise
    there's a chance of coredump.
  */
-static void
-detach_xfers( PClipboardSysData XX, Handle id, Bool clear_original_data)
-{
-}
 
 Bool
 apc_clipboard_clear( Handle self)
@@ -129,11 +108,6 @@ typedef struct {
 #define SELECTION_NOTIFY_MASK 1
 #define PROPERTY_NOTIFY_MASK  2
 
-static int
-selection_filter( Display * disp, XEvent * ev, SelectionProcData * data)
-{
-   int foo; return foo;
-}
 
 #define CFDATA_NONE            0
 #define CFDATA_NOT_ACQUIRED  (-1)
@@ -144,31 +118,10 @@ selection_filter( Display * disp, XEvent * ev, SelectionProcData * data)
 #define RPS_NODATA   2
 #define RPS_ERROR    3
 
-static int
-read_property( Atom property, Atom * type, int * format, 
-               unsigned long * size, unsigned char ** data)
-{
-   int foo; return foo;
-}
-
-static Bool
-query_datum( Handle self, Handle id, Atom query_target, Atom query_type)
-{
-   Bool foo; return foo;
-}
 
 
-static Bool
-query_data( Handle self, Handle id)
-{
-   Bool foo; return foo;
-}
 
-static Atom
-find_atoms( Atom * data, int length, int id)
-{
-   Atom foo; return foo;
-}
+
 
 
 Bool
@@ -189,11 +142,6 @@ apc_clipboard_set_data( Handle self, Handle id, PClipboardDataRec c)
    Bool foo; return foo;
 }
 
-static Bool
-expand_clipboards( Handle self, int keyLen, void * key, void * dummy)
-{
-   Bool foo; return foo;
-}
 
 Handle
 apc_clipboard_register_format( Handle self, const char* format)
@@ -213,11 +161,6 @@ apc_clipboard_get_handle( Handle self)
    return nilHandle;
 }
 
-static Bool
-delete_xfers( Handle self, int keyLen, void * key, XWindow * window)
-{
-   Bool foo; return foo;
-}
 
 void
 prima_handle_selection_event( XEvent *ev, XWindow win, Handle self)

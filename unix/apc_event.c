@@ -341,23 +341,9 @@ extern Bool appDead;
     0x0038, 0x0033, 0x0000, 0x003d                                  /* 0xffb8-0xffbd */
 };
 
-static unsigned int
-KeySymToUcs4(KeySym keysym)
-{
-   unsigned int foo; return foo;
-}
 /* end unicode map */
 
-static void
-handle_key_event( Handle self, XKeyEvent *ev, Event *e, KeySym * sym, Bool release)
-{
-}
 
-static Bool
-input_disabled( PDrawableSysData XX, Bool ignore_horizon)
-{
-   Bool foo; return foo;
-}
 
 Bool
 prima_no_input( PDrawableSysData XX, Bool ignore_horizon, Bool beep)
@@ -365,10 +351,6 @@ prima_no_input( PDrawableSysData XX, Bool ignore_horizon, Bool beep)
    Bool foo; return foo;
 }
 
-static void
-syntetic_mouse_move( void)
-{
-}
 
 typedef struct _WMSyncData
 {
@@ -379,43 +361,10 @@ typedef struct _WMSyncData
    Bool    allow_cmSize;
 } WMSyncData;
 
-static void
-wm_sync_data_from_event( Handle self, WMSyncData * wmsd, XConfigureEvent * cev, Bool mapped)
-{
-}
 
-static void
-open_wm_sync_data( Handle self, WMSyncData * wmsd)
-{
-}
 
-static Bool
-process_wm_sync_data( Handle self, WMSyncData * wmsd)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-wm_event( Handle self, XEvent *xev, PEvent ev)
-{
-   Bool foo; return foo;
-}
 
-static int
-compress_configure_events( XEvent *ev)
-/*
-   This reads as many ConfigureNotify events so these do not
-   trash us down. This can happen when the WM allows dynamic
-   top-level windows resizing, and large amount of ConfigureNotify
-   events are sent as the user resizes the window.
-
-   Xlib has many functions to peek into event queue, but all
-   either block or XFlush() implicitly, which isn't a good
-   idea - so the code uses XNextEvent/XPutBackEvent calls.
- */
-{
-   int foo; return foo;
-}
 
  static char * xevdefs[] = { "0", "1"
 ,"KeyPress" ,"KeyRelease" ,"ButtonPress" ,"ButtonRelease" ,"MotionNotify" ,"EnterNotify"
@@ -433,11 +382,6 @@ prima_handle_event( XEvent *ev, XEvent *next_event)
 
 #define DEAD_BEEF 0xDEADBEEF
 
-static int
-copy_events( Handle self, PList events, WMSyncData * w, int eventType)
-{
-   int foo; return foo;
-}
 
 void
 prima_wm_sync( Handle self, int eventType)

@@ -62,11 +62,6 @@ process_transparents( Handle self)
 {
 }
 
-static int
-flush_events( Display * disp, XEvent * ev, Handle self)
-{
-   int foo; return foo;
-}
 
 Bool
 apc_widget_create( Handle self, Handle owner, Bool sync_paint,
@@ -225,11 +220,6 @@ apc_widget_invalidate_rect( Handle self, Rect *rect)
    Bool foo; return foo;
 }
 
-static Bool 
-scroll( Handle owner, Handle self, Point * delta)
-{
-   Bool foo; return foo;
-}
 
 Bool
 apc_widget_scroll( Handle self, int horiz, int vert,
@@ -262,11 +252,6 @@ apc_widget_set_first_click( Handle self, Bool firstClick)
    Bool foo; return foo;
 }
 
-static int
-flush_refocus( Display * disp, XEvent * ev, void * dummy)
-{
-   int foo; return foo;
-}
 
 Bool
 apc_widget_set_focused( Handle self)
@@ -301,10 +286,6 @@ apc_widget_set_shape( Handle self, Handle mask)
 /* Used instead of XUnmapWindow sometimes because when a focused
    widget gets hidden, the X server's revert_to is sometimes
    weirdly set to RevertToPointerRoot ( mwm is the guilty one ) */
-static void
-apc_XUnmapWindow( Handle self)
-{
-}
 
 void
 prima_send_cmSize( Handle self, Point oldSize)

@@ -28,15 +28,7 @@
 
 #include "unix/guts.h"
 
-static void
-inactivate_timer( PTimerSysData sys)
-{
-}
 
-static void
-fetch_sys_timer( Handle self, PTimerSysData *s, Bool *real_timer)
-{
-}
 
 #define ENTERTIMER \
 	PTimerSysData sys; \

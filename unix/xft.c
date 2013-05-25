@@ -101,37 +101,11 @@ typedef struct {
    uint32_t   map[128];   /* maps characters 128-255 into unicode */
 } CharSetInfo;
 
-static CharSetInfo std_charsets[] = {
-    { "iso8859-1",  nil, 0, 1 }
-#ifdef HAVE_ICONV_H    
-    ,
-    { "iso8859-2",  nil, 0, 0 },
-    { "iso8859-3",  nil, 0, 0 },
-    { "iso8859-4",  nil, 0, 0 },
-    { "iso8859-5",  nil, 0, 0 },
-    { "iso8859-7",  nil, 0, 0 },
-    { "iso8859-8",  nil, 0, 0 },
-    { "iso8859-9",  nil, 0, 0 },
-    { "iso8859-10", nil, 0, 0 },
-    { "iso8859-13", nil, 0, 0 },
-    { "iso8859-14", nil, 0, 0 },
-    { "iso8859-15", nil, 0, 0 },
-    { "koi8-r",     nil, 0, 0 }  /* this is special - change the constant
-                                    KOI8_INDEX as well when updating
-                                    the table */
-/* You are welcome to add more 8-bit charsets here - just keep in mind
-   that each encoding requires iconv() to load a file */
-#endif    
-};
 
 #define KOI8_INDEX 12
 #define MAX_CHARSET (sizeof(std_charsets)/sizeof(CharSetInfo))
 #define MAX_GLYPH_SIZE (guts.limits.request_length / 256)
 
-static PHash encodings    = nil;
-static PHash mismatch     = nil; /* fonts not present in xft base */
-static char  fontspecific[] = "fontspecific";
-static CharSetInfo * locale = nil;
 
 #ifdef NEED_X11_EXTENSIONS_XRENDER_H
 /* piece of Xrender guts */
@@ -156,27 +130,9 @@ prima_xft_done(void)
 {
 }
 
-static unsigned short
-utf8_flag_strncpy( char * dst, const char * src, unsigned int maxlen, unsigned short is_utf8_flag)
-{
-   return 0;
-}
 
-static void
-fcpattern2font( FcPattern * pattern, PFont font)
-{
-}
 
-static void
-xft_build_font_key( PFontKey key, PFont f, Bool bySize)
-{
-}
 
-static PCachedFont
-try_size( Handle self, Font f, double size)
-{
-   return nil;
-}
 
 
 Bool
@@ -219,12 +175,6 @@ prima_xft_font_encodings( PHash hash)
 {
 }
    
-static FcChar32 *
-xft_text2ucs4( const unsigned char * text, int len, Bool utf8, uint32_t * map8)
-{
-   FcChar32 *ret;
-   return ret;
-}
 
 int
 prima_xft_get_text_width( PCachedFont self, const char * text, int len, Bool addOverhang, 
@@ -239,12 +189,6 @@ prima_xft_get_text_box( Handle self, const char * text, int len, Bool utf8)
    Point * foo; return foo;
 }
 
-static XftFont *
-create_no_aa_font( XftFont * font)
-{
-   FcPattern * request;
-   return XftFontOpenPattern( DISP, request);
-}
 
 #define SORT(a,b)	{ int swp; if ((a) > (b)) { swp=(a); (a)=(b); (b)=swp; }}
 #define REVERT(a)	(XX-> size. y - (a) - 1)
@@ -271,12 +215,6 @@ prima_xft_text_out( Handle self, const char * text, int x, int y, int len, Bool 
    Bool foo; return foo;
 }
                              
-static Bool
-xft_add_item( unsigned long ** list, int * count, int * size, FcChar32 chr, 
-              Bool decrease_count_if_failed)
-{
-   Bool foo; return foo;
-}
 
 unsigned long *
 prima_xft_get_font_ranges( Handle self, int * count)

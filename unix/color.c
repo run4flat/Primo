@@ -126,33 +126,14 @@ apc_widget_map_color( Handle self, Color color)
    Color foo; return foo;
 }
 
-static PHash  hatches;
-static Bool   kill_hatches( Pixmap pixmap, int keyLen, void * key, void * dummy);
-static Bool   prima_color_new( XColor * xc);
 
 /*
-static int card[256];
-static int cardi = 0;
-static Bool
-my_XAllocColor( Display * disp, Colormap cm, XColor * xc, int line)
-{
-   Bool foo; return foo;
-}
 
-static void
-my_XFreeColors( Display * disp, Colormap cm, long * ls, int count, long pal, int line)
-{
-}
 
 #define XAllocColor(a,b,c) my_XAllocColor(a,b,c,__LINE__)
 #define XFreeColors(a,b,c,d,e) my_XFreeColors(a,b,c,d,e,__LINE__)
 */
 
-static Bool
-alloc_color( XColor * c) 
-{
-   Bool foo; return foo;
-}
 
 /*
      Fills Brush structure. If dithering is needed,
@@ -171,35 +152,11 @@ prima_allocate_color( Handle self, Color color, Brush * brush)
 }
 
 
-static Bool
-alloc_main_color_range( XColor * xc, int count, int maxDiff)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-create_std_palettes( XColor * xc, int count)
-{
-   Bool foo; return foo;
-}
 
-static void
-fill_cubic( XColor * xc, int d)
-{
-}
 
-static char * do_visual = nil;
-static PList color_options = nil;
 
-static void
-set_color_class( int class, char * option, char * value)
-{
-}
 
-static void
-apply_color_class( int c_class, Color value) 
-{
-}
 
 Bool
 prima_init_color_subsystem(char * error_buf)
@@ -242,11 +199,6 @@ prima_color_find( Handle self, long color, int maxDiff, int * diff, int maxRank)
    int foo; return foo;
 }
 
-static Bool
-prima_color_new( XColor * xc)
-{
-   Bool foo; return foo;
-}
 
 /*
    Adds reference to widget that is responsible
@@ -299,10 +251,6 @@ prima_lpal_set( Byte * palette, int index, int rank )
 }
           
 
-static Bool kill_hatches( Pixmap pixmap, int keyLen, void * key, void * dummy)
-{
-   Bool foo; return foo;
-}
 
 Pixmap 
 prima_get_hatch( FillPattern * fp)

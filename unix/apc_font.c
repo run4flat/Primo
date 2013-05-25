@@ -35,36 +35,11 @@
 #include "unix/guts.h"
 #include <locale.h>
 
-static PHash xfontCache = nil;
-static Bool have_vector_fonts = false;
-static PHash encodings = nil;
-static char **ignore_encodings;
-static int n_ignore_encodings;
-static char *s_ignore_encodings;
 
 /* these are freed right after use */
-static char * do_default_font = nil;
-static char * do_caption_font = nil;
-static char * do_msg_font = nil;
-static char * do_menu_font = nil;
-static char * do_widget_font = nil;
-static Bool   do_xft = true;
-static Bool   do_core_fonts = true;
-static Bool   do_xft_no_antialias = false;
-static Bool   do_xft_priority = true;
-static Bool   do_no_scaled_fonts = false;
 
-static void detail_font_info( PFontInfo f, PFont font, Bool addToCache, Bool bySize);
 
-static void
-str_lwr( char *d, const char *s)
-{
-}
 
-static void
-fill_default_font( Font * font )
-{
-}
 
 /* Extracts font name, charset, foundry etc from X properties, if available.
    Usually it is when X server can access its internal font files directly.
@@ -72,22 +47,8 @@ fill_default_font( Font * font )
    - X properties values are not the same as XLFD, and are precise font descriptors
    - alias fonts ( defined via fonts.alias ) don't have X properties
  */
-static void
-font_query_name( XFontStruct * s, PFontInfo f)
-{
-}
 
-static Bool
-xlfd_parse_font( char * xlfd_name, PFontInfo info, Bool do_vector_fonts)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-pick_default_font_with_encoding(void)
-{
-   Bool foo; return foo;
-}
 
 Bool
 prima_init_font_subsystem( char * error_buf)
@@ -111,11 +72,6 @@ prima_free_rotated_entry( PCachedFont f)
 {
 }
 
-static Bool
-free_rotated_entries( PCachedFont f, int keyLen, void * key, void * dummy)
-{
-   Bool foo; return foo;
-}
 
 void
 prima_cleanup_font_subsystem( void)
@@ -134,10 +90,6 @@ apc_font_load( const char* filename)
    int foo; return foo;
 }
 
-static void
-dump_font( PFont f)
-{
-}
 
 void
 prima_build_font_key( PFontKey key, PFont f, Bool bySize)
@@ -150,11 +102,6 @@ prima_find_known_font( PFont font, Bool refill, Bool bySize)
    return nil;
 }
 
-static Bool
-add_font_to_cache( PFontKey key, PFontInfo f, const char *name, XFontStruct *s, int uPos, int uThinkness)
-{
-   Bool foo; return foo;
-}
 
 void
 prima_init_try_height( HeightGuessStack * p, int target, int firstMove )
@@ -167,19 +114,10 @@ prima_try_height( HeightGuessStack * p, int height)
    int foo; return foo;
 }
 
-static void
-detail_font_info( PFontInfo f, PFont font, Bool addToCache, Bool bySize)
-{
-}
 
 #define QUERYDIFF_BY_SIZE        (-1)
 #define QUERYDIFF_BY_HEIGHT      (-2)
 
-static double 
-query_diff( PFontInfo fi, PFont f, char * lcname, int selector)
-{
-   double foo; return foo;
-}
 
 Bool
 prima_core_font_pick( Handle self, PFont source, PFont dest)
@@ -200,11 +138,6 @@ apc_font_pick( Handle self, PFont source, PFont dest)
 }
 
 
-static PFont
-spec_fonts( int *retCount)
-{
-   return nil;
-}
 
 PFont
 apc_fonts( Handle self, const char *facename, const char * encoding, int *retCount)

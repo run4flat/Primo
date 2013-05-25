@@ -53,23 +53,8 @@ log_write( const char *format, ...)
    Bool foo; return foo;
 }
 
-static XrmQuark
-get_class_quark( const char *name)
-{
-   XrmQuark foo; return foo;
-}
 
-static XrmQuark
-get_instance_quark( const char *name)
-{
-   XrmQuark foo; return foo;
-}
 
-static Bool
-update_quarks_cache( Handle self)
-{
-   Bool foo; return foo;
-}
 
 int
 unix_rm_get_int( Handle self, XrmQuark class_detail, XrmQuark name_detail, int default_value)
@@ -216,10 +201,6 @@ apc_message( Handle self, PEvent e, Bool is_post)
    Bool foo; return foo;
 }
 
-static void 
-close_msgdlg( struct MsgDlg * md)
-{
-}
 
 void
 prima_msgdlg_event( XEvent * ev, struct MsgDlg * md)

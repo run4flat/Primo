@@ -59,42 +59,11 @@ prima_unix_guts(void)
    return &guts;
 }
 
-static int
-x_error_handler( Display *d, XErrorEvent *ev)
-{
-   int foo; return foo;
-}
 
-static int
-x_io_error_handler( Display *d)
-{
-   int foo; return foo;
-}
 
-static XrmDatabase
-get_database( void)
-{
-   XrmDatabase foo; return foo;
-}
 
-static int
-get_idepth( void)
-{
-   int foo; return foo;
-}
 
-static Bool  do_x11     = true;
-static Bool  do_sync    = false;
-static char* do_display = NULL;
-static int   do_debug   = 0;
-static Bool  do_icccm_only = false;
-static Bool  do_no_shmem   = false;
 
-static Bool
-init_x11( char * error_buf )
-{
-   Bool foo; return foo;
-}
 
 int
 prima_debug( const char *format, ...)
@@ -102,10 +71,6 @@ prima_debug( const char *format, ...)
    int foo; return foo;
 }
 
-static void
-free_gc_pool( struct gc_head *head)
-{
-}
 
 Bool
 apc_application_begin_paint( Handle self)
@@ -167,11 +132,6 @@ apc_application_get_handle( Handle self, ApiHandle apiHandle)
    return nilHandle;
 }
 
-static Bool
-wm_net_get_current_workarea( Rect * r)
-{
-   Bool foo; return foo;
-}
 
 Rect
 apc_application_get_indents( Handle self)
@@ -214,21 +174,8 @@ typedef FILE *FileStream;
 #define PerlIO_fileno(f) fileno(f)
 #endif
 
-static Bool
-purge_invalid_watchers( Handle self, void *dummy)
-{
-   Bool foo; return foo;
-}
 
-static void
-perform_pending_paints( void)
-{
-}
 
-static void
-send_pending_events( void)
-{
-}
 
 Bool
 prima_one_loop_round( Bool wait, Bool careOfApplication)

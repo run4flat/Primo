@@ -40,18 +40,7 @@
 
 #include <gtk/gtk.h>
 
-static int gtk_initialized = 0;
 
-static GtkWidget *gtk_dialog           = NULL;
-static char	gtk_dialog_title[256];
-static char*	gtk_dialog_title_ptr   = NULL;
-static Bool	gtk_select_multiple    = FALSE;
-static Bool	gtk_overwrite_prompt   = FALSE;
-static Bool	gtk_show_hidden_files  = FALSE;
-static char	gtk_current_folder[MAXPATHLEN+1];
-static char*	gtk_current_folder_ptr = NULL;
-static List*	gtk_filters            = NULL;
-static int	gtk_filter_index       = 0;
 
 Bool
 prima_gtk_init(void)
@@ -65,16 +54,7 @@ prima_gtk_done(void)
    Bool foo; return foo;
 }
 
-static gboolean do_events(gpointer data)
-{
-	return false;
-}
 
-static char *
-gtk_openfile( Bool open)
-{
-   char * foo; return foo;
-}
 
 char *
 prima_gtk_openfile( char * params)

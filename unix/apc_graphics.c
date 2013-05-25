@@ -145,16 +145,7 @@ apc_gp_done( Handle self)
    Bool foo; return foo;
 }
 
-static int
-arc_completion( double * angleStart, double * angleEnd, int * needFigure)
-{
-   int foo; return foo;
-}
 
-static void
-calculate_ellipse_divergence(void)
-{
-}
 
 #define ELLIPSE_RECT x - ( dX + 1) / 2 + 1, y - dY / 2, dX-guts.ellipseDivergence.x, dY-guts.ellipseDivergence.y
 #define FILL_ANTIDEFECT_REPAIRABLE \
@@ -242,18 +233,8 @@ apc_gp_fill_sector( Handle self, int x, int y, int dX, int dY, double angleStart
    Bool foo; return foo;
 }
 
-static int
-get_pixel_depth( int depth) 
-{
-   int foo; return foo;
-}
    
 
-static uint32_t
-color_to_pixel( Handle self, Color color, int depth)
-{
-   uint32_t foo; return foo;
-}
 
 typedef struct {
    XImage *  i;
@@ -268,22 +249,8 @@ typedef struct {
    PList  *  lists;
 } FillSession;
 
-static Bool 
-fs_get_pixel( FillSession * fs, int x, int y)
-{
-   Bool foo; return foo;
-}
 
-static void
-hline( FillSession * fs, int x1, int y, int x2)
-{
-}
 
-static int
-fill( FillSession * fs, int sx, int sy, int d, int pxl, int pxr)
-{
-   int foo; return foo;
-}
 
 Bool
 apc_gp_flood_fill( Handle self, int x, int y, Color color, Bool singleBorder)
@@ -357,23 +324,9 @@ apc_gp_set_pixel( Handle self, int x, int y, Color color)
    Bool foo; return foo;
 }
 
-static Point
-gp_get_text_overhangs( Handle self, const char *text, int len, Bool wide)
-{
-   Point foo; return foo;
-}
 
-static int
-gp_get_text_width( Handle self, const char *text, int len, Bool addOverhang, Bool wide);
 
-static Point *
-gp_get_text_box( Handle self, const char * text, int len, Bool wide);
 
-static Bool
-gp_text_out_rotated( Handle self, const char * text, int x, int y, int len, Bool wide, Bool * ok_to_not_rotate) 
-{
-   Bool foo; return foo;
-}
 
 Bool
 apc_gp_text_out( Handle self, const char * text, int x, int y, int len, Bool utf8)
@@ -484,11 +437,6 @@ apc_gp_get_rop2( Handle self)
    int foo; return foo;
 }
 
-static int
-gp_get_text_width( Handle self, const char *text, int len, Bool addOverhang, Bool wide)
-{
-   int foo; return foo;
-}
 
 int
 apc_gp_get_text_width( Handle self, const char * text, int len, Bool addOverhang, Bool utf8)
@@ -496,11 +444,6 @@ apc_gp_get_text_width( Handle self, const char * text, int len, Bool addOverhang
    int foo; return foo;
 }
 
-static Point *
-gp_get_text_box( Handle self, const char * text, int len, Bool wide)
-{
-   Point * foo; return foo;
-}
 
 Point *
 apc_gp_get_text_box( Handle self, const char * text, int len, Bool utf8)
