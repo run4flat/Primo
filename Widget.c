@@ -425,17 +425,13 @@ Widget_validate_owner( Handle self, Handle * owner, HV * profile)
 Font
 Widget_get_default_font( char * dummy)
 {
-   Font font;
-   apc_widget_default_font( &font);
-   return font;
+   Font foo; return foo;
 }
 
 Font
 Widget_get_default_popup_font( char * dummy)
 {
-   Font f;
-   apc_popup_default_font( &f);
-   return f;
+   Font foo; return foo;
 }
 
 
@@ -497,7 +493,7 @@ Widget_get_pointer_size( char*dummy)
 Font
 Widget_get_popup_font( Handle self)
 {
-   return var-> popupFont;
+   Font foo; return foo;
 }
 
 Handle

@@ -107,11 +107,7 @@ Drawable_set( Handle self, HV * profile)
 Font *
 Drawable_font_match( char * dummy, Font * source, Font * dest, Bool pick)
 {
-   if ( pick) 
-      apc_font_pick( nilHandle, source, dest);
-   else
-      Drawable_font_add( nilHandle, source, dest);
-   return dest;
+   Font * foo; return foo;
 }
 
 Bool
@@ -507,8 +503,7 @@ Drawable_fillPattern( Handle self, Bool set, SV * svpattern)
 Font
 Drawable_get_font( Handle self)
 {
-   Font foo;
-   return foo;
+   Font foo; return foo;
 }
 
 void

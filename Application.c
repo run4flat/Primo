@@ -134,25 +134,19 @@ Application_font_encodings( Handle self, char * encoding)
 Font
 Application_get_default_font( char * dummy)
 {
-   Font font;
-   apc_font_default( &font);
-   return font;
+   Font foo; return foo;
 }
 
 Font
 Application_get_message_font( char * dummy)
 {
-   Font font;
-   apc_sys_get_msg_font( &font);
-   return font;
+   Font foo; return foo;
 }
 
 Font
 Application_get_caption_font( char * dummy)
 {
-   Font font;
-   apc_sys_get_caption_font( &font);
-   return font;
+   Font foo; return foo;
 }
 
 
@@ -325,7 +319,7 @@ Application_set_hint_font( Handle self, Font hintFont)
 Font
 Application_get_hint_font( Handle self)
 {
-   return CWidget( var->  hintWidget)-> get_font( var->  hintWidget);
+   Font foo; return foo;
 }
 
 Bool
