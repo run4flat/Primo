@@ -101,30 +101,6 @@ IconHandle
 Icon_split( Handle self)
 {
    IconHandle ret = {0,0};
-   PImage i;
-   HV * profile = newHV();
-   char* className = var-> self-> className;
-
-   pset_H( owner,        var-> owner);
-   pset_i( width,        var-> w);
-   pset_i( height,       var-> h);
-   pset_i( type,         imMono|imGrayScale);
-   pset_i( conversion,   var->conversion);
-   pset_i( hScaling,     is_opt( optHScaling));
-   pset_i( vScaling,     is_opt( optVScaling));
-   pset_i( preserveType, is_opt( optPreserveType));
-
-   ret. andMask = Object_create( "Prima::Image", profile);
-   sv_free(( SV *) profile);
-   i = ( PImage) ret. andMask;
-   memcpy( i-> data, var-> mask, var-> maskSize);
-   i-> self-> update_change(( Handle) i);
-
-   var-> self-> className = inherited className;
-   ret. xorMask         = inherited dup( self);
-   var-> self-> className = className;
-
-   --SvREFCNT( SvRV( i-> mate));
    return ret;
 }
 
