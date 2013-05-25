@@ -165,39 +165,13 @@ Application_get_default_cursor_width( char * dummy)
 Point
 Application_get_default_scrollbar_metrics( char * dummy)
 {
-   Point ret;
-   ret. x = apc_sys_get_value( svXScrollbar);
-   ret. y = apc_sys_get_value( svYScrollbar);
-   return ret;
+   Point foo; return foo;
 }
 
 Point
 Application_get_default_window_borders( char * dummy, int borderStyle)
 {
-   Point ret = { 0,0};
-   switch ( borderStyle) {
-   case bsNone:
-      ret.x = svXbsNone;
-      ret.y = svYbsNone;
-      break;
-   case bsSizeable:
-      ret.x = svXbsSizeable;
-      ret.y = svYbsSizeable;
-      break;
-   case bsSingle:
-      ret.x = svXbsSingle;
-      ret.y = svYbsSingle;
-      break;
-   case bsDialog:
-      ret.x = svXbsDialog;
-      ret.y = svYbsDialog;
-      break;
-   default:
-      return ret;
-   }
-   ret. x = apc_sys_get_value( ret. x);
-   ret. y = apc_sys_get_value( ret. y);
-   return ret;
+   Point foo; return foo;
 }
 
 int
@@ -307,10 +281,7 @@ Application_get_parent( Handle self)
 Point
 Application_get_scroll_rate( Handle self)
 {
-   Point ret;
-   ret. x = apc_sys_get_value( svAutoScrollFirst);
-   ret. y = apc_sys_get_value( svAutoScrollNext);
-   return ret;
+   Point foo; return foo;
 }
 
 static void hshow( Handle self)
@@ -416,15 +387,13 @@ Application_pointerVisible( Handle self, Bool set, Bool pointerVisible)
 Point
 Application_size( Handle self, Bool set, Point size)
 {
-   if ( set) return size;
-   return apc_application_get_size( self);
+   Point foo; return foo;
 }
 
 Point
 Application_origin( Handle self, Bool set, Point origin)
 {
-   Point p = { 0, 0};
-   return p;
+   Point foo; return foo;
 }
 
 Bool

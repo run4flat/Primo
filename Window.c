@@ -249,28 +249,19 @@ Window_borderStyle( Handle self, Bool set, int borderStyle)
 Point
 Window_frameOrigin( Handle self, Bool set, Point frameOrigin)
 {
-   if ( !set)
-      return apc_widget_get_pos( self);
-   apc_widget_set_pos( self, frameOrigin.x, frameOrigin.y);
-   return frameOrigin;
+   Point foo; return foo;
 }
 
 Point
 Window_frameSize( Handle self, Bool set, Point frameSize)
 {
-   if ( !set)
-      return apc_widget_get_size( self);
-   apc_widget_set_size( self, frameSize.x, frameSize.y);
-   return frameSize;
+   Point foo; return foo;
 }
 
 Point
 Window_origin( Handle self, Bool set, Point origin)
 {
-   if ( !set)
-      return apc_window_get_client_pos( self);
-   apc_window_set_client_pos( self, origin.x, origin.y);
-   return origin;
+   Point foo; return foo;
 }
 
 Rect
@@ -291,10 +282,7 @@ Window_selected( Handle self, Bool set, Bool selected)
 Point
 Window_size( Handle self, Bool set, Point size)
 {
-   if ( !set)
-      return apc_window_get_client_size( self);
-   apc_window_set_client_size( self, size.x, size.y);
-   return size;
+   Point foo; return foo;
 }
 
 Bool

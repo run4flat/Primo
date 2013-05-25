@@ -571,7 +571,7 @@ Widget_get_parent( Handle self)
 Point
 Widget_get_pointer_size( char*dummy)
 {
-   return apc_pointer_get_size( nilHandle);
+   Point foo; return foo;
 }
 
 Font
@@ -589,7 +589,7 @@ Widget_get_selectee( Handle self)
 Point
 Widget_get_virtual_size( Handle self)
 {
-   return var-> virtualSize;
+   Point foo; return foo;
 }
 
 /* set_props() */
@@ -821,19 +821,13 @@ Widget_currentWidget( Handle self, Bool set, Handle widget)
 Point
 Widget_cursorPos( Handle self, Bool set, Point cursorPos)
 {
-   if ( !set)
-      return apc_cursor_get_pos( self);
-   apc_cursor_set_pos( self, cursorPos. x, cursorPos. y);
-   return cursorPos;
+   Point foo; return foo;
 }
 
 Point
 Widget_cursorSize( Handle self, Bool set, Point cursorSize)
 {
-   if ( !set)
-      return apc_cursor_get_size( self);
-   apc_cursor_set_size( self, cursorSize. x, cursorSize. y);
-   return cursorSize;
+   Point foo; return foo;
 }
 
 Bool
@@ -887,10 +881,7 @@ Widget_left( Handle self, Bool set, int left)
 Point
 Widget_origin( Handle self, Bool set, Point origin)
 {
-   if ( !set)
-      return apc_widget_get_pos( self);
-   apc_widget_set_pos( self, origin.x, origin.y);
-   return origin;
+   Point foo; return foo;
 }
 
 Bool
@@ -944,15 +935,7 @@ Widget_pointerIcon( Handle self, Bool set, Handle icon)
 Point
 Widget_pointerHotSpot( Handle self, Bool set, Point hotSpot)
 {
-   enter_method;
-   Handle icon;
-   if ( !set)
-      return apc_pointer_get_hot_spot( self);
-   if ( var-> stage > csFrozen) return hotSpot;
-   icon = my-> get_pointerIcon( self);
-   apc_pointer_set_user( self, icon, hotSpot);
-   if ( var-> pointerType == crUser) my-> first_that( self, (void*)sptr, nil);
-   return hotSpot;
+   Point foo; return foo;
 }
 
 int
@@ -971,14 +954,7 @@ Widget_pointerType( Handle self, Bool set, int type)
 Point
 Widget_pointerPos( Handle self, Bool set, Point p)
 {
-   if ( !set) {
-      p = apc_pointer_get_pos( self);
-      apc_widget_map_points( self, false, 1, &p);
-      return p;
-   }
-   apc_widget_map_points( self, true, 1, &p);
-   apc_pointer_set_pos( self, p. x, p. y);
-   return p;
+   Point foo; return foo;
 }
 
 Handle
@@ -1077,10 +1053,7 @@ Widget_showHint( Handle self, Bool set, Bool showHint )
 Point
 Widget_size( Handle self, Bool set, Point size)
 {
-   if ( !set)
-      return apc_widget_get_size( self);
-   apc_widget_set_size( self, size.x, size.y);
-   return size;
+   Point foo; return foo;
 }
 
 Bool

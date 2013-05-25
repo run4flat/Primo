@@ -115,21 +115,13 @@ Image_vScaling( Handle self, Bool set, Bool scaling)
 Point
 Image_resolution( Handle self, Bool set, Point resolution)
 {
-   if ( !set)
-      return var-> resolution;
-   if ( resolution. x <= 0 || resolution. y <= 0)
-      resolution = apc_gp_get_resolution( application);
-   var-> resolution = resolution;
-   return resolution;
+   Point foo; return foo;
 }
 
 Point
 Image_size( Handle self, Bool set, Point size)
 {
-   if ( !set)
-      return inherited size( self, set, size);
-   CImage( self)-> stretch( self, size.x, size.y);
-   return size;
+   Point foo; return foo;
 }
 
 SV *

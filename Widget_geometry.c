@@ -124,15 +124,7 @@ Widget_geometry( Handle self, Bool set, int geometry)
 Point
 Widget_geomSize( Handle self, Bool set, Point geomSize)
 {
-   if ( !set)
-      return var-> geomSize;
-      /* return ( var-> geometry == gtDefault) ? my-> get_size(self) : var-> geomSize; */
-   var-> geomSize = geomSize;
-   if ( var-> geometry == gtDefault) 
-      my-> set_size( self, var-> geomSize);
-   else
-      geometry_reset_all();
-   return var-> geomSize;
+   Point foo; return foo;
 }
 
 int
@@ -177,41 +169,13 @@ Widget_check_in( Handle self, Handle in, Bool barf)
 Point
 Widget_sizeMin( Handle self, Bool set, Point min)
 {
-   if ( !set)
-      return var-> sizeMin;
-   var-> sizeMin = min;
-   if ( var-> stage <= csFrozen) {
-      Point sizeActual  = my-> get_size( self);
-      Point newSize     = sizeActual;
-      if ( sizeActual. x < min. x) newSize. x = min. x;
-      if ( sizeActual. y < min. y) newSize. y = min. y;
-      if (( newSize. x != sizeActual. x) || ( newSize. y != sizeActual. y))
-         my-> set_size( self, newSize);
-      if ( var-> geometry != gtDefault)
-         geometry_reset_all();
-   }
-   apc_widget_set_size_bounds( self, var-> sizeMin, var-> sizeMax);
-   return min;
+   Point foo; return foo;
 }
 
 Point
 Widget_sizeMax( Handle self, Bool set, Point max)
 {
-   if ( !set)
-      return var-> sizeMax;
-   var-> sizeMax = max;
-   if ( var-> stage <= csFrozen) {
-      Point sizeActual  = my-> get_size( self);
-      Point newSize     = sizeActual;
-      if ( sizeActual. x > max. x) newSize. x = max. x;
-      if ( sizeActual. y > max. y) newSize. y = max. y;
-      if (( newSize. x != sizeActual. x) || ( newSize. y !=  sizeActual. y))
-          my-> set_size( self, newSize);
-      if ( var-> geometry != gtDefault)
-         geometry_reset_all();
-   }
-   apc_widget_set_size_bounds( self, var-> sizeMin, var-> sizeMax);
-   return max;
+   Point foo; return foo;
 }
 
 

@@ -197,7 +197,7 @@ Drawable_get_nearest_color( Handle self, Color color)
 Point
 Drawable_resolution( Handle self, Bool set, Point resolution)
 {
-   return resolution;
+   Point foo; return foo;
 }
 
 SV *
@@ -234,7 +234,7 @@ Drawable_height( Handle self, Bool set, int height)
 Point
 Drawable_size ( Handle self, Bool set, Point size)
 {
-   return size;
+   Point foo; return foo;
 }
 
 int
@@ -258,8 +258,7 @@ Drawable_text_out( Handle self, SV * text, int x, int y)
 Point *
 Drawable_polypoints( SV * points, char * procName, int mod, int * n_points)
 {
-   Point * p;
-   return p;
+   Point * foo; return foo;
 }
 
 static Bool
@@ -496,7 +495,7 @@ Drawable_textOutBaseline( Handle self, Bool set, Bool textOutBaseline)
 Point
 Drawable_translate( Handle self, Bool set, Point translate)
 {
-   return translate;
+   Point foo; return foo;
 }
 
 SV *
