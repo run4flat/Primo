@@ -34,67 +34,6 @@
 #include "Icon.h"
 #include "DeviceBitmap.h"
 
-#define REVERT(a)	( XX-> size. y - (a) - 1 )
-#define SHIFT(a,b)	{ (a) += XX-> gtransform. x + XX-> btransform. x; \
-                           (b) += XX-> gtransform. y + XX-> btransform. y; }
-/* Multiple evaluation macro! */
-#define REVERSE_BYTES_32(x) ((((x)&0xff)<<24) | (((x)&0xff00)<<8) | (((x)&0xff0000)>>8) | (((x)&0xff000000)>>24))
-#define REVERSE_BYTES_16(x) ((((x)&0xff)<<8 ) | (((x)&0xff00)>>8))
-
-#define ByteBits                8
-#define ByteMask                0xff
-#define ByteValues              256
-#define LOWER_BYTE(x)           ((x)&ByteMask)
-#define ColorComponentMask      ByteMask
-#define LSNibble                0x0f
-#define LSNibbleShift           0
-#define MSNibble                0xf0
-#define MSNibbleShift           4
-#define NPalEntries4            16
-#define NPalEntries8            256
-
-typedef U8 Pixel8;
-typedef unsigned long XPixel;
-
-typedef uint16_t Pixel16;
-
-typedef struct
-{
-   Pixel16 a;
-   Pixel16 b;
-} Duplet16;
-
-typedef struct
-{
-   ColorComponent a0, a1, a2;
-} Pixel24;
-
-typedef struct
-{
-   ColorComponent a0, a1, a2;
-   ColorComponent b0, b1, b2;
-} Duplet24;
-
-typedef uint32_t Pixel32;
-
-typedef struct
-{
-   Pixel32 a;
-   Pixel32 b;
-} Duplet32;
-
-
-#define get_ximage_data(xim)            ((xim)->data_alias)
-#define get_ximage_bytes_per_line(xim)  ((xim)->bytes_per_line_alias)
-
-#ifdef USE_MITSHM
-static int
-shm_ignore_errors(Display *d, XErrorEvent *ev)
-{
-   int foo; return foo;
-}
-#endif
-
 PrimaXImage*
 prima_prepare_ximage( int width, int height, Bool bitmap)
 {
@@ -108,18 +47,6 @@ prima_XDestroyImage( XImage * i)
 
 Bool
 prima_free_ximage( PrimaXImage *i) 
-{
-   Bool foo; return foo;
-}
-
-static Bool
-destroy_ximage( PrimaXImage *i)
-{
-   Bool foo; return foo;
-}
-
-static Bool
-destroy_one_ximage( PrimaXImage *i, int nothing1, void *nothing2, void *nothing3)
 {
    Bool foo; return foo;
 }
@@ -147,11 +74,6 @@ Bool
 apc_image_create( Handle self)
 {
    Bool foo; return foo;
-}
-
-static void
-clear_caches( Handle self)
-{
 }
 
 Bool
@@ -202,12 +124,6 @@ apc_dbm_get_handle( Handle self)
    return nilHandle;
 }
 
-static Byte*
-mirror_bits( void)
-{
-   Byte* foo; return foo;
-}
-
 void
 prima_copy_xybitmap( unsigned char *data, const unsigned char *idata, int w, int h, int ls, int ils)
 {
@@ -218,138 +134,19 @@ prima_mirror_bytes( unsigned char *data, int dataSize)
 {
 }
 
-static Bool
-create_cache1_1( Image *img, ImageCache *cache, Bool for_icon)
-{
-   Bool foo; return foo;
-}
-
-static void
-create_rgb_to_8_lut( int ncolors, const PRGBColor pal, Pixel8 *lut)
-{
-}
-
-static void
-create_rgb_to_16_lut( int ncolors, const PRGBColor pal, Pixel16 *lut)
-{
-}
-
-static int *
-rank_rgb_shifts( void)
-{
-   int * foo; return foo;
-}
-
-static void
-create_rgb_to_xpixel_lut( int ncolors, const PRGBColor pal, XPixel *lut)
-{
-}
-
-static Bool
-create_cache4_8( Image *img, ImageCache *cache)
-{
-   Bool foo; return foo;
-}
 
 
-static Bool
-create_cache4_16( Image *img, ImageCache *cache)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-create_cache4_24( Image *img, ImageCache *cache)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-create_cache4_32( Image *img, ImageCache *cache)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-create_cache_equal( Image *img, ImageCache *cache)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-create_cache8_8_tc( Image *img, ImageCache *cache)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-create_cache8_16( Image *img, ImageCache *cache)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-create_cache8_24( Image *img, ImageCache *cache)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-create_cache8_32( Image *img, ImageCache *cache)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-create_cache24_16( Image *img, ImageCache *cache)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-create_cache24_32( Image *img, ImageCache *cache)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-create_cache1( Image* img, ImageCache *cache, int bpp)
-{
-   Bool foo; return foo;
-}
 
-static Bool
-create_cache4( Image* img, ImageCache *cache, int bpp)
-{
-   Bool foo; return foo;
-}
-
-static Bool
-create_cache8( Image* img, ImageCache *cache, int bpp)
-{
-   Bool foo; return foo;
-}
-
-static Bool
-create_cache24( Image* img, ImageCache *cache, int bpp)
-{
-   Bool foo; return foo;
-}
-
-static void
-cache_remap_8( Image*img, ImageCache* cache)
-{
-}
-
-static void
-cache_remap_4( Image*img, ImageCache* cache)
-{
-}
-
-static void
-cache_remap_1( Image*img, ImageCache* cache)
-{
-}
 
 
 ImageCache*
@@ -364,11 +161,6 @@ prima_create_icon_pixmaps( Handle self, Pixmap *xor, Pixmap *and)
    Bool foo; return foo;
 }
 
-static Bool
-put_pixmap( Handle self, Handle pixmap, int dst_x, int dst_y, int src_x, int src_y, int w, int h, int rop)
-{
-   Bool foo; return foo;
-}
 
 Bool
 apc_gp_put_image( Handle self, Handle image, int x, int y, int xFrom, int yFrom, int xLen, int yLen, int rop)
@@ -382,20 +174,8 @@ apc_image_begin_paint( Handle self)
    Bool foo; return foo;
 }
 
-static void
-convert_16_to_24( XImage *i, PImage img)
-{
-}
 
-static void
-convert_32_to_24( XImage *i, PImage img)
-{
-}
 
-static void
-convert_equal_paletted( XImage *i, PImage img)
-{
-}
 
 Bool
 prima_query_image( Handle self, XImage * i)
