@@ -56,29 +56,13 @@ log_write( const char *format, ...)
 static XrmQuark
 get_class_quark( const char *name)
 {
-   XrmQuark quark;
-   char *s, *t;
-
-   t = s = prima_normalize_resource_string( duplicate_string( name), true);
-   if ( t && *t == 'P' && strncmp( t, "Prima__", 7) == 0)
-      s = t + 7;
-   if ( s && *s == 'A' && strcmp( s, "Application") == 0)
-      strcpy( s, "Prima"); /* we have enough space */
-   quark = XrmStringToQuark( s);
-   free( t);
-   return quark;
+   XrmQuark foo; return foo;
 }
 
 static XrmQuark
 get_instance_quark( const char *name)
 {
-   XrmQuark quark;
-   char *s;
-
-   s = duplicate_string( name);
-   quark = XrmStringToQuark( prima_normalize_resource_string( s, false));
-   free( s);
-   return quark;
+   XrmQuark foo; return foo;
 }
 
 static Bool
