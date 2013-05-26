@@ -36,6 +36,8 @@
 #include <dirent.h>
 #include "guts.h"
 #include "Object.h"
+
+/* XXX Make Hummingbird create its own BOOT section, etc */
 #include "Hummingbird.h"
 
 
@@ -60,7 +62,6 @@ CPerlObj* pPerl;
 static PHash vmtHash = nil;
 static List  staticObjects;
 static List  staticHashes;
-static int   prima_init_ok = 0;
 
 Handle application = nilHandle;
 long   apcError = 0;
@@ -521,42 +522,12 @@ sv_query_method( SV *sv, char *methodName, Bool cacheIt)
    return nil;
 }
 
-static void
-register_notifications( PVMT vmt)
-{
-   SV *package;
-   SV *nt_sub;
-   SV *nt_ref;
-   HV *nt;
-   PVMT v = vmt;
-   HE *he;
-   char buf[ 1024];
-
-   //while (( v != nil) && ( v != (PVMT) CComponent)) v = v-> base;
-   if (!v) return;
-   package = newSVpv( vmt-> className, 0);
-   if ( !package) croak( "GUTS016: Not enough memory");
-   nt_sub = ( SV*) sv_query_method( package, "notification_types", 0);
-   if ( !nt_sub) croak( "GUTS016: Invalid package %s", vmt-> className);
-   nt_ref = cv_call_perl( package, nt_sub, "<");
-   if ( !nt_ref || !SvROK(nt_ref) || SvTYPE(SvRV(nt_ref)) != SVt_PVHV)
-      croak( "GUTS016: %s: Bad notification_types() return value", vmt-> className);
-   nt = (HV*)SvRV(nt_ref);
-
-   hv_iterinit( nt);
-   while (( he = hv_iternext( nt)) != nil) {
-      snprintf( buf, 1024, "on%s", HeKEY( he));
-      if (sv_query_method( package, buf, 0)) continue;
-      snprintf( buf, 1024, "%s::on%s", vmt-> className, HeKEY( he));
-      //newXS( buf, Component_set_notification_FROMPERL, vmt-> className);
-   }
-   sv_free( package);
-}
-
+/* XXX This now does nothing, since there is no window subsystem. Should
+ * this be implemented apart from the window subsystem? */
 XS(Prima_options)
 {
    dXSARGS;
-   char * option, * value = nil;
+/*   char * option, * value = nil;
    (void)items;
 
    switch ( items) {
@@ -582,7 +553,7 @@ XS(Prima_options)
       croak("Invalid call to Prima::options");
    }
    SPAGAIN;
-   XSRETURN_EMPTY;
+*/   XSRETURN_EMPTY;
 }
 
 XS(Prima_init)
@@ -601,28 +572,16 @@ XS(Prima_init)
       sv_free( package);
       if ( !ref) croak("'use Prima;' call required in main script");
    }
-
-   if ( prima_init_ok == 0) {
-      /* Don't register notifications; Hummingbird is derived from Object,
-       * not Component. */
-      /* register_notifications((PVMT)CHummingbird); */
-      prima_init_ok++;
-   }
    
-   if ( prima_init_ok == 1) {
-//      prima_init_image_subsystem();
-      prima_init_ok++;
-   }
+   /* XXX This function is passed the current version. Should we check the
+    * version? I suppose that's handled by Dynaloader, so perhaps this
+    * function is pretty much useless... */
 
-   if ( prima_init_ok == 2) {
-//      if ( !window_subsystem_init( error_buf)) 
-//	 croak( "%s", error_buf);
-      prima_init_ok++;
-   }
    SPAGAIN;
    XSRETURN_EMPTY;
 }
 
+/* XXX still useful/necessary? */
 XS( Prima_message_FROMPERL)
 {
    dXSARGS;
@@ -668,7 +627,7 @@ build_dynamic_vmt( void *vvmmtt, const char *ancestorName, int ancestorVmtSize)
    to = (void **)((char *)vmt + sizeof(VMT));
    for ( i = 0; i < n; i++) if ( to[i] == nil) to[i] = from[i];
    build_static_vmt( vmt);
-   register_notifications( vmt);
+   /* XXX register_notifications( vmt); */
    return true;
 }
 
@@ -772,7 +731,7 @@ gimme_the_vmt( const char *className)
    hash_store( vmtHash, (char *)className, strlen( className), vmt);
    list_add( &staticObjects, (Handle) vmt);
    list_add( &staticObjects, (Handle) vmt-> className);
-   register_notifications( vmt);
+   /* XXX register_notifications( vmt); */
    return vmt;
 }
 
@@ -1205,21 +1164,17 @@ XS( prima_cleanup)
    hash_first_that( primaObjects, (void*)kill_objects, nil, nil, nil);
    hash_destroy( primaObjects, false);
    primaObjects = nil;
-//   if ( prima_init_ok > 1) prima_cleanup_image_subsystem();
-//   if ( prima_init_ok > 2) window_subsystem_cleanup();
    hash_destroy( vmtHash, false);
    vmtHash = nil;
    list_delete_all( &staticObjects, true);
    list_destroy( &staticObjects);
    list_destroy( &postDestroys);
    kill_zombies();
-//   if ( prima_init_ok > 2) window_subsystem_done();
    list_first_that( &staticHashes, (void*)kill_hashes, nil);
    list_destroy( &staticHashes);
 #ifdef PARANOID_MALLOC
    output_mallocs();
 #endif
-   prima_init_ok = 0;
 
    ST(0) = &PL_sv_yes;
    XSRETURN(1);
