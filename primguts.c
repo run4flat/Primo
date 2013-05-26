@@ -836,8 +836,8 @@ call_perl_indirect( Handle self, char *subName, const char *format, Bool c_decl,
    int _int;
    char * _string;
    double _number;
-   Point _Point;
-   Rect _Rect;
+   /*Point _Point;
+   Rect _Rect;*/
    SV * _SV;
    Bool returns = false;
    SV *toReturn = nil;
@@ -874,12 +874,13 @@ call_perl_indirect( Handle self, char *subName, const char *format, Bool c_decl,
       case 'S':
          stackExtend++;
          break;
-      case 'P':
+/* XXX These need to become runtime things, not hard-coded */
+/*      case 'P':
          stackExtend += 2;
          break;
       case 'R':
          stackExtend += 4;
-         break;
+         break;*/
       default:
          croak( "GUTS004: Illegal parameter description (%c) in call to %s()",
                     format[ i], ( coderef) ? "code reference" : subName);
@@ -916,23 +917,23 @@ call_perl_indirect( Handle self, char *subName, const char *format, Bool c_decl,
             _SV = va_arg( params, SV *);
             PUSHs( sv_2mortal( newSVsv( _SV)));
             break;
-         case 'P':
+/*         case 'P':
             _Point = va_arg( params, Point);
             PUSHs( sv_2mortal( newSViv( _Point. x)));
             PUSHs( sv_2mortal( newSViv( _Point. y)));
             break;
-         case 'H':
+*/         case 'H':
             _Handle = va_arg( params, Handle);
             PUSHs( _Handle ? (( PAnyObject) _Handle)-> mate : nilSV);
             break;
-         case 'R':
+/*         case 'R':
             _Rect = va_arg( params, Rect);
             PUSHs( sv_2mortal( newSViv( _Rect. left)));
             PUSHs( sv_2mortal( newSViv( _Rect. bottom)));
             PUSHs( sv_2mortal( newSViv( _Rect. right)));
             PUSHs( sv_2mortal( newSViv( _Rect. top)));
             break;
-         }
+*/         }
          i++;
       }
 
@@ -1155,12 +1156,13 @@ kill_objects( void * item, int keyLen, Handle * self, void * dummy)
    return false;
 }
 
+/* XXX Not used in minimal class; can this be replaced with croak? */
 void
 perl_error(void)
 {
-    char * error = apc_last_error();
+/*    char * error; = apc_last_error();
     if ( error == NULL) error = "unknown system error";
-    sv_setpv( GvSV( PL_errgv), error);
+    sv_setpv( GvSV( PL_errgv), error);*/
 }
 
 Bool appDead = false;
@@ -1226,7 +1228,8 @@ XS( prima_cleanup)
 static void
 register_constants( void)
 {
-   register_nt_constants();
+/* XXX Accomplish this in the Boot section of each package, not here */
+/*   register_nt_constants();
    register_kb_constants();
    register_km_constants();
    register_mb_constants();
@@ -1263,6 +1266,7 @@ register_constants( void)
    register_fr_constants();
    register_mt_constants();
    register_gt_constants();
+*/
 }
 
 XS( Object_alive_FROMPERL);
@@ -1460,6 +1464,7 @@ create_object( const char *objClass, const char *types, ...)
    return (void*)res;
 }
 
+/* XXX */
 Handle
 apc_get_application(void)
 {
@@ -1471,26 +1476,6 @@ apc_get_core_version()
 {
     return PRIMA_CORE_VERSION;
 }
-
-FillPattern fillPatterns[] = {
-  {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-  {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
-  {0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00, 0xFF, 0xFF},
-  {0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01},
-  {0x70, 0x38, 0x1C, 0x0E, 0x07, 0x83, 0xC1, 0xE0},
-  {0xE1, 0xC3, 0x87, 0x0F, 0x1E, 0x3C, 0x78, 0xF0},
-  {0x4B, 0x96, 0x2D, 0x5A, 0xB4, 0x69, 0xD2, 0xA5},
-  {0x88, 0x88, 0x88, 0xFF, 0x88, 0x88, 0x88, 0xFF},
-  {0x18, 0x24, 0x42, 0x81, 0x18, 0x24, 0x42, 0x81},
-  {0x33, 0xCC, 0x33, 0xCC, 0x33, 0xCC, 0x33, 0xCC},
-  {0x00, 0x08, 0x00, 0x80, 0x00, 0x08, 0x00, 0x80},
-  {0x00, 0x22, 0x00, 0x88, 0x00, 0x22, 0x00, 0x88},
-  {0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55},
-  {0xaa, 0xff, 0xaa, 0xff, 0xaa, 0xff, 0xaa, 0xff},
-  {0x51, 0x22, 0x15, 0x88, 0x45, 0x22, 0x54, 0x88},
-  {0x02, 0x27, 0x05, 0x00, 0x20, 0x72, 0x50, 0x00}
-};
-
 
 /* list section */
 

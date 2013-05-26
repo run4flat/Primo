@@ -10,12 +10,8 @@ primguts.c
 README
 test.pl
 Types.cls
-Utils.c
-Utils.cls
 include/apricot.h
 include/guts.h
-include/img.h
-include/img_conv.h
 include/unix/guts.h
 include/unix/queue.h
 pod/gencls.pod

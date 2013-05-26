@@ -61,20 +61,9 @@ extern SV *   eventHook;
 
 extern void build_static_vmt( void *vmt);
 extern void kill_zombies( void);
-extern void prima_init_image_subsystem( void);
-extern void prima_cleanup_image_subsystem( void);
 
 extern Handle  gimme_the_real_mate( SV *perlObject);
 
-/* kernel exports */
-extern XS( Component_set_notification_FROMPERL);
-
-extern PRGBColor read_palette( int * palSize, SV * palette);
-extern Bool prima_read_point( SV *rvav, int * pt, int number, char * error);
-extern Bool accel_notify ( Handle group, Handle self, PEvent event);
-extern Bool font_notify ( Handle self, Handle child, void * font);
-extern Bool find_accel( Handle self, Handle item, int * key);
-extern Bool single_color_notify ( Handle self, Handle child, void * color);
 extern Bool kill_all( Handle self, Handle child, void * dummy);
 
 #ifdef __cplusplus
