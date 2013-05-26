@@ -1,60 +1,16 @@
-/*-
- * Copyright (c) 1997-2002 The Protein Laboratory, University of Copenhagen
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- * $Id$
- */
-
-/***********************************************************/
-/*                                                         */
-/*  System dependent miscellaneous routines (unix, x11)    */
-/*                                                         */
-/***********************************************************/
-
 #include <apricot.h>
 #include <sys/stat.h>
 #include "unix/guts.h"
 #include "Application.h"
 #include "File.h"
 #include "Icon.h"
-#define XK_MISCELLANY
 #include <X11/keysymdef.h>
-
-/* Miscellaneous system-dependent functions */
-
-#define X_COLOR_TO_RGB(xc)     (ARGB(((xc).red>>8),((xc).green>>8),((xc).blue>>8)))
-#define RANGE(a)        { if ((a) < -16383) (a) = -16383; else if ((a) > 16383) a = 16383; }
-#define RANGE2(a,b)     RANGE(a) RANGE(b)
 
 Bool
 log_write( const char *format, ...)
 {
    Bool foo; return foo;
 }
-
-
-
 
 int
 unix_rm_get_int( Handle self, XrmQuark class_detail, XrmQuark name_detail, int default_value)
@@ -77,8 +33,6 @@ apc_lookup_color( const char * colorName)
    Color foo; return foo;
 }
 
-/* Component-related functions */
-
 Bool
 apc_component_create( Handle self)
 {
@@ -96,8 +50,6 @@ apc_component_fullname_changed_notify( Handle self)
 {
    Bool foo; return foo;
 }
-
-/* Cursor support */
 
 void
 prima_no_cursor( Handle self)
@@ -150,8 +102,6 @@ apc_cursor_get_visible( Handle self)
    Bool foo; return foo;
 }
 
-/* File */
-
 void
 prima_rebuild_watchers( void)
 {
@@ -187,8 +137,6 @@ apc_kbd_get_state( Handle self)
    int foo; return foo;
 }
 
-/* Messages */
-
 Bool
 prima_simple_message( Handle self, int cmd, Bool is_post)
 {
@@ -215,8 +163,6 @@ apc_show_message( const char * message, Bool utf8)
    Bool foo; return foo;
 }
 
-/* system metrics */
-
 Bool
 apc_sys_get_insert_mode( void)
 {
@@ -236,7 +182,7 @@ apc_sys_get_caption_font( PFont f)
 }
 
 int
-apc_sys_get_value( int v)  /* XXX one big XXX */
+apc_sys_get_value( int v)
 {
    int foo; return foo;
 }
@@ -246,8 +192,6 @@ apc_sys_set_insert_mode( Bool insMode)
 {
    Bool foo; return foo;
 }
-
-/* etc */
 
 Bool
 apc_beep( int style)
