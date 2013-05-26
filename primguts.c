@@ -36,21 +36,6 @@
 #include <dirent.h>
 #include "guts.h"
 #include "Object.h"
-#include "Component.h"
-#include "File.h"
-#include "Clipboard.h"
-#include "Drawable.h"
-#include "Widget.h"
-#include "Window.h"
-#include "Image.h"
-#include "Icon.h"
-#include "AbstractMenu.h"
-#include "AccelTable.h"
-#include "Menu.h"
-#include "Popup.h"
-#include "Application.h"
-#include "Timer.h"
-#include "Utils.h"
 #include "Hummingbird.h"
 
 
@@ -547,7 +532,7 @@ register_notifications( PVMT vmt)
    HE *he;
    char buf[ 1024];
 
-   while (( v != nil) && ( v != (PVMT) CComponent)) v = v-> base;
+   //while (( v != nil) && ( v != (PVMT) CComponent)) v = v-> base;
    if (!v) return;
    package = newSVpv( vmt-> className, 0);
    if ( !package) croak( "GUTS016: Not enough memory");
@@ -563,7 +548,7 @@ register_notifications( PVMT vmt)
       snprintf( buf, 1024, "on%s", HeKEY( he));
       if (sv_query_method( package, buf, 0)) continue;
       snprintf( buf, 1024, "%s::on%s", vmt-> className, HeKEY( he));
-      newXS( buf, Component_set_notification_FROMPERL, vmt-> className);
+      //newXS( buf, Component_set_notification_FROMPERL, vmt-> className);
    }
    sv_free( package);
 }
@@ -799,10 +784,10 @@ notify_perl( Handle self, char *methodName, const char *format, ...)
    char subName[ 256];
    va_list params;
 
-   snprintf( subName, 256, "%s_%s", (( PComponent) self)-> name, methodName);
+   //snprintf( subName, 256, "%s_%s", (( PComponent) self)-> name, methodName);
    va_start( params, format);
-   toReturn = call_perl_indirect((( PComponent) self)-> owner,
-                 subName, format, true, false, params);
+   //toReturn = call_perl_indirect((( PComponent) self)-> owner,
+   //              subName, format, true, false, params);
    va_end( params);
    return toReturn;
 }
@@ -1199,7 +1184,7 @@ static void output_mallocs( void);
 #define PRIMAPERL_endav endav
 #endif
 
-XS(Utils_getdir_FROMPERL);
+//XS(Utils_getdir_FROMPERL);
 
 static Bool 
 kill_hashes( PHash hash, void * dummy)
@@ -1281,7 +1266,7 @@ register_constants( void)
 }
 
 XS( Object_alive_FROMPERL);
-XS( Component_event_hook_FROMPERL);
+//XS( Component_event_hook_FROMPERL);
 
 XS( boot_Prima)
 {
@@ -1321,7 +1306,6 @@ XS( boot_Prima)
    newXS( "Prima::cleanup", prima_cleanup, "Prima");
    newXS( "Prima::init", Prima_init, "Prima");
    newXS( "Prima::options", Prima_options, "Prima");
-   newXS( "Prima::Utils::getdir", Utils_getdir_FROMPERL, "Prima::Utils");
    /* register built-in classes */
    newXS( "Prima::Object::create",  create_from_Perl, "Prima::Object");
    newXS( "Prima::Object::destroy", destroy_from_Perl, "Prima::Object");
