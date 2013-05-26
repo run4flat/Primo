@@ -39,7 +39,6 @@
 #include "Component.h"
 #include "File.h"
 #include "Clipboard.h"
-#include "DeviceBitmap.h"
 #include "Drawable.h"
 #include "Widget.h"
 #include "Window.h"
