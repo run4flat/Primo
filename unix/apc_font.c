@@ -1,54 +1,5 @@
-/*
- * Copyright (c) 1997-2002 The Protein Laboratory, University of Copenhagen
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- * $Id$
- */
-
-/***********************************************************/
-/*                                                         */
-/*  System dependent font routines (unix, x11)             */
-/*                                                         */
-/***********************************************************/
-
 #include "unix/guts.h"
 #include <locale.h>
-
-
-/* these are freed right after use */
-
-
-
-
-/* Extracts font name, charset, foundry etc from X properties, if available.
-   Usually it is when X server can access its internal font files directly.
-   This means two things:
-   - X properties values are not the same as XLFD, and are precise font descriptors
-   - alias fonts ( defined via fonts.alias ) don't have X properties
- */
-
-
 
 Bool
 prima_init_font_subsystem( char * error_buf)
@@ -113,11 +64,6 @@ prima_try_height( HeightGuessStack * p, int height)
 {
    int foo; return foo;
 }
-
-
-#define QUERYDIFF_BY_SIZE        (-1)
-#define QUERYDIFF_BY_HEIGHT      (-2)
-
 
 Bool
 prima_core_font_pick( Handle self, PFont source, PFont dest)

@@ -1,43 +1,7 @@
-/*-
- * Copyright (c) 1997-2002 The Protein Laboratory, University of Copenhagen
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- * $Id$
- */
-
 #include "unix/guts.h"
 #include "Application.h"
 #include "Clipboard.h"
 #include "Icon.h"
-
-#define WIN PComponent(application)-> handle
-
-#define CF_NAME(x)   (guts. clipboard_formats[(x)*3])
-#define CF_TYPE(x)   (guts. clipboard_formats[(x)*3+1])
-#define CF_FORMAT(x) (guts. clipboard_formats[(x)*3+2])
-#define CF_ASSIGN(i,a,b,c) CF_NAME(i)=(a);CF_TYPE(i)=(b);CF_FORMAT(i)=((Atom)c)
-#define CF_32        (sizeof(long)*8)        /* 32-bit properties are hacky */
 
 Bool
 prima_init_clipboard_subsystem(char * error_buf)
@@ -57,18 +21,6 @@ apc_clipboard_create( Handle self)
    Bool foo; return foo;
 }
 
-
-/*
-   each clipboard type can be represented by a set of 
-   X properties pairs, where each is X name and X type.
-   get_typename() returns such pairs by the index.
- */
-
-
-/*
-   Deletes a transfer record from pending xfer chain.
- */
-
 Bool
 apc_clipboard_destroy( Handle self)
 {
@@ -87,38 +39,11 @@ apc_clipboard_close( Handle self)
    Bool foo; return foo;
 }
 
-/*
-   Detaches data for pending transfers from XX, so eventual changes 
-   to XX->internal would not affect them. detach_xfers() should be
-   called before clipboard_kill_item(XX-> internal), otherwise
-   there's a chance of coredump.
- */
-
 Bool
 apc_clipboard_clear( Handle self)
 {
    Bool foo; return foo;
 }
-
-
-#define SELECTION_NOTIFY_MASK 1
-#define PROPERTY_NOTIFY_MASK  2
-
-
-#define CFDATA_NONE            0
-#define CFDATA_NOT_ACQUIRED  (-1)
-#define CFDATA_ERROR         (-2)
-
-#define RPS_OK       0
-#define RPS_PARTIAL  1
-#define RPS_NODATA   2
-#define RPS_ERROR    3
-
-
-
-
-
-
 
 Bool
 apc_clipboard_has_format( Handle self, Handle id)
