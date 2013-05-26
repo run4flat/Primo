@@ -147,7 +147,7 @@ object Prima::Widget( Prima::Drawable)
    method   void     done();
    method   void     end_paint();
    method   void     end_paint_info();
-   method   Bool     exposed()                       => apc_widget_is_exposed;
+#   method   Bool     exposed()                       => apc_widget_is_exposed;
    static   SV      *fetch_resource( char *className, char *name, char *classRes, char *res, Handle owner, int resType = frString);
    method   Handle   first();
    c_only   Handle   first_that( void * actionProc, void * params);
@@ -162,7 +162,7 @@ object Prima::Widget( Prima::Drawable)
    method   void     key_event( int command, int code, int key = kbNoKey, int mod = 0, int repeat = 1, Bool post = 0);
    method   Handle   last();
    method   Bool     lock();
-   method   Color    map_color( Color color) => apc_widget_map_color;
+#   method   Color    map_color( Color color) => apc_widget_map_color;
    method   void     mouse_event( int command = cmMouseDown, int button = mbLeft, int mod = 0, int x = 0, int y = 0, Bool dblclk = 0, Bool post = 0);
    method   Handle   next();
    method   Handle   next_tab( Bool forward = true);
@@ -173,7 +173,7 @@ object Prima::Widget( Prima::Drawable)
    import   SV *     profile_default ();
    method   Handle   prev();
    method   void     repaint();
-   method   Bool     responsive()                    => apc_widget_is_responsive;
+#   method   Bool     responsive()                    => apc_widget_is_responsive;
    public   void     screen_to_client();
    public   void     scroll( int dx, int dy, Rect *confine, Rect *clip, Bool withChildren);
    method   void     send_to_back();
@@ -181,21 +181,21 @@ object Prima::Widget( Prima::Drawable)
    method   void     setup();
    method   void     show();
    method   void     show_cursor();
-   method   Bool     showing()                       => apc_widget_is_showing;
+#   method   Bool     showing()                       => apc_widget_is_showing;
    method   Bool     unlock();
    method   void     update_view();
    c_only   void     update_sys_handle( HV * profile);
    c_only   Bool     validate_owner( Handle * newOwner, HV * profile);
-   method   Bool     validate_rect( Rect rect)       => apc_widget_validate_rect;
+#   method   Bool     validate_rect( Rect rect)       => apc_widget_validate_rect;
 
 # properties read methods
-   method   Bool     get_capture()                   => apc_widget_is_captured;
+#   method   Bool     get_capture()                   => apc_widget_is_captured;
    static   Font     get_default_font( char * dummy = "");
    static   Font     get_default_popup_font( char * dummy = "");
-   method   Rect     get_invalid_rect()              => apc_widget_get_invalid_rect;
+#   method   Rect     get_invalid_rect()              => apc_widget_get_invalid_rect;
    method   SV   *   get_handle();
    method   Bool     get_locked();
-   method   int      get_mouse_state()               => apc_pointer_get_state;
+#   method   int      get_mouse_state()               => apc_pointer_get_state;
    public   void     get_pack_slaves();
    method   Handle   get_parent();
    method   SV   *   get_parent_handle();
@@ -203,7 +203,7 @@ object Prima::Widget( Prima::Drawable)
    static   Point    get_pointer_size( char * dummy = "");
    method   Font     get_popup_font();
    c_only   Handle   get_selectee();
-   method   int      get_shift_state()               => apc_kbd_get_state;
+#   method   int      get_shift_state()               => apc_kbd_get_state;
    method   Point    get_virtual_size();
    public   void     get_widgets();
 

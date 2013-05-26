@@ -88,23 +88,23 @@ object Prima::Drawable ( Prima::Component)
    static SV *  render_spline( SV * obj, SV * points, int precision = -1);
 
    # operators
-   method Bool  arc( int x, int y, int dX, int dY, double startAngle, double endAngle) => apc_gp_arc;
-   method Bool  bar(int x1, int y1, int x2, int y2)        => apc_gp_bar;
-   method Bool  chord( int x, int y, int dX, int dY, double startAngle, double endAngle) => apc_gp_chord;
-   method Bool  clear(int x1=-1, int y1=-1, int x2=-1, int y2=-1)        => apc_gp_clear;
-   method Bool  ellipse(int x, int y, int dX, int dY)      => apc_gp_ellipse;
-   method Bool  fill_chord( int x, int y, int dX, int dY, double startAngle, double endAngle) => apc_gp_fill_chord;
-   method Bool  fill_ellipse(int x, int y, int dX, int dY) => apc_gp_fill_ellipse;
+#   method Bool  arc( int x, int y, int dX, int dY, double startAngle, double endAngle) => apc_gp_arc;
+#   method Bool  bar(int x1, int y1, int x2, int y2)        => apc_gp_bar;
+#   method Bool  chord( int x, int y, int dX, int dY, double startAngle, double endAngle) => apc_gp_chord;
+#   method Bool  clear(int x1=-1, int y1=-1, int x2=-1, int y2=-1)        => apc_gp_clear;
+#   method Bool  ellipse(int x, int y, int dX, int dY)      => apc_gp_ellipse;
+#   method Bool  fill_chord( int x, int y, int dX, int dY, double startAngle, double endAngle) => apc_gp_fill_chord;
+#   method Bool  fill_ellipse(int x, int y, int dX, int dY) => apc_gp_fill_ellipse;
    method Bool  fillpoly( SV * points);
-   method Bool  fill_sector( int x, int y, int dX, int dY, double startAngle, double endAngle) => apc_gp_fill_sector;
+#   method Bool  fill_sector( int x, int y, int dX, int dY, double startAngle, double endAngle) => apc_gp_fill_sector;
    method Bool  fill_spline( SV * points);
-   method Bool  flood_fill( int x, int y, Color color, Bool singleBorder = 1) => apc_gp_flood_fill;
-   method Bool  line(int x1, int y1, int x2, int y2)       => apc_gp_line;
+#   method Bool  flood_fill( int x, int y, Color color, Bool singleBorder = 1) => apc_gp_flood_fill;
+#   method Bool  line(int x1, int y1, int x2, int y2)       => apc_gp_line;
    method Bool  lines( SV * points);
    method Bool  polyline( SV * points);
    method Bool  put_image_indirect( Handle image, int x, int y, int xFrom, int yFrom, int xDestLen, int yDestLen, int xLen, int yLen, int rop);
-   method Bool  rectangle(int x1, int y1, int x2, int y2)  => apc_gp_rectangle;
-   method Bool  sector( int x, int y, int dX, int dY, double startAngle, double endAngle) => apc_gp_sector;
+#   method Bool  rectangle(int x1, int y1, int x2, int y2)  => apc_gp_rectangle;
+#   method Bool  sector( int x, int y, int dX, int dY, double startAngle, double endAngle) => apc_gp_sector;
    method Bool  spline( SV * points);
    method Bool  text_out( SV * text, int x, int y);
    method SV*   text_wrap( SV * text, int width, int options = twDefault, int tabIndent = 8);

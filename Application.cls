@@ -87,17 +87,17 @@ object Prima::Application( Prima::Widget)
    method Handle get_focused_widget();
    method Handle get_widget_from_handle( SV * handle);
    method Handle get_hint_widget();
-   method Rect   get_indents() => apc_application_get_indents;
+#   method Rect   get_indents() => apc_application_get_indents;
    static Font   get_message_font( char * dummy = "");
    method Handle get_modal_window( int modalFlag = mtExclusive, Bool topMost = true);
    method Point  get_scroll_rate();
    static SV *   get_system_info( char * dummy = "");
    static int    get_system_value( char * dummy = "", int sysValue = 0);
-   method Bool   go( void)   => apc_application_go;
+#   method Bool   go( void)   => apc_application_go;
    c_only void   handle_event ( PEvent event);
    method void   hide();
    method void   init( HV * profile);
-   method Bool   lock()                        => apc_application_lock;
+#   method Bool   lock()                        => apc_application_lock;
    method void   insert_behind( Handle widget);
    method Handle next();
    import SV *   notification_types();
@@ -108,7 +108,7 @@ object Prima::Application( Prima::Widget)
    method void   show();
    static void   sync( char *dummy = "");
    static SV*    sys_action( char * dymmy = "", char * params = "");
-   method Bool   unlock()                      => apc_application_unlock;
+#   method Bool   unlock()                      => apc_application_unlock;
    c_only void   update_sys_handle( HV * profile);
    c_only Bool   validate_owner( Handle * newOwner, HV * profile);
    static void   yield( char *dummy = "");
@@ -117,7 +117,7 @@ object Prima::Application( Prima::Widget)
    method Font   get_hint_font();
    method Handle get_image( int x, int y, int xLen, int yLen);
    method Handle get_parent();
-   method Handle get_widget_from_point( Point p) => apc_application_get_widget_from_point;
+#   method Handle get_widget_from_point( Point p) => apc_application_get_widget_from_point;
 
    method void   set( HV * profile);
    method void   set_capture( Bool capture, Handle confineTo);
