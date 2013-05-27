@@ -199,6 +199,8 @@ reallocf(void *ptr, size_t size)
  * It is stupid, but Borland C/C++ 5.02 doesn't have snprintf/vsnprintf in its
  * RTL.
  */
+
+/* XXX consider my_snprintf from perlapi */
 int
 vsnprintf( char *buf, size_t len, const char *format, va_list args)
 {
@@ -735,7 +737,8 @@ gimme_the_vmt( const char *className)
    return vmt;
 }
 
-
+/* XXX this does not appear to ever be used. It uses Components, so it
+ * should be removed. */
 SV *
 notify_perl( Handle self, char *methodName, const char *format, ...)
 {
